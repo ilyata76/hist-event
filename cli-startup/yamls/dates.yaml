@@ -1,12 +1,16 @@
 dates:
   - id: 1
-    name: aboba name
-    description: DESCRIPTION 
+    name: "31.08.2023 20:27:11111"
+    description: "Описание для ?внутренних целей?"
   - id : 2
-    name : aboba 2 name
-    description: DESCRIPTION 2\
-      MNHO GOASD
-        DASGKLSDAGKLSDAG
-              SDALGK
+    name : "23.08.2023"
+    description: "Многострочное
+                  описание события
+                  2"
   - id : 3
-    name : aboba 2 name
+    name : "\"Дата августовского путча\""
+  - id : 4
+    name : "18 ноября 2024"
+  - id : 5
+    name : "23 июня 2023"
+    description: "Описание события 5"

@@ -17,3 +17,20 @@ class ParseResult :
     number = "number"
     name = "name"
 
+
+class ParseKeywords :
+    """
+        Класс для определения ключевых слов в {КЛЮЧЕВОЕ СЛОВО:1}[description]
+    """
+    date = "date"
+    person = "person"
+    place = "place"
+
+
+class YamlKeywords :
+    """
+        Для определения некоторых параметров YAML конфигураций
+    """
+    dates = "dates"
+    persons = "persons"
+    places = "places"
