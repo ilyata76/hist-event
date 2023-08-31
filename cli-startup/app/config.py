@@ -4,7 +4,8 @@
 import os
 
 yaml_folder = str(os.environ.get("YAML_FOLDER", "./yamls"))
-debug = bool(os.environ.get("DEBUG_MODE", True))
+debug = bool(os.environ.get("DEBUG_MODE", False))
+use_console_debug = bool(os.environ.get("DEBUG_CONSOLE", False))
 
 
 

@@ -10,10 +10,12 @@ logger.remove(0)
 logger.add(sys.stderr, level="WARNING")
 
 if config.debug : 
-    #logger.add(sys.stdout, level="DEBUG")
+    if config.use_console_debug : 
+        logger.add(sys.stdout, level="DEBUG")
     logger.add("debug.log", format="{time} {level} {message}", level="DEBUG", rotation="4 MB", compression="zip")
 else : 
-    #logger.add(sys.stdout, level="INFO")
+    if config.use_console_debug : 
+        logger.add(sys.stdout, level="INFO")
     logger.add("log.log", format="{time} {level} {message}", level="INFO", rotation="4 MB", compression="zip")
 
 #######################

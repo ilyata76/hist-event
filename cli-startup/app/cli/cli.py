@@ -37,7 +37,7 @@ class StartupCLI(cli.Application):
 
     ## Логика
 
-    def main(self):
+    def main(self) :
         """
             Главный запуск = запуск всех операций
         """
@@ -47,7 +47,7 @@ class StartupCLI(cli.Application):
             path_folder = Path(config.yaml_folder)
 
 
-        print(parse(path_folder.joinpath("test.yaml")))
+        print(parse(path_folder.joinpath("test.yaml"), path_folder.joinpath("dates.yaml")))
 
         self.log("A {x}", x=path_folder)
 
