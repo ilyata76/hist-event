@@ -8,14 +8,13 @@ import yaml
 import pyparsing
 import config
 
-from schemas.Entity import BaseStorage
-from schemas.Date import DateStorage, Date
-from schemas.Person import PersonStorage, Person
-from schemas.Place import PlaceStorage, Place
-from schemas.Source import SourceStorage, Source
-from schemas.Other import OtherStorage, Other
-from schemas.Event import EventStorage, Event
-from schemas.Parameters import Storages
+from schemas.Date import Date
+from schemas.Person import Person
+from schemas.Place import Place
+from schemas.Source import Source
+from schemas.Other import Other
+from schemas.Event import Event
+from schemas.Storages import Storages
 
 
 def dictFromYaml(path : Path) -> dict | list[dict] | None:

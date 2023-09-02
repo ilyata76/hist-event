@@ -7,7 +7,8 @@ from loguru import logger
 
 import config
 from processes.parse import parse
-from schemas.Parameters import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
+from processes.generateSQL import generateSQL
+from schemas.Storages import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
                                 PersonStorage, OtherStorage, EventStorage
 
 
@@ -53,24 +54,56 @@ class StartupCLI(cli.Application):
             Главный запуск = запуск всех операций
         """
         try :
-            path_folder = Path(self.path_folder)
+            path_yaml_folder = Path(self.path_yaml_folder)
         except AttributeError:
-            path_folder = Path(config.yaml_folder)
+            path_yaml_folder = Path(config.yaml_folder)
 
-        print(parse(path_folder, self.storages))
+        try :
+            path_sql_folder = Path(self.path_sql_folder)
+        except AttributeError:
+            path_sql_folder = Path(config.sql_folder)
 
-        self.log("A {x}", x=path_folder)
+        self.log("Начинаем парсинг")
+        self.storages = parse(path_yaml_folder, self.storages)
+        if not self.storages :
+            raise Exception("storages обнулились!")
+        #self.log("Теперь хранилища storages []->:\n\n{stor}\n\n", stor=self.storages)
 
 
-    @cli.switch("--path-folder", str)
-    def setPathFolder(self, path_folder : Path) :
+        self.log("Начинаем генерацию SQL")
+        string = generateSQL(self.storages)
+        if not string :
+            raise Exception("SQL string пустая!")
+        
+        with open(path_sql_folder.joinpath("main.sql"), "w", encoding="utf-8") as file :
+            file.write(string)
+
+        self.log("A {x}", x=path_yaml_folder)
+
+
+    @cli.switch("--yaml-folder", str)
+    def setPathFolder(self, path_yaml_folder : Path) :
         """
-            Установить путь до папки с файлами
+            Установить путь до папки с YAML файлами
         """
-        self.path_folder = path_folder
+        self.path_yaml_folder = path_yaml_folder
 
-        message = "Установлена папка для всех файлов {path}"
+        message = "Установлена папка для всех YAML файлов {path}"
 
-        logger.info(message, path=path_folder)
+        logger.info(message, path=path_yaml_folder)
         if self.verbose :
-            print(message.format(path=path_folder))
+            print(message.format(path=path_yaml_folder))
+
+
+    @cli.switch("--sql-folder", str)
+    def setPathFolder(self, path_sql_folder : Path) :
+        """
+            Установить путь до папки с будущими SQL файлами
+        """
+        self.path_sql_folder = path_sql_folder
+
+        message = "Установлена папка для всех YAML файлов {path}"
+
+        logger.info(message, path=path_sql_folder)
+        if self.verbose :
+            print(message.format(path=path_sql_folder))

@@ -192,3 +192,39 @@ class Storages() :
         string += "\n" + str(self.other_storage) + "\n"
         string += "\n" + str(self.event_storage) + "\n"
         return string
+
+
+    def dropTablesSQL(self) -> str :
+        """
+            Удалить таблиц, если те существуют
+        """
+        logger.debug("Удаление таблиц SQL через Storages")
+        return "\n\n".join([x.dropTableSQL() for x in [self.source_storage, self.date_storage,
+                                                       self.place_storage, self.person_storage, 
+                                                       self.other_storage, self.event_storage]])
+    
+
+    def generateTablesSQL(self) -> str :
+        """
+            Генерация таблиц
+        """
+        logger.debug("Генерация таблиц SQL через Storages")
+        return "\n\n".join([self.source_storage.generateTableSQL(),
+                            self.date_storage.generateTableSQL(),
+                            self.place_storage.generateTableSQL(),
+                            self.person_storage.generateTableSQL(),
+                            self.other_storage.generateTableSQL(),
+                            self.event_storage.generateTableSQL()])
+    
+
+    def fillTablesSQL(self) -> str :
+        """
+            Наполнение таблиц
+        """
+        logger.debug("Заполнение таблиц SQL через Storages")
+        return "\n\n".join([self.source_storage.fillTableSQL(),
+                            self.date_storage.fillTableSQL(),
+                            self.place_storage.fillTableSQL(),
+                            self.person_storage.fillTableSQL(),
+                            self.other_storage.fillTableSQL(),
+                            self.event_storage.fillTableSQL()])

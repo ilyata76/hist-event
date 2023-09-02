@@ -9,14 +9,14 @@ class BaseEntity(BaseModel) :
     """
         Сущность описывается несколькими полями
     """
+    id : int
     # базовая часть
     name : str | None = None
-    id : int
-    events : set[int] | None = None
-    ex_events : set[int] | None = None
     description : str | None = None
     # часть, которая может быть заполнена во время регистрации и сохранения
     #   других сущностей
+    events : set[int] | None = None
+    ex_events : set[int] | None = None
     dates : set[int] | None = None
     ex_dates : set[int] | None = None # ссылки от внешних источников
     places : set[int] | None = None
@@ -103,6 +103,17 @@ class BaseStorage() :
                 field - см. ConfigKeywords.dates ex_dates и др.
         """
         return self.registerEntity(id, entity_id, field)
+    
+
+    def dropTableSQL(self) -> str : 
+        logger.debug(f"Удаление таблиц SQL для {self.name}")
+        return f"""DROP TABLE IF EXISTS {self.name} CASCADE;"""
+    def generateTableSQL(self) -> str : 
+        logger.debug(f"Создание таблиц SQL для {self.name}")
+        return ""
+    def fillTableSQL(self) -> str : 
+        logger.debug(f"Заполнение таблиц SQL для {self.name}")
+        return ""
 
 
     def __str__(self) -> str :
