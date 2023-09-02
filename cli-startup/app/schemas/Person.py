@@ -9,6 +9,7 @@ class Person(BaseEntity) :
     """
         Модель, описывающая сущность персоналии
     """
+    person : str | None = None
 
 
 class PersonStorage(BaseStorage) :

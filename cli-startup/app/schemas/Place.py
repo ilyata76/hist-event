@@ -9,6 +9,7 @@ class Place(BaseEntity) :
     """
         Модель, описывающая сущность места
     """
+    geo : str | None = None
 
 
 class PlaceStorage(BaseStorage) :

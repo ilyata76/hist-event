@@ -9,6 +9,7 @@ class Date(BaseEntity) :
     """
         Модель, описывающая сущность даты
     """
+    date : str | None = None
 
 
 class DateStorage(BaseStorage) :

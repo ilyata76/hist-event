@@ -10,7 +10,7 @@ class BaseEntity(BaseModel) :
         Сущность описывается несколькими полями
     """
     # базовая часть
-    name : str
+    name : str | None = None
     id : int
     events : set[int] | None = None
     description : str | None = None

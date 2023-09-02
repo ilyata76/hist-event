@@ -37,6 +37,16 @@ class ConfigKeywords :
     id : str = "id"
     events : str = "events"
     description : str = "description"
+    # date специфика
+    date : str = "date"
+    # person специфика
+    person : str = "person"
+    # place специфика
+    geo : str = "geo"
+    # source специфика
+    link : str = "link"
+    author : str = "author"
+    ##
     dates : str = "dates"
     persons : str = "persons"
     places : str = "places"

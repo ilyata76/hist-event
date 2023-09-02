@@ -96,6 +96,11 @@ def parseFile(path : Path, keyword : str,
             name = dict_entity.get(config.ConfigKeywords.name, None)
             id = dict_entity.get(config.ConfigKeywords.id, None)
             description = dict_entity.get(config.ConfigKeywords.description, None)
+            link = dict_entity.get(config.ConfigKeywords.link, None)
+            author = dict_entity.get(config.ConfigKeywords.author, None)
+            date = dict_entity.get(config.ConfigKeywords.date, None)
+            person = dict_entity.get(config.ConfigKeywords.person, None)
+            geo = dict_entity.get(config.ConfigKeywords.geo, None)
             
             match keyword : # добавим в Storage в зависимости от типа читаемого файла
 
@@ -104,7 +109,9 @@ def parseFile(path : Path, keyword : str,
                     if not current_storage.get(id) and\
                         not current_storage.append(Source(name=name,
                                                           id=id,
-                                                          description=description) ) :
+                                                          description=description,
+                                                          link=link,
+                                                          author=author) ) :
                         raise Exception("Непредвиденная ошибка с добавлением нового источника!")
 
                 case config.ConfigKeywords.dates : 
@@ -114,7 +121,8 @@ def parseFile(path : Path, keyword : str,
                     if not current_storage.get(id) and\
                         not current_storage.append(Date(name=name,
                                                         id=id,
-                                                        description=description) ) :
+                                                        description=description,
+                                                        date=date) ) :
                         raise Exception("Непредвиденная ошибка с добавлением новой даты!")
 
                 case config.ConfigKeywords.places :
@@ -122,7 +130,8 @@ def parseFile(path : Path, keyword : str,
                     if not current_storage.get(id) and\
                         not current_storage.append(Place(name=name,
                                                          id=id,
-                                                         description=description)) :
+                                                         description=description,
+                                                         geo=geo)) :
                         raise Exception("Непредвиденная ошибка с добавлением нового места!")
 
                 case config.ConfigKeywords.persons :
@@ -130,7 +139,8 @@ def parseFile(path : Path, keyword : str,
                     if not current_storage.get(id) and\
                         not current_storage.append(Person(name=name,
                                                           id=id,
-                                                          description=description)) :
+                                                          description=description,
+                                                          person=person)) :
                         raise Exception("Непредвиденная ошибка с добавлением новой персоналии!")
 
 
