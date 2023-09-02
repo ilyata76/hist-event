@@ -44,3 +44,4 @@ class ConfigKeywords :
     ex_dates : str = "ex_dates"
     ex_places : str = "ex_places"
     ex_persons : str = "ex_persons"
+    ex_sources : str = "ex_sources"

@@ -22,6 +22,8 @@ class BaseEntity(BaseModel) :
     ex_places : set[int] | None = None # ссылки от внешних источников
     persons : set[int] | None = None
     ex_persons : set[int] | None = None # ссылки от внешних источников
+    sources : set[int] | None = None
+    ex_sources : set[int] | None = None
 
 
 class BaseStorage() :

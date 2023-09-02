@@ -12,6 +12,7 @@ from schemas.Entity import BaseStorage
 from schemas.Date import DateStorage, Date
 from schemas.Person import PersonStorage, Person
 from schemas.Place import PlaceStorage, Place
+from schemas.Source import SourceStorage, Source
 
 
 def dictFromYaml(path : Path) -> dict | list[dict] | None:
@@ -65,6 +66,7 @@ def parseText(string : str, pattern : pyparsing.ParserElement) -> list[dict] :
 ############ РАБОТА С ХРАНИЛИЩАМИ
 
 def parseFile(path : Path, keyword : str,
+              source_storage : SourceStorage,
               date_storage : DateStorage, 
               place_storage : PlaceStorage,
               person_storage : PersonStorage) :
@@ -97,27 +99,38 @@ def parseFile(path : Path, keyword : str,
             
             match keyword : # добавим в Storage в зависимости от типа читаемого файла
 
+                case config.ConfigKeywords.sources :
+                    current_storage = source_storage
+                    if not current_storage.get(id) and\
+                        not current_storage.append(Source(name=name,
+                                                          id=id,
+                                                          description=description) ) :
+                        raise Exception("Непредвиденная ошибка с добавлением нового источника!")
+
                 case config.ConfigKeywords.dates : 
                     # оставляем так без обобщения на .append(BaseEntity()) для удобства
                     # логов и дебага
                     current_storage = date_storage
-                    if not current_storage.append(Date(name=name,
-                                                    id=id,
-                                                    description=description) ) :
+                    if not current_storage.get(id) and\
+                        not current_storage.append(Date(name=name,
+                                                        id=id,
+                                                        description=description) ) :
                         raise Exception("Непредвиденная ошибка с добавлением новой даты!")
 
                 case config.ConfigKeywords.places :
                     current_storage = place_storage
-                    if not current_storage.append(Place(name=name,
-                                                      id=id,
-                                                      description=description)) :
+                    if not current_storage.get(id) and\
+                        not current_storage.append(Place(name=name,
+                                                         id=id,
+                                                         description=description)) :
                         raise Exception("Непредвиденная ошибка с добавлением нового места!")
 
                 case config.ConfigKeywords.persons :
                     current_storage = person_storage
-                    if not current_storage.append(Person(name=name,
-                                                        id=id,
-                                                        description=description)) :
+                    if not current_storage.get(id) and\
+                        not current_storage.append(Person(name=name,
+                                                          id=id,
+                                                          description=description)) :
                         raise Exception("Непредвиденная ошибка с добавлением новой персоналии!")
 
 
@@ -135,6 +148,7 @@ def parseFile(path : Path, keyword : str,
                         case config.ConfigKeywords.dates : register_keyword = config.ConfigKeywords.ex_dates
                         case config.ConfigKeywords.places : register_keyword = config.ConfigKeywords.ex_places
                         case config.ConfigKeywords.persons : register_keyword = config.ConfigKeywords.ex_persons
+                        case config.ConfigKeywords.sources : register_keyword = config.ConfigKeywords.ex_sources
                         case _ : raise Exception("Нет такого типа!")
 
                     # теперь прочитаем текст на наличие {ссылок:1}[x]
@@ -161,6 +175,9 @@ def parseFile(path : Path, keyword : str,
                             case config.ParseKeywords.person : 
                                 storage = person_storage
                                 save_keyword = config.ConfigKeywords.persons
+                            case config.ParseKeywords.source :
+                                storage = source_storage
+                                save_keyword = config.ConfigKeywords.sources
                             case _ : raise Exception("Нет такого типа!")
 
                         # проверить, что сущность-ссылка существует в хранилище
@@ -196,7 +213,7 @@ def parseFile(path : Path, keyword : str,
 ################### ГЛАВНЫЙ ПРОЦЕСС
 
 def parse(path : Path, date_path : Path | None = None, persons_path : Path | None = None,
-          place_path : Path | None = None):
+          place_path : Path | None = None, source_path : Path | None = None):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
@@ -205,15 +222,17 @@ def parse(path : Path, date_path : Path | None = None, persons_path : Path | Non
         logger.info("Начало операции ОБЩЕГО парсинга")
         s = "sadgklsad l фывлджа ыфваждл ыфвадлыва {date: 1123   }[ zh-аб об /\\аб  ]  {person :2123} [ии:и]"
 
+        s0 = SourceStorage(name="sources")
         s1 = DateStorage(name="dates")
         s2 = PlaceStorage(name="places")
         s3 = PersonStorage(name="persons")
 
-        parseFile(date_path, config.ConfigKeywords.dates, s1, s2, s3)
-        parseFile(place_path, config.ConfigKeywords.places, s1, s2, s3)
-        parseFile(persons_path, config.ConfigKeywords.persons, s1, s2, s3)
+        parseFile(source_path, config.ConfigKeywords.sources, s0, s1, s2, s3)
+        parseFile(date_path, config.ConfigKeywords.dates, s0, s1, s2, s3)
+        parseFile(place_path, config.ConfigKeywords.places, s0, s1, s2, s3)
+        parseFile(persons_path, config.ConfigKeywords.persons, s0, s1, s2, s3)
 
-        print(s1,'\n\n\n', s2,'\n\n\n', s3)
+        print('\n\n\n', s0, '\n\n\n', s1,'\n\n\n', s2,'\n\n\n', s3, '\n\n\n')
 
         logger.info("Конец операции ОБЩЕГО парсинга")
         return 1

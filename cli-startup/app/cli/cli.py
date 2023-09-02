@@ -50,7 +50,8 @@ class StartupCLI(cli.Application):
         print(parse(path_folder.joinpath("test.yaml"), 
                     path_folder.joinpath("dates.yaml"),
                     path_folder.joinpath("persons.yaml"),
-                    path_folder.joinpath("places.yaml")))
+                    path_folder.joinpath("places.yaml"),
+                    path_folder.joinpath("sources.yaml"),))
 
         self.log("A {x}", x=path_folder)
 
