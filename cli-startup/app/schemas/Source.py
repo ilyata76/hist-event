@@ -11,6 +11,7 @@ class Source(BaseEntity) :
     """
     author : str | None = None
     link : str | None = None
+    date : str | None = None
 
 
 class SourceStorage(BaseStorage) :

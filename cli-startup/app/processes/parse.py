@@ -119,7 +119,8 @@ def parseFile(path : Path, keyword : str,
                                                           id=id,
                                                           description=description,
                                                           link=link,
-                                                          author=author) ) :
+                                                          author=author,
+                                                          date=date) ) :
                         raise Exception("Непредвиденная ошибка с добавлением нового источника!")
 
                 case config.ConfigKeywords.dates : 
@@ -247,8 +248,11 @@ def parseFile(path : Path, keyword : str,
 
 ################### ГЛАВНЫЙ ПРОЦЕСС
 
-def parse(path : Path, dates_path : Path | None = None, persons_path : Path | None = None,
-          places_path : Path | None = None, sources_path : Path | None = None,
+def parse(path : Path, 
+          dates_path : Path | None = None, 
+          persons_path : Path | None = None,
+          places_path : Path | None = None, 
+          sources_path : Path | None = None,
           others_path : Path | None = None):
     """
         Главная функция. Возвращает набор классов, 
