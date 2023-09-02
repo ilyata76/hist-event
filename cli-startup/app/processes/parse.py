@@ -8,9 +8,10 @@ import yaml
 import pyparsing
 import config
 
-from schemas.Date import DateStorage, Date, DateConfig
-from schemas.Person import PersonStorage, Person, PersonConfig
-from schemas.Place import PlaceStorage, Place, PlaceConfig
+from schemas.Entity import BaseStorage
+from schemas.Date import DateStorage, Date
+from schemas.Person import PersonStorage, Person
+from schemas.Place import PlaceStorage, Place
 
 
 def dictFromYaml(path : Path) -> dict | list[dict] | None:
@@ -52,151 +53,144 @@ def parseText(string : str, pattern : pyparsing.ParserElement) -> list[dict] :
     parse_list = pattern.searchString(string).as_list()
     result = []
 
-    # ВОЗМОЖНО, нужно сразу здесь определять и конфигурировать модели
     for x in parse_list :
         stroke = x[0]
-        result.append(
-            {
-                config.ParseResult.keyword : stroke.split(':')[0].strip(),
-                config.ParseResult.number : stroke.split(':')[1].strip().split('[')[0].strip(),
-                config.ParseResult.name : stroke.split('[')[1].strip()
-            }
-        )
+        result.append( { config.ParseResult.keyword : stroke.split(':')[0].strip(),
+                         config.ParseResult.number : stroke.split(':')[1].strip().split('[')[0].strip(),
+                         config.ParseResult.name : stroke.split('[')[1].strip() } )
     logger.info("Парсинг строки события res={res}", res=result.__len__())
     return result
 
 
 ############ РАБОТА С ХРАНИЛИЩАМИ
 
-
-def parseDatesFile(path : Path) -> DateStorage | None:
+def parseFile(path : Path, keyword : str,
+              date_storage : DateStorage, 
+              place_storage : PlaceStorage,
+              person_storage : PersonStorage) :
     """
-        Парсит файл с датами и создаёт список сущностей дат
+        Парсит файл, изменяет классы Storage во время прохода.
+            Регистрирует одни сущности в хранилищах других, если те будут встречены.
+            Сохраняет встречаемые для себя в хранилище.
     """
-    try : 
-        logger.info("Начало операции полного парсинга файла дат")
-        dates = dictFromYaml(path)[config.YamlKeywords.dates]
-        date_storage = DateStorage()
 
-        if not dates :
-            raise Exception("dates.yaml : error occured")
-        if type(dates) is dict : 
-            dates = [dates]
+    try :
+        logger.info("Начало операции полного парсинга файла keyword={keyword} path={path}", 
+                    path=path, keyword=keyword)
+        
+        # прочитаем YAML файл, возьмём часть от keyword
+        dict_entities = dictFromYaml(path)[keyword]
+        # переменная для определения текущего стора для текущей сущности от keyword
+        current_storage = BaseStorage()
 
-        for date in dates :
-            date_storage.append(Date(name=date.get(DateConfig.name, None),
-                                     id=date.get(DateConfig.id, None),
-                                     description=date.get(DateConfig.description, None) ))
+        if not dict_entities :
+            raise Exception(f"{keyword} : {path} : возникла ошибка во время обхода файла (результат None)")
+        if type(dict_entities) is dict : 
+            # если результат - один словарь, а не много
+            dict_entities = [dict_entities]
 
-        logger.info("Конец операции полного парсинга файла дат res={res}", res=date_storage.storage.__len__())
-        return date_storage
-    except Exception as exc :
-        logger.error("ОШИБКА ВО ВРЕМЯ ПАРСИНГА ФАЙЛА ДАТ exc={exc}", exc=exc)
-        return None
-
-
-def parsePlacesFile(path : Path, date_storage : DateStorage) -> PlaceStorage | None:
-    """
-        Парсит файл с местами и создаёт список сущностей местами.
-        Проверяет существование дат, регистрирует их у местами
-            в соответствующее поле.
-    """
-    try : 
-        logger.info("Начало операции полного парсинга файла мест")
-        places = dictFromYaml(path)[config.YamlKeywords.places]
-
-        if not places :
-            raise Exception("places.yaml : error occured")
-        if type(places) is dict : 
-            places = [places]
-
-        place_storage = PlaceStorage()
-
-        for place in places :
+        for dict_entity in dict_entities :
+            # получим по ключевым словам параметры нашей сущности, если те имеются
+            name = dict_entity.get(config.ConfigKeywords.name, None)
+            id = dict_entity.get(config.ConfigKeywords.id, None)
+            description = dict_entity.get(config.ConfigKeywords.description, None)
             
-            name = place.get(PlaceConfig.name, None)
-            id = place.get(PlaceConfig.id, None)
-            description = place.get(PlaceConfig.description, None)
-            
-            if not place_storage.append(Place(name=name,
-                                       id=id,
-                                       description=description)) :
-                raise Exception("Ошибка с добавлением нового места!")
-            
+            match keyword : # добавим в Storage в зависимости от типа читаемого файла
+
+                case config.ConfigKeywords.dates : 
+                    # оставляем так без обобщения на .append(BaseEntity()) для удобства
+                    # логов и дебага
+                    current_storage = date_storage
+                    if not current_storage.append(Date(name=name,
+                                                    id=id,
+                                                    description=description) ) :
+                        raise Exception("Непредвиденная ошибка с добавлением новой даты!")
+
+                case config.ConfigKeywords.places :
+                    current_storage = place_storage
+                    if not current_storage.append(Place(name=name,
+                                                      id=id,
+                                                      description=description)) :
+                        raise Exception("Непредвиденная ошибка с добавлением нового места!")
+
+                case config.ConfigKeywords.persons :
+                    current_storage = person_storage
+                    if not current_storage.append(Person(name=name,
+                                                        id=id,
+                                                        description=description)) :
+                        raise Exception("Непредвиденная ошибка с добавлением новой персоналии!")
+
+
+            def saveAndRegisterEntitites(text, pattern : pyparsing.ParserElement) -> bool :
+                """
+                    Функция регистрирует и сохраняет сущности: одни при обходе, другие при 
+                        определении, что появилась внешняя ссылка
+                """
+                try :
+                    
+                    register_keyword = None
+                    match keyword : # определим тип сущности, которую мы будем регистрировать как внешнюю ссылку
+                        # т.е. в словарь ex_dates мы будем класть даты в том случае, когда мы находится
+                        # в описании entity DATE, перейдя к ним от keyword => dates <=> ex_dates
+                        case config.ConfigKeywords.dates : register_keyword = config.ConfigKeywords.ex_dates
+                        case config.ConfigKeywords.places : register_keyword = config.ConfigKeywords.ex_places
+                        case config.ConfigKeywords.persons : register_keyword = config.ConfigKeywords.ex_persons
+                        case _ : raise Exception("Нет такого типа!")
+
+                    # теперь прочитаем текст на наличие {ссылок:1}[x]
+                    entities : list[dict] = parseText(text, pattern)
+
+                    for entity in entities :
+                        # {keyword: "date"; number: "1"; name: "ABOBA"}
+                        # name - для интерфейсов, нас не интересует
+                        entity_id = int(entity[config.ParseResult.number])
+                        entity_keyword = entity[config.ParseResult.keyword]
+
+                        # теперь определим словарь для "сохранения"
+                        # (в текущую сущность встречаемые в её текстах)
+                        save_keyword = None
+                        # а также storage, которые будет хранить её как ВНЕШНЮЮ ССЫЛКУ
+                        storage = BaseStorage()
+                        match entity_keyword :
+                            case config.ParseKeywords.date : 
+                                storage = date_storage
+                                save_keyword = config.ConfigKeywords.dates
+                            case config.ParseKeywords.place : 
+                                storage = place_storage
+                                save_keyword = config.ConfigKeywords.places
+                            case config.ParseKeywords.person : 
+                                storage = person_storage
+                                save_keyword = config.ConfigKeywords.persons
+                            case _ : raise Exception("Нет такого типа!")
+
+                        # проверить, что сущность-ссылка существует в хранилище
+                        if not storage.get(entity_id) :
+                            raise Exception(f"Сущности {entity_id}[{entity_keyword}] в хранилище \
+                                             ещё не существует!")
+
+                        # сохранить для читаемой сущности ссылку на ту, что встретилась
+                        #       в тексте
+                        if not current_storage.saveEntity(id, entity_id, save_keyword) :
+                            raise Exception(f"Ошибка с сохранением сущности {entity_id}[{entity_keyword}][{save_keyword}] \
+                                             для сущности {id}[{keyword}]!")
+                            
+                        # также зарегистрировать в storage, что появилась внешняя 
+                        #       ссылка на сущность-ссылку
+                        if not storage.registerEntity(entity_id, id, register_keyword) :
+                            raise Exception(f"Ошибка с регистрацией сущности {id}[{keyword}][{register_keyword}] \
+                                             для сущности {entity_id}[{entity_keyword}]!")
+      
+                except Exception as exc :
+                    raise exc
+
             if description :
-                entities : list[dict] = parseText(description, patternTextInclusion())
-                
-                for entity in entities :
-
-                    if entity[config.ParseResult.keyword] == config.ParseKeywords.date :
-                        if not date_storage.get(int(entity[config.ParseResult.number])) :
-                            raise Exception(f"Даты {entity[config.ParseResult.number]} не существует!")
-                        if not place_storage.registerDate(id, int(entity[config.ParseResult.number])) :
-                            raise Exception("Ошибка с регистрацией даты для места!")
+                saveAndRegisterEntitites(description, patternTextInclusion())
 
 
-
-        logger.info("Конец операции полного парсинга файла мест res={res}", res=place_storage.storage.__len__())
-        return place_storage
-    
     except Exception as exc :
-        logger.error("ОШИБКА ВО ВРЕМЯ ПАРСИНГА ФАЙЛА МЕСТО exc={exc}", exc=exc)
+        logger.error("ОШИБКА ВО ВРЕМЯ ПАРСИНГА ФАЙЛА файла keyword={keyword} path={path} exc={exc}", 
+                     path=path, keyword=keyword, exc=exc)
         return None
-
-
-def parsePersonsFile(path : Path, date_storage : DateStorage,
-                     place_storage : PlaceStorage) -> PersonStorage | None:
-    """
-        Парсит файл с персонами и создаёт список сущностей персон.
-        Проверяет существование дат и мест, регистрирует их у персоны
-            в соответствующее поле.
-    """
-    try : 
-        logger.info("Начало операции полного парсинга файла персон")
-        persons = dictFromYaml(path)[config.YamlKeywords.persons]
-
-        if not persons :
-            raise Exception("persons.yaml : error occured")
-        if type(persons) is dict : 
-            persons = [persons]
-
-        person_storage = PersonStorage()
-
-        for person in persons :
-
-            name = person.get(PersonConfig.name, None)
-            id = person.get(PersonConfig.id, None)
-            description = person.get(PersonConfig.description, None)
-            
-            if not person_storage.append(Person(name=name,
-                                                id=id,
-                                                description=description)) :
-                raise Exception("Ошибка с добавлением новой персоналии!")
-            
-            if description :
-                entities : list[dict] = parseText(description, patternTextInclusion())
-                
-                for entity in entities :
-
-                    if entity[config.ParseResult.keyword] == config.ParseKeywords.date :
-                        if not date_storage.get(int(entity[config.ParseResult.number])) :
-                            raise Exception(f"Даты {entity[config.ParseResult.number]} не существует!")
-                        if not person_storage.registerDate(id, int(entity[config.ParseResult.number])) :
-                            raise Exception(f"Ошибка с регистрацией даты для персоналии!")
-
-                    elif entity[config.ParseResult.keyword] == config.ParseKeywords.place :
-                        if not place_storage.get(int(entity[config.ParseResult.number])) :
-                            raise Exception(f"Места {entity[config.ParseResult.number]} не существует!")
-                        if not person_storage.registerPlace(id, int(entity[config.ParseResult.number])) :
-                            raise Exception(f"Ошибка с регистрацией места для персоналии!")
-                        
-        logger.info("Конец операции полного парсинга файла персон res={res}", res=person_storage.storage.__len__())
-        return person_storage
-    
-    except Exception as exc :
-        logger.error("ОШИБКА ВО ВРЕМЯ ПАРСИНГА ФАЙЛА ПЕРСОН exc={exc}", exc=exc)
-        return None
-
 
 
 ################### ГЛАВНЫЙ ПРОЦЕСС
@@ -211,12 +205,15 @@ def parse(path : Path, date_path : Path | None = None, persons_path : Path | Non
         logger.info("Начало операции ОБЩЕГО парсинга")
         s = "sadgklsad l фывлджа ыфваждл ыфвадлыва {date: 1123   }[ zh-аб об /\\аб  ]  {person :2123} [ии:и]"
 
-        x = parseText(s, patternTextInclusion())
-        
-        y = parseDatesFile(date_path)
-        z = parsePlacesFile(place_path, date_storage=y)
-        c = parsePersonsFile(persons_path, date_storage=y, place_storage=z)
-        print(y,'\n\n\n',z,'\n\n\n',c)
+        s1 = DateStorage(name="dates")
+        s2 = PlaceStorage(name="places")
+        s3 = PersonStorage(name="persons")
+
+        parseFile(date_path, config.ConfigKeywords.dates, s1, s2, s3)
+        parseFile(place_path, config.ConfigKeywords.places, s1, s2, s3)
+        parseFile(persons_path, config.ConfigKeywords.persons, s1, s2, s3)
+
+        print(s1,'\n\n\n', s2,'\n\n\n', s3)
 
         logger.info("Конец операции ОБЩЕГО парсинга")
         return 1

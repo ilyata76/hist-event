@@ -9,22 +9,19 @@ class BaseEntity(BaseModel) :
     """
         Сущность описывается несколькими полями
     """
+    # базовая часть
     name : str
     id : int
     events : set[int] | None = None
     description : str | None = None
-
-
-class BaseEntityConfig :
-    """
-        Описать константы, по которым будет идти сравнение
-            при парсинге
-    """
-    name : str = "name"
-    id : str = "id"
-    events : str = "events"
-    description : str = "description"
-
+    # часть, которая может быть заполнена в зависимости
+    #   от типа сущности
+    dates : set[int] | None = None
+    ex_dates : set[int] | None = None # ссылки от внешних источников
+    places : set[int] | None = None
+    ex_places : set[int] | None = None # ссылки от внешних источников
+    persons : set[int] | None = None
+    ex_persons : set[int] | None = None # ссылки от внешних источников
 
 
 class BaseStorage() :
@@ -34,9 +31,10 @@ class BaseStorage() :
             и регистрации ивентов.
     """
 
-    def __init__(self) :
+    def __init__(self, name = None) :
         logger.debug("Создание класса Storage")
         self.storage = {}
+        self.name = name if name else "BaseStorage"
 
 
     def append(self, entity : BaseEntity) -> bool :
@@ -49,11 +47,12 @@ class BaseStorage() :
             res = True
         except Exception as exc:
             logger.error("Ошибка во время добавления в Storage exc={exc}", exc=exc)
+            raise exc
         logger.debug("Добавление сущности в Storage res={res}", res=res)
         return res
 
 
-    def get(self, id) -> BaseEntity | None :
+    def get(self, id : int) -> BaseEntity | None :
         """
             Взятие по индексу. Вернёт None, если такого нет
         """
@@ -62,30 +61,44 @@ class BaseStorage() :
             res = self.storage.get(id, None)
         except Exception as exc:
             logger.error("Ошибка во взятия по индексу в Storage exc={exc}", exc=exc)
+            raise exc
         logger.debug("Получение сущности из Storage res={res}", res=res)
         return res
 
 
-    def registerEvent(self, id, event_id) -> bool :
+    def registerEntity(self, id : int, entity_id : int, field : str) -> bool :
         """
-            "Зарегистрировать" событие. Будет проходить во время
-                обхода текстов событий event_id ... {entity:id}[name]
+            Зарегистрировать одну сущность для другой по field. Если существует, конечно.
+                field - см. ConfigKeywords.dates ex_dates и др.
         """
         res = False
         try : 
             entity = self.get(id)
-            if entity :
-                if entity.events is None :
-                    entity.events = set([event_id])
+
+            if entity and field in entity.model_fields :
+                att_field = getattr(entity, field)
+                if att_field is None :
+                    setattr(entity, field, set([entity_id]))
                 else :
-                    entity.events.add(event_id)
+                    att_field.add(entity_id)
                 res = True
+
         except Exception as exc:
-            logger.error("Ошибка во время регистрации ивента{event} для сущности{entity} в Storage exc={exc}", 
-                         event=event_id, exc=exc, entity=id)
-        logger.debug("Регистрация события{event} для сущности{entity} в Storage res={res}", 
-                     entity=id, event=event_id, res=res)
+            logger.error("Сохранение/регтстрация сущности {entity_id} по полю {field} для сущности {id} в хранилище {name}. exc={exc}", 
+                         field=field, entity_id=entity_id, exc=exc, id=id, name=self.name)
+            raise exc
+        
+        logger.debug(f"Сохранение/регтстрация сущности {entity_id} по полю {field} для сущности {id} в хранилище {self.name}. res={res}")
         return res
+
+
+    def saveEntity(self, id : int, entity_id : int, field : str) -> bool :
+        """
+            Другое название для registerEntity (для читаемости).
+                field - см. ConfigKeywords.dates ex_dates и др.
+        """
+        print("переход")
+        return self.registerEntity(id, entity_id, field)
 
 
     def __str__(self) -> str :
@@ -93,6 +106,10 @@ class BaseStorage() :
             Для принта и логов
         """
         try : 
-            return self.storage.__str__()
-        except :
-            return "None"
+            result = self.name + "\n"
+            for key in self.storage :
+                result += str(key) + "  :  " + str(self.storage[key]) + "\n"
+            return result
+        except Exception as exc:
+            logger.error("Ошибка во время вывода _str_ exc={exc}", exc=exc)
+            return "Error"

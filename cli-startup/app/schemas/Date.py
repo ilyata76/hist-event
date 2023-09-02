@@ -2,7 +2,7 @@
     Схемы, определяющие дату сущность
 """
 from loguru import logger
-from schemas.Entity import BaseEntity, BaseStorage, BaseEntityConfig
+from schemas.Entity import BaseEntity, BaseStorage
 
 
 class Date(BaseEntity) :
@@ -11,27 +11,21 @@ class Date(BaseEntity) :
     """
 
 
-class DateConfig(BaseEntityConfig) :
-    """
-        Константы для парсинга, как у BaseEntityConfig
-    """
-
-
 class DateStorage(BaseStorage) :
     """
         Класс управления набором дат.
         Используется в первую очередь для лёгкого доступа 
-            и регистрации ивентов.
+            и регистрации других сущностей.
     """
 
     def append(self, date : Date) -> bool :
-        logger.info("Добавление даты date={date}", date=date)
+        logger.info(f"Добавление даты {date} в {self.name}")
         return super().append(date)
     
     def get(self, id : int) -> Date | None :
-        logger.info("Получение даты id={id}", id={id})
+        logger.info(f"Получение даты {id} из {self.name}")
         return super().get(id)
     
-    def registerEvent(self, id : int, event_id : int) -> bool :
-        logger.info("Регистрация ивента для даты id={id} event_id={event_id}", id=id, event_id=event_id)
-        return super().registerEvent(id, event_id)
+    def registerEntity(self, id : int, entity_id : int, field : str) -> bool :
+        logger.info(f"Регистрация в хранилище дат {self.name} новой сущности {entity_id}[{field}] для {id}")
+        return super().registerEntity(id, entity_id, field)

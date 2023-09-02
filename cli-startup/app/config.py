@@ -20,17 +20,27 @@ class ParseResult :
 
 class ParseKeywords :
     """
-        Класс для определения ключевых слов в {КЛЮЧЕВОЕ СЛОВО:1}[description]
+        Класс для определения ключевых слов в {>КЛЮЧЕВОЕ СЛОВО<:1}[description]
     """
     date = "date"
     person = "person"
     place = "place"
+    source = "source"
 
 
-class YamlKeywords :
+class ConfigKeywords :
     """
-        Для определения некоторых параметров YAML конфигураций
-    """
-    dates = "dates"
-    persons = "persons"
-    places = "places"
+        Для парсинга.
+            Определяют константы для конфигов каждой из моделей
+    """    
+    name : str = "name"
+    id : str = "id"
+    events : str = "events"
+    description : str = "description"
+    dates : str = "dates"
+    persons : str = "persons"
+    places : str = "places"
+    sources : str = "sources"
+    ex_dates : str = "ex_dates"
+    ex_places : str = "ex_places"
+    ex_persons : str = "ex_persons"
