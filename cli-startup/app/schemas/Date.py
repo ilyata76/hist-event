@@ -1,5 +1,5 @@
 """
-    Схемы, определяющие дату сущность
+    Схемы, определяющие дату как сущность
 """
 from loguru import logger
 from schemas.Entity import BaseEntity, BaseStorage

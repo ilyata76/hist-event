@@ -1,5 +1,5 @@
 """
-    Схемы, определяющие сущность
+    Схемы, определяющие сущность и основные операции над сущностью
 """
 from loguru import logger
 from pydantic import BaseModel
@@ -14,8 +14,8 @@ class BaseEntity(BaseModel) :
     id : int
     events : set[int] | None = None
     description : str | None = None
-    # часть, которая может быть заполнена в зависимости
-    #   от типа сущности
+    # часть, которая может быть заполнена во время регистрации и сохранения
+    #   других сущностей
     dates : set[int] | None = None
     ex_dates : set[int] | None = None # ссылки от внешних источников
     places : set[int] | None = None
@@ -23,14 +23,16 @@ class BaseEntity(BaseModel) :
     persons : set[int] | None = None
     ex_persons : set[int] | None = None # ссылки от внешних источников
     sources : set[int] | None = None
-    ex_sources : set[int] | None = None
+    ex_sources : set[int] | None = None # ссылки от внешних источников
+    others : set[int] | None = None
+    ex_others : set[int] | None = None
 
 
 class BaseStorage() :
     """
-        Класс управления набором дат/персоналий/мест.
+        Класс управления набором дат/персоналий/мест и прочими сущностями.
         Используется в первую очередь для лёгкого доступа 
-            и регистрации ивентов.
+            и регистрации других сущностей.
     """
 
     def __init__(self, name = None) :
@@ -99,7 +101,6 @@ class BaseStorage() :
             Другое название для registerEntity (для читаемости).
                 field - см. ConfigKeywords.dates ex_dates и др.
         """
-        print("переход")
         return self.registerEntity(id, entity_id, field)
 
 

@@ -13,6 +13,7 @@ from schemas.Date import DateStorage, Date
 from schemas.Person import PersonStorage, Person
 from schemas.Place import PlaceStorage, Place
 from schemas.Source import SourceStorage, Source
+from schemas.Other import OtherStorage, Other
 
 
 def dictFromYaml(path : Path) -> dict | list[dict] | None:
@@ -69,7 +70,8 @@ def parseFile(path : Path, keyword : str,
               source_storage : SourceStorage,
               date_storage : DateStorage, 
               place_storage : PlaceStorage,
-              person_storage : PersonStorage) :
+              person_storage : PersonStorage,
+              other_storage : OtherStorage) :
     """
         Парсит файл, изменяет классы Storage во время прохода.
             Регистрирует одни сущности в хранилищах других, если те будут встречены.
@@ -101,6 +103,7 @@ def parseFile(path : Path, keyword : str,
             date = dict_entity.get(config.ConfigKeywords.date, None)
             person = dict_entity.get(config.ConfigKeywords.person, None)
             geo = dict_entity.get(config.ConfigKeywords.geo, None)
+            meta = dict_entity.get(config.ConfigKeywords.meta, None)
             
             match keyword : # добавим в Storage в зависимости от типа читаемого файла
 
@@ -143,6 +146,15 @@ def parseFile(path : Path, keyword : str,
                                                           person=person)) :
                         raise Exception("Непредвиденная ошибка с добавлением новой персоналии!")
 
+                case config.ConfigKeywords.others :
+                    current_storage = other_storage
+                    if not current_storage.get(id) and\
+                        not current_storage.append(Other(name=name,
+                                                         id=id,
+                                                         description=description,
+                                                         meta=meta)) :
+                        raise Exception("Непредвиденная ошибка с добавлением нового 'другого'!")
+
 
             def saveAndRegisterEntitites(text, pattern : pyparsing.ParserElement) -> bool :
                 """
@@ -159,6 +171,7 @@ def parseFile(path : Path, keyword : str,
                         case config.ConfigKeywords.places : register_keyword = config.ConfigKeywords.ex_places
                         case config.ConfigKeywords.persons : register_keyword = config.ConfigKeywords.ex_persons
                         case config.ConfigKeywords.sources : register_keyword = config.ConfigKeywords.ex_sources
+                        case config.ConfigKeywords.others : register_keyword = config.ConfigKeywords.ex_others
                         case _ : raise Exception("Нет такого типа!")
 
                     # теперь прочитаем текст на наличие {ссылок:1}[x]
@@ -188,6 +201,9 @@ def parseFile(path : Path, keyword : str,
                             case config.ParseKeywords.source :
                                 storage = source_storage
                                 save_keyword = config.ConfigKeywords.sources
+                            case config.ParseKeywords.other :
+                                storage = other_storage
+                                save_keyword = config.ConfigKeywords.others
                             case _ : raise Exception("Нет такого типа!")
 
                         # проверить, что сущность-ссылка существует в хранилище
@@ -223,26 +239,28 @@ def parseFile(path : Path, keyword : str,
 ################### ГЛАВНЫЙ ПРОЦЕСС
 
 def parse(path : Path, date_path : Path | None = None, persons_path : Path | None = None,
-          place_path : Path | None = None, source_path : Path | None = None):
+          place_path : Path | None = None, source_path : Path | None = None,
+          other_path : Path | None = None):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
     """
     try : 
         logger.info("Начало операции ОБЩЕГО парсинга")
-        s = "sadgklsad l фывлджа ыфваждл ыфвадлыва {date: 1123   }[ zh-аб об /\\аб  ]  {person :2123} [ии:и]"
 
         s0 = SourceStorage(name="sources")
         s1 = DateStorage(name="dates")
         s2 = PlaceStorage(name="places")
         s3 = PersonStorage(name="persons")
+        s4 = OtherStorage(name="others")
 
-        parseFile(source_path, config.ConfigKeywords.sources, s0, s1, s2, s3)
-        parseFile(date_path, config.ConfigKeywords.dates, s0, s1, s2, s3)
-        parseFile(place_path, config.ConfigKeywords.places, s0, s1, s2, s3)
-        parseFile(persons_path, config.ConfigKeywords.persons, s0, s1, s2, s3)
+        parseFile(source_path, config.ConfigKeywords.sources, s0, s1, s2, s3, s4)
+        parseFile(date_path, config.ConfigKeywords.dates, s0, s1, s2, s3, s4)
+        parseFile(place_path, config.ConfigKeywords.places, s0, s1, s2, s3, s4)
+        parseFile(persons_path, config.ConfigKeywords.persons, s0, s1, s2, s3, s4)
+        parseFile(other_path, config.ConfigKeywords.others, s0, s1, s2, s3, s4)
 
-        print('\n\n\n', s0, '\n\n\n', s1,'\n\n\n', s2,'\n\n\n', s3, '\n\n\n')
+        print('\n\n\n', s0, '\n\n\n', s1,'\n\n\n', s2,'\n\n\n', s3, '\n\n\n', s4, '\n\n\n')
 
         logger.info("Конец операции ОБЩЕГО парсинга")
         return 1
