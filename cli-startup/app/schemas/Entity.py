@@ -13,6 +13,7 @@ class BaseEntity(BaseModel) :
     name : str | None = None
     id : int
     events : set[int] | None = None
+    ex_events : set[int] | None = None
     description : str | None = None
     # часть, которая может быть заполнена во время регистрации и сохранения
     #   других сущностей

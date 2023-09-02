@@ -27,6 +27,7 @@ class ParseKeywords :
     place = "place"
     source = "source"
     other = "other"
+    event = "event"
 
 
 class ConfigKeywords :
@@ -38,7 +39,7 @@ class ConfigKeywords :
     id : str = "id"
     events : str = "events"
     description : str = "description"
-    # date специфика
+    # date & event специфика
     date : str = "date"
     # person специфика
     person : str = "person"
@@ -49,6 +50,10 @@ class ConfigKeywords :
     author : str = "author"
     # other специфика
     meta : str = "meta"
+    # event специфика
+    min : str = "min"
+    max : str = "max"
+    level : str = "level"
     ##
     dates : str = "dates"
     persons : str = "persons"
@@ -60,3 +65,5 @@ class ConfigKeywords :
     ex_persons : str = "ex_persons"
     ex_sources : str = "ex_sources"
     ex_others : str = "ex_others"
+    events : str = "events"
+    ex_events : str = "ex_events"

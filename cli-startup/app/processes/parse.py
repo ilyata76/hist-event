@@ -14,6 +14,7 @@ from schemas.Person import PersonStorage, Person
 from schemas.Place import PlaceStorage, Place
 from schemas.Source import SourceStorage, Source
 from schemas.Other import OtherStorage, Other
+from schemas.Event import EventStorage, Event
 
 
 def dictFromYaml(path : Path) -> dict | list[dict] | None:
@@ -35,7 +36,7 @@ def patternTextInclusion() -> pyparsing.ParserElement :
 
     keyword = pyparsing.alphas
     number = pyparsing.nums
-    name = pyparsing.alphanums + " _-/\\:()" + pyparsing.ppu.Cyrillic.alphanums # TODO to config
+    name = pyparsing.alphanums + " _-/\\:()?!" + pyparsing.ppu.Cyrillic.alphanums # TODO to config
 
     return pyparsing.Combine( pyparsing.Suppress("{") + pyparsing.ZeroOrMore(" ") + pyparsing.Word(keyword) #' { abo'
                                  + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + ":" + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) #' : '
@@ -71,7 +72,8 @@ def parseFile(path : Path, keyword : str,
               date_storage : DateStorage, 
               place_storage : PlaceStorage,
               person_storage : PersonStorage,
-              other_storage : OtherStorage) :
+              other_storage : OtherStorage,
+              event_storage : EventStorage) :
     """
         Парсит файл, изменяет классы Storage во время прохода.
             Регистрирует одни сущности в хранилищах других, если те будут встречены.
@@ -109,6 +111,9 @@ def parseFile(path : Path, keyword : str,
             person = dict_entity.get(config.ConfigKeywords.person, None)
             geo = dict_entity.get(config.ConfigKeywords.geo, None)
             meta = dict_entity.get(config.ConfigKeywords.meta, None)
+            min = dict_entity.get(config.ConfigKeywords.min, None)
+            max = dict_entity.get(config.ConfigKeywords.max, None)
+            level = dict_entity.get(config.ConfigKeywords.level, None)
             
             match keyword : # добавим в Storage в зависимости от типа читаемого файла
 
@@ -160,6 +165,18 @@ def parseFile(path : Path, keyword : str,
                                                          description=description,
                                                          meta=meta)) :
                         raise Exception("Непредвиденная ошибка с добавлением нового 'другого'!")
+                    
+                
+                case config.ConfigKeywords.events :
+                    current_storage = event_storage
+                    if not current_storage.get(id) and \
+                        not current_storage.append(Event(name=name,
+                                                         id=id,
+                                                         min=min,
+                                                         max=max,
+                                                         level=level,
+                                                         date=date)) :
+                        raise Exception("Непредвиденная ошибка с добавлением нового события!!!")
 
 
             def saveAndRegisterEntitites(text, pattern : pyparsing.ParserElement) -> bool :
@@ -178,6 +195,7 @@ def parseFile(path : Path, keyword : str,
                         case config.ConfigKeywords.persons : register_keyword = config.ConfigKeywords.ex_persons
                         case config.ConfigKeywords.sources : register_keyword = config.ConfigKeywords.ex_sources
                         case config.ConfigKeywords.others : register_keyword = config.ConfigKeywords.ex_others
+                        case config.ConfigKeywords.events : register_keyword = config.ConfigKeywords.ex_events
                         case _ : raise Exception("Нет такого типа!")
 
                     # теперь прочитаем текст на наличие {ссылок:1}[x]
@@ -210,6 +228,9 @@ def parseFile(path : Path, keyword : str,
                             case config.ParseKeywords.other :
                                 storage = other_storage
                                 save_keyword = config.ConfigKeywords.others
+                            case config.ParseKeywords.event :
+                                storage = event_storage
+                                save_keyword = config.ConfigKeywords.events
                             case _ : raise Exception("Нет такого типа!")
 
                         # проверить, что сущность-ссылка существует в хранилище
@@ -238,11 +259,19 @@ def parseFile(path : Path, keyword : str,
             if description :
                 saveAndRegisterEntitites(description, patternTextInclusion())
 
+            if min :
+                saveAndRegisterEntitites(min, patternTextInclusion())
+
+            if max :
+                saveAndRegisterEntitites(max, patternTextInclusion())
+
     except Exception as exc :
         res_code = 1
         logger.error("ОШИБКА ВО ВРЕМЯ ПАРСИНГА ФАЙЛА файла keyword={keyword} path={path} exc={exc}", 
                      path=path, keyword=keyword, exc=exc)
 
+    logger.info("Начало операции полного парсинга файла keyword={keyword} path={path} res_code={res_code}", 
+                    path=path, keyword=keyword, res_code=res_code)
     return res_code
 
 
@@ -253,7 +282,8 @@ def parse(path : Path,
           persons_path : Path | None = None,
           places_path : Path | None = None, 
           sources_path : Path | None = None,
-          others_path : Path | None = None):
+          others_path : Path | None = None,
+          events_path : Path | None = None):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
@@ -267,29 +297,33 @@ def parse(path : Path,
         s2 = PlaceStorage(name="places")
         s3 = PersonStorage(name="persons")
         s4 = OtherStorage(name="others")
+        s5 = EventStorage(name="events")
 
         source_code = 2
         date_code = 2
         place_code = 2
         person_code = 2
         other_code = 2
+        event_code = 2
 
         for i in range(config.max_reparse_count) :
-            logger.info(f"ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i}")
+            logger.info(f"ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
             if source_code == 2 :
-                source_code = parseFile(sources_path, config.ConfigKeywords.sources, s0, s1, s2, s3, s4)
+                source_code = parseFile(sources_path, config.ConfigKeywords.sources, s0, s1, s2, s3, s4, s5)
             if date_code == 2 :
-                date_code = parseFile(dates_path, config.ConfigKeywords.dates, s0, s1, s2, s3, s4)
+                date_code = parseFile(dates_path, config.ConfigKeywords.dates, s0, s1, s2, s3, s4, s5)
             if place_code == 2 :
-                place_code = parseFile(places_path, config.ConfigKeywords.places, s0, s1, s2, s3, s4)
+                place_code = parseFile(places_path, config.ConfigKeywords.places, s0, s1, s2, s3, s4, s5)
             if person_code == 2 :
-                person_code = parseFile(persons_path, config.ConfigKeywords.persons, s0, s1, s2, s3, s4)
+                person_code = parseFile(persons_path, config.ConfigKeywords.persons, s0, s1, s2, s3, s4, s5)
             if other_code == 2 :
-                other_code = parseFile(others_path, config.ConfigKeywords.others, s0, s1, s2, s3, s4)
+                other_code = parseFile(others_path, config.ConfigKeywords.others, s0, s1, s2, s3, s4, s5)
+            if event_code == 2 :
+                event_code = parseFile(events_path, config.ConfigKeywords.events, s0, s1, s2, s3, s4, s5)
 
-            codes = [source_code, date_code, place_code, person_code, other_code]
+            codes = [source_code, date_code, place_code, person_code, other_code, event_code]
 
             if 1 in codes :
                 logger.error(f"Ошибка на итерации {i}")
@@ -303,7 +337,7 @@ def parse(path : Path,
         else :
             logger.info(f"УСПЕШНЫЙ ПАРСИНГ")
 
-        print('\n\n\n', s0, '\n\n\n', s1,'\n\n\n', s2,'\n\n\n', s3, '\n\n\n', s4, '\n\n\n')
+        print('\n\n\n', s0, '\n\n\n', s1,'\n\n\n', s2,'\n\n\n', s3, '\n\n\n', s4, '\n\n\n', s5, '\n\n\n')
 
         logger.info("Конец операции ОБЩЕГО парсинга")
         return 1

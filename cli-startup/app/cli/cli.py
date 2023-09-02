@@ -52,7 +52,8 @@ class StartupCLI(cli.Application):
                     path_folder.joinpath("persons.yaml"),
                     path_folder.joinpath("places.yaml"),
                     path_folder.joinpath("sources.yaml"),
-                    path_folder.joinpath("others.yaml")))
+                    path_folder.joinpath("others.yaml"),
+                    path_folder.joinpath("events.yaml")))
 
         self.log("A {x}", x=path_folder)
 
