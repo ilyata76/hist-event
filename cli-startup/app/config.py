@@ -6,7 +6,7 @@ import os
 yaml_folder = str(os.environ.get("YAML_FOLDER", "./yamls"))
 debug = bool(os.environ.get("DEBUG_MODE", False))
 use_console_debug = bool(os.environ.get("DEBUG_CONSOLE", False))
-
+max_reparse_count = int(os.environ.get("MAX_REPARSE_COUNT", 10))
 
 
 class ParseResult :

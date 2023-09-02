@@ -9,7 +9,6 @@ class Source(BaseEntity) :
     """
         Модель, описывающая сущность исторического источника
     """
-    # source специфика
     author : str | None = None
     link : str | None = None
 
