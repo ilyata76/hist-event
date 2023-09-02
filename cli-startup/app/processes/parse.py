@@ -48,23 +48,6 @@ def patternTextInclusion() -> pyparsing.ParserElement :
                                  )
 
 
-def parseText(string : str, pattern : pyparsing.ParserElement) -> list[dict] :
-    """
-        Возвращает список словарей - результата парсинга по паттерну
-        Используется для парсинга текста события и регистрации их ID в моделях
-    """
-    logger.debug("Начало парсинга текста события")
-    parse_list = pattern.searchString(string).as_list()
-    result = []
-
-    for x in parse_list :
-        stroke = x[0]
-        result.append( { config.ParseResult.keyword : stroke.split(':')[0].strip(),
-                         config.ParseResult.number : stroke.split(':')[1].strip().split('[')[0].strip(),
-                         config.ParseResult.name : stroke.split('[')[1].strip() } )
-    logger.info("Парсинг строки события res={res}", res=result.__len__())
-    return result
-
 
 ############ РАБОТА С ХРАНИЛИЩАМИ
 
@@ -80,21 +63,12 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
             - 2 если некоторые сущности были ещё не добавлены
     """
     try :
-        source_storage : SourceStorage = storages.source_storage
-        date_storage : DateStorage = storages.date_storage
-        place_storage : PlaceStorage = storages.place_storage
-        person_storage : PersonStorage = storages.person_storage
-        other_storage : OtherStorage = storages.other_storage
-        event_storage : EventStorage = storages.event_storage
-
         res_code = 0
         logger.info("Начало операции полного парсинга файла keyword={keyword} path={path}", 
                     path=path, keyword=keyword)
         
         # прочитаем YAML файл, возьмём часть от keyword
         dict_entities = dictFromYaml(path)[keyword]
-        # переменная для определения текущего стора для текущей сущности от keyword
-        current_storage = BaseStorage()
 
         if not dict_entities :
             raise Exception(f"{keyword} : {path} : возникла ошибка во время обхода файла (результат None)")
@@ -117,155 +91,40 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
             max = dict_entity.get(config.ConfigKeywords.max, None)
             level = dict_entity.get(config.ConfigKeywords.level, None)
             
+            entity_to_append = None
+
             match keyword : # добавим в Storage в зависимости от типа читаемого файла
-
                 case config.ConfigKeywords.sources :
-                    current_storage = source_storage
-                    if not current_storage.get(id) and\
-                        not current_storage.append(Source(name=name,
-                                                          id=id,
-                                                          description=description,
-                                                          link=link,
-                                                          author=author,
-                                                          date=date) ) :
-                        raise Exception("Непредвиденная ошибка с добавлением нового источника!")
-
+                    entity_to_append = Source(name=name, id=id, description=description,
+                                               link=link, author=author, date=date)
                 case config.ConfigKeywords.dates : 
-                    # оставляем так без обобщения на .append(BaseEntity()) для удобства
-                    # логов и дебага
-                    current_storage = date_storage
-                    if not current_storage.get(id) and\
-                        not current_storage.append(Date(name=name,
-                                                        id=id,
-                                                        description=description,
-                                                        date=date) ) :
-                        raise Exception("Непредвиденная ошибка с добавлением новой даты!")
-
+                    entity_to_append = Date(name=name, id=id, description=description, 
+                                            date=date)
                 case config.ConfigKeywords.places :
-                    current_storage = place_storage
-                    if not current_storage.get(id) and\
-                        not current_storage.append(Place(name=name,
-                                                         id=id,
-                                                         description=description,
-                                                         geo=geo)) :
-                        raise Exception("Непредвиденная ошибка с добавлением нового места!")
-
+                    entity_to_append = Place(name=name, id=id, description=description, 
+                                             geo=geo)
                 case config.ConfigKeywords.persons :
-                    current_storage = person_storage
-                    if not current_storage.get(id) and\
-                        not current_storage.append(Person(name=name,
-                                                          id=id,
-                                                          description=description,
-                                                          person=person)) :
-                        raise Exception("Непредвиденная ошибка с добавлением новой персоналии!")
-
+                    entity_to_append = Person(name=name, id=id, description=description, 
+                                              person=person)
                 case config.ConfigKeywords.others :
-                    current_storage = other_storage
-                    if not current_storage.get(id) and\
-                        not current_storage.append(Other(name=name,
-                                                         id=id,
-                                                         description=description,
-                                                         meta=meta)) :
-                        raise Exception("Непредвиденная ошибка с добавлением нового 'другого'!")
-                    
-                
+                    entity_to_append = Other(name=name, id=id, description=description, 
+                                             meta=meta)
                 case config.ConfigKeywords.events :
-                    current_storage = event_storage
-                    if not current_storage.get(id) and \
-                        not current_storage.append(Event(name=name,
-                                                         id=id,
-                                                         min=min,
-                                                         max=max,
-                                                         level=level,
-                                                         date=date)) :
-                        raise Exception("Непредвиденная ошибка с добавлением нового события!!!")
+                    entity_to_append = Event(name=name, id=id, min=min,
+                                             max=max, level=level, date=date)
 
-
-            def saveAndRegisterEntitites(text, pattern : pyparsing.ParserElement) -> bool :
-                """
-                    Функция регистрирует и сохраняет сущности: одни при обходе, другие при 
-                        определении, что появилась внешняя ссылка
-                """
-                try :
-                    nonlocal res_code
-                    register_keyword = None
-                    match keyword : # определим тип сущности, которую мы будем регистрировать как внешнюю ссылку
-                        # т.е. в словарь ex_dates мы будем класть даты в том случае, когда мы находится
-                        # в описании entity DATE, перейдя к ним от keyword => dates <=> ex_dates
-                        case config.ConfigKeywords.dates : register_keyword = config.ConfigKeywords.ex_dates
-                        case config.ConfigKeywords.places : register_keyword = config.ConfigKeywords.ex_places
-                        case config.ConfigKeywords.persons : register_keyword = config.ConfigKeywords.ex_persons
-                        case config.ConfigKeywords.sources : register_keyword = config.ConfigKeywords.ex_sources
-                        case config.ConfigKeywords.others : register_keyword = config.ConfigKeywords.ex_others
-                        case config.ConfigKeywords.events : register_keyword = config.ConfigKeywords.ex_events
-                        case _ : raise Exception("Нет такого типа!")
-
-                    # теперь прочитаем текст на наличие {ссылок:1}[x]
-                    entities : list[dict] = parseText(text, pattern)
-
-                    for entity in entities :
-                        # {keyword: "date"; number: "1"; name: "ABOBA"}
-                        # name - для интерфейсов, нас не интересует
-                        entity_id = int(entity[config.ParseResult.number])
-                        entity_keyword = entity[config.ParseResult.keyword]
-
-                        # теперь определим словарь для "сохранения"
-                        # (в текущую сущность встречаемые в её текстах)
-                        save_keyword = None
-                        # а также storage, которые будет хранить её как ВНЕШНЮЮ ССЫЛКУ
-                        storage = BaseStorage()
-                        match entity_keyword :
-                            case config.ParseKeywords.date : 
-                                storage = date_storage
-                                save_keyword = config.ConfigKeywords.dates
-                            case config.ParseKeywords.place : 
-                                storage = place_storage
-                                save_keyword = config.ConfigKeywords.places
-                            case config.ParseKeywords.person : 
-                                storage = person_storage
-                                save_keyword = config.ConfigKeywords.persons
-                            case config.ParseKeywords.source :
-                                storage = source_storage
-                                save_keyword = config.ConfigKeywords.sources
-                            case config.ParseKeywords.other :
-                                storage = other_storage
-                                save_keyword = config.ConfigKeywords.others
-                            case config.ParseKeywords.event :
-                                storage = event_storage
-                                save_keyword = config.ConfigKeywords.events
-                            case _ : raise Exception("Нет такого типа!")
-
-                        # проверить, что сущность-ссылка существует в хранилище
-                        if not storage.get(entity_id) :
-                            res_code = 2
-                            logger.error(f"Сущности {entity_id}[{entity_keyword}] в хранилище ещё не существует!")
-                            continue
-                            # raise Exception(f"Сущности {entity_id}[{entity_keyword}] в хранилище \
-                            #                  ещё не существует!")
-
-                        # сохранить для читаемой сущности ссылку на ту, что встретилась
-                        #       в тексте
-                        if not current_storage.saveEntity(id, entity_id, save_keyword) :
-                            raise Exception(f"Ошибка с сохранением сущности {entity_id}[{entity_keyword}][{save_keyword}] \
-                                             для сущности {id}[{keyword}]!")
-                            
-                        # также зарегистрировать в storage, что появилась внешняя 
-                        #       ссылка на сущность-ссылку
-                        if not storage.registerEntity(entity_id, id, register_keyword) :
-                            raise Exception(f"Ошибка с регистрацией сущности {id}[{keyword}][{register_keyword}] \
-                                             для сущности {entity_id}[{entity_keyword}]!")
-      
-                except Exception as exc :
-                    raise exc
+            if not storages.append(id, keyword, entity_to_append) :
+                raise Exception(f"Не удалость добавить сущность {entity_to_append} по {keyword}")
 
             if description :
-                saveAndRegisterEntitites(description, patternTextInclusion())
-
+                if storages.saveAndRegisterEntitites(description, patternTextInclusion(), keyword, id) == 2 :
+                    res_code = 2
             if min :
-                saveAndRegisterEntitites(min, patternTextInclusion())
-
+                if storages.saveAndRegisterEntitites(min, patternTextInclusion(), keyword, id) == 2:
+                    res_code = 2
             if max :
-                saveAndRegisterEntitites(max, patternTextInclusion())
+                if storages.saveAndRegisterEntitites(max, patternTextInclusion(), keyword, id) == 2 :
+                    res_code = 2
 
     except Exception as exc :
         res_code = 1
@@ -274,6 +133,7 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
 
     logger.info("Начало операции полного парсинга файла keyword={keyword} path={path} res_code={res_code}", 
                     path=path, keyword=keyword, res_code=res_code)
+
     return res_code
 
 
@@ -312,7 +172,7 @@ def parse(path_folder : Path,
         source_code, date_code, place_code, person_code, other_code,event_code = 2, 2, 2, 2, 2, 2
 
         for i in range(config.max_reparse_count) :
-            logger.info(f"ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
+            logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
             if source_code == 2 :
