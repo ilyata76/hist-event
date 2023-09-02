@@ -15,6 +15,7 @@ from schemas.Place import PlaceStorage, Place
 from schemas.Source import SourceStorage, Source
 from schemas.Other import OtherStorage, Other
 from schemas.Event import EventStorage, Event
+from schemas.Parameters import Storages
 
 
 def dictFromYaml(path : Path) -> dict | list[dict] | None:
@@ -67,13 +68,7 @@ def parseText(string : str, pattern : pyparsing.ParserElement) -> list[dict] :
 
 ############ РАБОТА С ХРАНИЛИЩАМИ
 
-def parseFile(path : Path, keyword : str,
-              source_storage : SourceStorage,
-              date_storage : DateStorage, 
-              place_storage : PlaceStorage,
-              person_storage : PersonStorage,
-              other_storage : OtherStorage,
-              event_storage : EventStorage) :
+def parseFile(path : Path, keyword : str, storages : Storages) :
     """
         Парсит файл, изменяет классы Storage во время прохода.
             Регистрирует одни сущности в хранилищах других, если те будут встречены.
@@ -85,6 +80,13 @@ def parseFile(path : Path, keyword : str,
             - 2 если некоторые сущности были ещё не добавлены
     """
     try :
+        source_storage : SourceStorage = storages.source_storage
+        date_storage : DateStorage = storages.date_storage
+        place_storage : PlaceStorage = storages.place_storage
+        person_storage : PersonStorage = storages.person_storage
+        other_storage : OtherStorage = storages.other_storage
+        event_storage : EventStorage = storages.event_storage
+
         res_code = 0
         logger.info("Начало операции полного парсинга файла keyword={keyword} path={path}", 
                     path=path, keyword=keyword)
@@ -277,7 +279,8 @@ def parseFile(path : Path, keyword : str,
 
 ################### ГЛАВНЫЙ ПРОЦЕСС
 
-def parse(path : Path, 
+def parse(path_folder : Path,
+          storages : Storages,
           dates_path : Path | None = None, 
           persons_path : Path | None = None,
           places_path : Path | None = None, 
@@ -292,36 +295,38 @@ def parse(path : Path,
         logger.info("Начало операции ОБЩЕГО парсинга")
 
         logger.info("СОЗДАНИЕ ХРАНИЛИЩА")
-        s0 = SourceStorage(name="sources")
-        s1 = DateStorage(name="dates")
-        s2 = PlaceStorage(name="places")
-        s3 = PersonStorage(name="persons")
-        s4 = OtherStorage(name="others")
-        s5 = EventStorage(name="events")
 
-        source_code = 2
-        date_code = 2
-        place_code = 2
-        person_code = 2
-        other_code = 2
-        event_code = 2
+        if not dates_path :
+            dates_path = path_folder.joinpath("dates.yaml")
+        if not persons_path :
+            persons_path = path_folder.joinpath("persons.yaml")
+        if not places_path :
+            places_path = path_folder.joinpath("places.yaml")
+        if not sources_path :
+            sources_path = path_folder.joinpath("sources.yaml")
+        if not others_path :
+            others_path = path_folder.joinpath("others.yaml")
+        if not events_path :
+            events_path = path_folder.joinpath("events.yaml")
+
+        source_code, date_code, place_code, person_code, other_code,event_code = 2, 2, 2, 2, 2, 2
 
         for i in range(config.max_reparse_count) :
             logger.info(f"ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
             if source_code == 2 :
-                source_code = parseFile(sources_path, config.ConfigKeywords.sources, s0, s1, s2, s3, s4, s5)
+                source_code = parseFile(sources_path, config.ConfigKeywords.sources, storages)
             if date_code == 2 :
-                date_code = parseFile(dates_path, config.ConfigKeywords.dates, s0, s1, s2, s3, s4, s5)
+                date_code = parseFile(dates_path, config.ConfigKeywords.dates, storages)
             if place_code == 2 :
-                place_code = parseFile(places_path, config.ConfigKeywords.places, s0, s1, s2, s3, s4, s5)
+                place_code = parseFile(places_path, config.ConfigKeywords.places, storages)
             if person_code == 2 :
-                person_code = parseFile(persons_path, config.ConfigKeywords.persons, s0, s1, s2, s3, s4, s5)
+                person_code = parseFile(persons_path, config.ConfigKeywords.persons, storages)
             if other_code == 2 :
-                other_code = parseFile(others_path, config.ConfigKeywords.others, s0, s1, s2, s3, s4, s5)
+                other_code = parseFile(others_path, config.ConfigKeywords.others, storages)
             if event_code == 2 :
-                event_code = parseFile(events_path, config.ConfigKeywords.events, s0, s1, s2, s3, s4, s5)
+                event_code = parseFile(events_path, config.ConfigKeywords.events, storages)
 
             codes = [source_code, date_code, place_code, person_code, other_code, event_code]
 
@@ -337,10 +342,8 @@ def parse(path : Path,
         else :
             logger.info(f"УСПЕШНЫЙ ПАРСИНГ")
 
-        print('\n\n\n', s0, '\n\n\n', s1,'\n\n\n', s2,'\n\n\n', s3, '\n\n\n', s4, '\n\n\n', s5, '\n\n\n')
-
         logger.info("Конец операции ОБЩЕГО парсинга")
-        return 1
+        return storages
     except Exception as exc :
         logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА exc={exc}", exc=exc)
         return None

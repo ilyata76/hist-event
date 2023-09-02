@@ -7,6 +7,8 @@ from loguru import logger
 
 import config
 from processes.parse import parse
+from schemas.Parameters import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
+                                PersonStorage, OtherStorage, EventStorage
 
 
 class StartupCLI(cli.Application):
@@ -21,6 +23,15 @@ class StartupCLI(cli.Application):
     verbose = cli.Flag(["v", "verbose"], 
                        help = "If given, I will be very talkative")
     
+
+    storages = Storages(
+        source_storage=SourceStorage(name="sources"), 
+        date_storage=DateStorage(name="dates"),
+        place_storage=PlaceStorage(name="places"), 
+        person_storage=PersonStorage(name="persons"),
+        other_storage=OtherStorage(name="others"),
+        event_storage=EventStorage(name="events")
+    )
 
 
     ## Для внутреннего пользования
@@ -46,14 +57,7 @@ class StartupCLI(cli.Application):
         except AttributeError:
             path_folder = Path(config.yaml_folder)
 
-
-        print(parse(path_folder.joinpath("test.yaml"), 
-                    path_folder.joinpath("dates.yaml"),
-                    path_folder.joinpath("persons.yaml"),
-                    path_folder.joinpath("places.yaml"),
-                    path_folder.joinpath("sources.yaml"),
-                    path_folder.joinpath("others.yaml"),
-                    path_folder.joinpath("events.yaml")))
+        print(parse(path_folder, self.storages))
 
         self.log("A {x}", x=path_folder)
 
