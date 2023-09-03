@@ -13,14 +13,20 @@ def generateSQL(storages : Storages) -> str | None:
     """
     try : 
         logger.info("\n\nНАЧАЛО ГЕНЕРАЦИИ SQL (УДАЛЕНИЕ ТАБЛИЦ)\n\n")
-        result = "-- УДАЛИТЬ ТАБЛИЦЫ, если те существуют\n\n"
+        result = "\n-- УДАЛИТЬ ТАБЛИЦЫ, если те существуют\n\n"
+        result += "BEGIN;\n\n"
         result += storages.dropTablesSQL() + "\n\n"
-        result += "-- СОЗДАТЬ ТАБЛИЦЫ \n\n"
+        result += "COMMIT;\n\n"
+        result += "\n-- СОЗДАТЬ ТАБЛИЦЫ \n\n"
         logger.info("СОЗДАНИЕ ТАБЛИЦ SQL")
+        result += "BEGIN;\n\n"
         result += storages.generateTablesSQL() + "\n\n"
-        result += "-- ЗАПОЛНИТЬ ТАБЛИЦЫ \n\n"
+        result += "COMMIT;\n\n"
+        result += "\n-- ЗАПОЛНИТЬ ТАБЛИЦЫ \n\n"
         logger.info("ЗАПОЛНЕНИЕ ТАБЛИЦ SQL")
+        result += "BEGIN;\n\n"
         result += storages.fillTablesSQL() + "\n\n"
+        result += "COMMIT;\n\n"
         logger.info("КОНЕЦ ГЕНЕРАЦИИ SQL")
         return result
     except :

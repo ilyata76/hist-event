@@ -1,4 +1,7 @@
+
 -- УДАЛИТЬ ТАБЛИЦЫ, если те существуют
+
+BEGIN;
 
 DROP TABLE IF EXISTS sources CASCADE; -- банк исторических разных источников
 
@@ -12,7 +15,12 @@ DROP TABLE IF EXISTS others CASCADE; -- банк всего остального
 
 DROP TABLE IF EXISTS events CASCADE; -- банк событий, главной сущности базы данных
 
+COMMIT;
+
+
 -- СОЗДАТЬ ТАБЛИЦЫ 
+
+BEGIN;
 
 CREATE TABLE sources (
     id INTEGER PRIMARY KEY,
@@ -136,7 +144,12 @@ CREATE TABLE events (
             CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id)
 );
 
+COMMIT;
+
+
 -- ЗАПОЛНИТЬ ТАБЛИЦЫ 
+
+BEGIN;
 
 INSERT INTO sources VALUES 
 (
@@ -251,4 +264,6 @@ INSERT INTO events VALUES
     '{1}', null, '{1}', null,
     '{1, 2}', null, null, null
 );
+
+COMMIT;
 
