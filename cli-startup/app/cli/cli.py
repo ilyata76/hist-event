@@ -63,22 +63,29 @@ class StartupCLI(cli.Application):
         except AttributeError:
             path_sql_folder = Path(config.sql_folder)
 
-        self.log("Начинаем парсинг")
-        self.storages = parse(path_yaml_folder, self.storages)
-        if not self.storages :
-            raise Exception("storages обнулились!")
-        #self.log("Теперь хранилища storages []->:\n\n{stor}\n\n", stor=self.storages)
+        try : 
+            self.log("Начинаем парсинг")
+            self.storages = parse(path_yaml_folder, self.storages)
+            if not self.storages :
+                logger.error("Произошла ошибка при обработке входных файлов!")
+                raise Exception("Произошла ошибка при обработке входных файлов!")
+            #self.log("Теперь хранилища storages []->:\n\n{stor}\n\n", stor=self.storages)
 
 
-        self.log("Начинаем генерацию SQL")
-        string = generateSQL(self.storages)
-        if not string :
-            raise Exception("SQL string пустая!")
-        
-        with open(path_sql_folder.joinpath("main.sql"), "w", encoding="utf-8") as file :
-            file.write(string)
+            self.log("Начинаем генерацию SQL")
+            string = generateSQL(self.storages)
+            if not string :
+                logger.error("Произошла ошибка при обработке данных и генерации SQL-запроса")
+                raise Exception("Произошла ошибка при обработке данных и генерации SQL-запроса")
+            
+            with open(path_sql_folder.joinpath("main.sql"), "w", encoding="utf-8") as file :
+                file.write(string)
 
-        self.log("A {x}", x=path_yaml_folder)
+            self.log("Работа программы завершена корректно")
+
+        except Exception as exc: 
+            self.log("Работа программы завершена некорректно")
+            logger.error("Программа завершила свою работу некорректно")
 
 
     @cli.switch("--yaml-folder", str)

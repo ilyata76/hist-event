@@ -42,6 +42,7 @@ class ConfigKeywords :
     description : str = "description"
     # date & event специфика
     date : str = "date"
+    time : str = "time"
     # person специфика
     person : str = "person"
     # place специфика

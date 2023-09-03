@@ -17,6 +17,8 @@ from schemas.Event import Event
 from schemas.Storages import Storages
 
 
+import datetime
+
 def dictFromYaml(path : Path) -> dict | list[dict] | None:
     """
         Открыть файл .yaml по пути path, 
@@ -89,6 +91,7 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
             min = dict_entity.get(config.ConfigKeywords.min, None)
             max = dict_entity.get(config.ConfigKeywords.max, None)
             level = dict_entity.get(config.ConfigKeywords.level, None)
+            time = dict_entity.get(config.ConfigKeywords.time, None)
             
             entity_to_append = None
 
@@ -97,8 +100,10 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
                     entity_to_append = Source(name=name, id=id, description=description,
                                                link=link, author=author, date=date)
                 case config.ConfigKeywords.dates : 
+                    if date : date = str(datetime.date.fromisoformat(date))
+                    if time : time = str(datetime.time.fromisoformat(time))
                     entity_to_append = Date(name=name, id=id, description=description, 
-                                            date=date)
+                                            date=date, time=time)
                 case config.ConfigKeywords.places :
                     entity_to_append = Place(name=name, id=id, description=description, 
                                              geo=geo)
@@ -179,20 +184,26 @@ def parse(path_folder : Path,
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
+            codes = [source_code, date_code, place_code, person_code, other_code, event_code]
+
             if source_code == 2 :
                 source_code = parseFile(sources_path, config.ConfigKeywords.sources, storages)
-            if date_code == 2 :
+                codes[0] = source_code
+            if date_code == 2 and 1 not in codes:
                 date_code = parseFile(dates_path, config.ConfigKeywords.dates, storages)
-            if place_code == 2 :
+                codes[1] = date_code
+            if place_code == 2 and 1 not in codes:
                 place_code = parseFile(places_path, config.ConfigKeywords.places, storages)
-            if person_code == 2 :
+                codes[2] = place_code
+            if person_code == 2 and 1 not in codes:
                 person_code = parseFile(persons_path, config.ConfigKeywords.persons, storages)
-            if other_code == 2 :
+                codes[3] = person_code
+            if other_code == 2 and 1 not in codes:
                 other_code = parseFile(others_path, config.ConfigKeywords.others, storages)
-            if event_code == 2 :
+                codes[4] = other_code
+            if event_code == 2 and 1 not in codes:
                 event_code = parseFile(events_path, config.ConfigKeywords.events, storages)
-
-            codes = [source_code, date_code, place_code, person_code, other_code, event_code]
+                codes[5] = event_code
 
             if 1 in codes :
                 logger.error(f"Ошибка на итерации {i}")

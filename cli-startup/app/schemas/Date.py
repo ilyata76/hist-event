@@ -13,6 +13,7 @@ class Date(BaseEntity) :
         Модель, описывающая сущность даты
     """
     date : str
+    time : str | None = None
 
 
 class DateStorage(BaseStorage) :
@@ -48,7 +49,8 @@ class DateStorage(BaseStorage) :
                                     CREATE TABLE {self.name} (
                                     	{ConfigKeywords.id} INTEGER PRIMARY KEY,
                                     	{ConfigKeywords.name} TEXT,
-                                    	{ConfigKeywords.date} TEXT NOT NULL,
+                                    	{ConfigKeywords.date} DATE NOT NULL,
+                                        {ConfigKeywords.time} TIME,
                                     	{ConfigKeywords.description} TEXT,
                                     	{ConfigKeywords.events} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_events} INTEGER ARRAY,
@@ -77,7 +79,7 @@ class DateStorage(BaseStorage) :
             x = self.storage[key]
             if type(x) is Date :
                 ary.append(inspect.cleandoc(f"""(
-                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.date)}, {NOV(x.description)}, 
+                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.date)}, {NOV(x.time)}, {NOV(x.description)}, 
                                                     {NOV(x.events)}, {NOV(x.ex_events)}, {NOV(x.dates)}, {NOV(x.ex_dates)},
                                                     {NOV(x.places)}, {NOV(x.ex_places)}, {NOV(x.persons)}, {NOV(x.ex_persons)},
                                                     {NOV(x.sources)}, {NOV(x.ex_sources)}, {NOV(x.others)}, {NOV(x.ex_others)}
