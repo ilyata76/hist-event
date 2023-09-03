@@ -12,7 +12,7 @@ class Event(BaseEntity) :
     """
         Модель, описывающая сущность события
     """
-    date : str
+    date : int # ссылка на дату
     min : str
     max : str
     level : str | None = None
@@ -51,7 +51,7 @@ class EventStorage(BaseStorage) :
                                     CREATE TABLE {self.name} (
                                     	{ConfigKeywords.id} INTEGER PRIMARY KEY,
                                     	{ConfigKeywords.name} TEXT NOT NULL,
-                                    	{ConfigKeywords.date} TEXT NOT NULL,
+                                    	{ConfigKeywords.date} INTEGER NOT NULL,
                                         {ConfigKeywords.min} TEXT NOT NULL,
                                         {ConfigKeywords.max} TEXT NOT NULL,
                                         {ConfigKeywords.level} TEXT,
@@ -67,7 +67,9 @@ class EventStorage(BaseStorage) :
                                     	{ConfigKeywords.sources} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_sources} INTEGER ARRAY,
                                     	{ConfigKeywords.others} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_others} INTEGER ARRAY
+                                    	{ConfigKeywords.ex_others} INTEGER ARRAY,
+
+	                                        CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id)
                                     );
                                     """ ) + super().generateTableSQL()
     

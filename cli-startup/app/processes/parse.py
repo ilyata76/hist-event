@@ -109,8 +109,13 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
                     entity_to_append = Other(name=name, id=id, description=description, 
                                              meta=meta)
                 case config.ConfigKeywords.events :
-                    entity_to_append = Event(name=name, id=id, min=min,
-                                             max=max, level=level, date=date)
+                    if storages.date_storage.get(int(date)) :
+                        entity_to_append = Event(name=name, id=id, min=min,
+                                                max=max, level=level, date=int(date))
+                    else :
+                        res_code = 2
+                        logger.error(f"Такой даты для события - date={date} - не существует")
+                        continue 
 
             if not storages.append(id, keyword, entity_to_append) :
                 raise Exception(f"Не удалость добавить сущность {entity_to_append} по {keyword}")
