@@ -46,8 +46,12 @@ CREATE TABLE sources (
 CREATE TABLE dates (
     id INTEGER PRIMARY KEY,
     name TEXT,
-    date DATE NOT NULL,
+    date DATE,
     time TIME,
+    start_date DATE,
+    start_time TIME,
+    end_date DATE,
+    end_time TIME,
     description TEXT,
     events INTEGER ARRAY,
     ex_events INTEGER ARRAY,
@@ -167,31 +171,36 @@ INSERT INTO sources VALUES
 
 INSERT INTO dates VALUES 
 (
-    '1', 'название', '2023-08-23', '20:27:59', 'Описание для ?внутренних целей? ({source : 1}[источник])', 
+    '1', 'название', '2023-08-23', '20:27:59', 
+    null, null, null, null, 'Описание для ?внутренних целей? ({source : 1}[источник])', 
     null, null, null, '{5}',
     null, null, null, '{1}',
     '{1}', null, null, null
 ),
 (
-    '2', 'название"', '2023-08-23', null, 'Многострочное описание события 2 ({source : 1}[источник]) а теперь здесь есть ссылка на {person:1}[челика]', 
+    '2', 'название"', '2023-08-23', null, 
+    null, null, null, null, 'Многострочное описание события 2 ({source : 1}[источник]) а теперь здесь есть ссылка на {person:1}[челика]', 
     null, null, null, null,
     null, '{1}', '{1}', null,
     '{1}', null, null, null
 ),
 (
-    '3', '"Дата августовского путча"', '2023-08-23', null, null, 
+    '3', '"Дата августовского путча"', '2023-07-23', null, 
+    '2023-06-23', '20:20:00', '2023-08-23', null, null, 
     null, null, null, null,
     null, '{1}', null, '{2}',
     null, null, null, null
 ),
 (
-    '4', '18 ноября 2024', '2023-08-23', '22:27:10+03:00', null, 
+    '4', '18 ноября 2024', '2023-08-23', '22:27:10+03:00', 
+    '2023-08-23', null, null, null, null, 
     null, null, null, null,
     null, '{1}', null, null,
     null, null, null, null
 ),
 (
-    '5', '23 августа 2023', '2023-08-23', '21:27:00', 'Описание события 5, которое было бы после {date:1}[этого], но не случилось ({source : 1}[источник])', 
+    '5', '23 августа 2023', '2023-08-23', '21:27:00', 
+    null, null, null, null, 'Описание события 5, которое было бы после {date:1}[этого], но не случилось ({source : 1}[источник])', 
     null, null, '{1}', null,
     null, null, null, null,
     '{1}', null, null, null

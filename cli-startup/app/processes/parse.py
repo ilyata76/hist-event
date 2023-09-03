@@ -62,6 +62,11 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
             level = dict_entity.get(config.ConfigKeywords.level, None)
             time = dict_entity.get(config.ConfigKeywords.time, None)
             
+            start_date = dict_entity.get(config.ConfigKeywords.start_date, None)
+            end_date = dict_entity.get(config.ConfigKeywords.end_date, None)
+            start_time = dict_entity.get(config.ConfigKeywords.start_time, None)
+            end_time = dict_entity.get(config.ConfigKeywords.end_time, None)
+            
             entity_to_append = None
 
             match keyword : # добавим в Storage в зависимости от типа читаемого файла
@@ -70,9 +75,14 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
                                                link=link, author=author, date=date)
                 case config.ConfigKeywords.dates : 
                     if date : date = str(datetime.date.fromisoformat(date))
+                    if start_date : start_date = str(datetime.date.fromisoformat(start_date))
+                    if end_date : end_date = str(datetime.date.fromisoformat(end_date))
                     if time : time = str(datetime.time.fromisoformat(time))
+                    if start_time : start_time = str(datetime.time.fromisoformat(start_time))
+                    if end_time :  end_time = str(datetime.time.fromisoformat(end_time))
                     entity_to_append = Date(name=name, id=id, description=description, 
-                                            date=date, time=time)
+                                            date=date, time=time, start_date=start_date, start_time=start_time,
+                                            end_date=end_date, end_time=end_time)
                 case config.ConfigKeywords.places :
                     entity_to_append = Place(name=name, id=id, description=description, 
                                              geo=geo)

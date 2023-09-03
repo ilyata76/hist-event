@@ -43,6 +43,10 @@ class ConfigKeywords :
     # date & event специфика
     date : str = "date"
     time : str = "time"
+    start_date : str = "start_date"
+    end_date : str = "end_date"
+    start_time : str = "start_time"
+    end_time : str = "end_time"
     # person специфика
     person : str = "person"
     # place специфика
