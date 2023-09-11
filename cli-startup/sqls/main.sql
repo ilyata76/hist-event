@@ -171,7 +171,7 @@ INSERT INTO sources VALUES
 
 INSERT INTO dates VALUES 
 (
-    '1', 'название', '2023-08-23', '20:27:59', 
+    '1', 'название', '2023-08-23', '10:10:10', 
     null, null, null, null, 'Описание для ?внутренних целей? ({source : 1}[источник])', 
     null, null, null, '{5}',
     null, null, null, '{1}',
@@ -181,25 +181,25 @@ INSERT INTO dates VALUES
     '2', 'название"', '2023-08-23', null, 
     null, null, null, null, 'Многострочное описание события 2 ({source : 1}[источник]) а теперь здесь есть ссылка на {person:1}[челика]', 
     null, null, null, null,
-    null, '{1}', '{1}', null,
+    null, '{1}', null, null,
     '{1}', null, null, null
 ),
 (
     '3', '"Дата августовского путча"', '2023-07-23', null, 
-    '2023-06-23', '20:20:00', '2023-08-23', null, null, 
+    '2023-06-23', null, '2023-08-23', null, null, 
     null, null, null, null,
     null, '{1}', null, '{2}',
     null, null, null, null
 ),
 (
-    '4', '18 ноября 2024', '2023-08-23', '22:27:10+03:00', 
-    '2023-08-23', null, null, null, null, 
+    '4', '18 ноября 2024', '2023-08-23', null, 
+    '2023-08-23', '10:10:10', null, null, null, 
     null, null, null, null,
     null, '{1}', null, null,
     null, null, null, null
 ),
 (
-    '5', '23 августа 2023', '2023-08-23', '21:27:00', 
+    '5', '23 августа 2023', '2023-08-23', null, 
     null, null, null, null, 'Описание события 5, которое было бы после {date:1}[этого], но не случилось ({source : 1}[источник])', 
     null, null, '{1}', null,
     null, null, null, null,
@@ -217,7 +217,7 @@ INSERT INTO places VALUES
 INSERT INTO persons VALUES 
 (
     '1', 'Абоба Максим Маркович', 'Абоба Максим Маркович', 'Абоба Максим Маркович родился {date:1}[сегодня] в городе {place:1}[Жепа] ({source : 1}[источник])', 
-    null, '{1, 6}', '{1}', '{2}',
+    null, '{1, 6}', '{1}', null,
     '{1}', null, null, '{2}',
     '{1}', null, null, '{1}'
 ),

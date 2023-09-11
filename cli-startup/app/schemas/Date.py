@@ -12,12 +12,14 @@ class Date(BaseEntity) :
     """
         Модель, описывающая сущность даты
     """
-    date : str | None = None
-    time : str | None = None
-    start_date : str | None = None
-    start_time : str | None = None
-    end_date : str | None = None
-    end_time : str | None = None
+    date : str | None = None # date
+    time : str | None = None # time
+    start : str | None = None # datetime
+    end : str | None = None # datetime
+    start_date : str | None = None # date
+    start_time : str | None = None # time
+    end_date : str | None = None # date
+    end_time : str | None = None # time
 
 
 class DateStorage(BaseStorage) :

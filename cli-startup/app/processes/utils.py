@@ -8,11 +8,14 @@ def dictFromYaml(path : Path) -> dict | list[dict] | None:
         Открыть файл .yaml по пути path, 
             вернуть результат в виде словаря
     """
-    logger.info("Чтение {yaml} файла", yaml=path)
-    buffer = None
-    with open(path, "rb") as file : # encoding="utf-8"
-        buffer = file.read()
-    return yaml.load(buffer, Loader=yaml.FullLoader)
+    try : 
+        logger.info("Чтение {yaml} файла", yaml=path)
+        buffer = None
+        with open(path, "rb") as file : # encoding="utf-8"
+            buffer = file.read()
+        return yaml.load(buffer, Loader=yaml.FullLoader)
+    except :
+        raise Exception(f"Нет такого файла {path}")
 
 
 def patternTextInclusion() -> pyparsing.ParserElement :
@@ -30,7 +33,7 @@ def patternTextInclusion() -> pyparsing.ParserElement :
                                  + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) # и имя 
                                  + "[" + pyparsing.ZeroOrMore(" ") + pyparsing.Word(name) #'[ NAME'
                                  + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + pyparsing.Suppress("]") #' ]'
-                                 )
+                            )
 
 
 def nullOrValue(value) -> str:

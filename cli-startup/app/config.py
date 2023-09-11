@@ -47,6 +47,8 @@ class ConfigKeywords :
     end_date : str = "end_date"
     start_time : str = "start_time"
     end_time : str = "end_time"
+    start : str = "start"
+    end : str = "end"
     # person специфика
     person : str = "person"
     # place специфика
