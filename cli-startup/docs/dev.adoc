@@ -1,0 +1,162 @@
+## Добавить новую сущность
+Сущность - главный и почти что единственный элемент cli-приложения, добавление новой сущности затрагивает почти все процессы его работы. Здесь описано, в какие из них нужно прямое вмешательство.
+
+### Чтобы добавить новую сущность на уровне кода, необходимо:
+
+* В файле `config.py` в классе `ParseKeyword` определить константы и ключевые слова, которые будут использоваться при проходе текстов (например, description-поля) для таких форм: `{>КЛЮЧЕВОЕ СЛОВО<:ID}[замещающий текст]`
+[source, python]
+----
+class ParseKeywords :
+    date = "date"
+    person = "person"
+    ...
+    # код здесь
+----
+
+* В файле `config.py` в классе `ConfigKeywords` определить специфические константы-названия_полей для определяемой сущности, а также, если на сущность можно будет ссылаться, константы-названия_полей для хранения ссылок
+[source, python]
+----
+class ConfigKeywords :
+    name : str = "name"
+    id : str = "id"
+    ...
+    # код для констант здесь
+    ...
+    dates : str = "dates" # set[int] для внутренних ссылок
+    ex_dates : str = "ex_dates" # для внешних
+    ...
+    # код для ссылок (внутренних и внешних) на сущность здесь
+----
+
+* Создать классы сущности и хранилища для сущностей в папке `schemas`, отнаследовавшись от `BaseEntity` и `BaseStorage`, поля должны соответствовать `str`-описаниям из конфига, описать методы по подобию существующим сущностям. А также функции, генерирующие `SQL`-код. НАПРИМЕР:
+[source, python]
+----
+def generateTableSQL(self) -> str:
+    ...
+    str_include  = f"\t{ConfigKeywords.author} TEXT NOT NULL,\n" # у последней строки в наборе str_include не должно быть запятой и перевода строки
+    ...
+    return super().generateTableSQL(str_include)
+...
+
+def fillTableSQL(self) -> str:
+    ...
+        if type(x) is Biblio :
+            str_include  = f"\t  {NOV(x.author)}, {NOV(x.link)}, {NOV(x.date)},\n"
+            str_include += f"\t  {NOV(x.state)}, {NOV(x.period)}"
+            str_result = super().fillTableSQL(x, str_include)
+            ary.append(str_result)
+    ...
+    return result
+----
+
+* Добавить в `Entity.py` у `BaseEntity` новые поля, `{keywords}`, `ex_{keywords}` 
+** Добавить у `BaseEntity` новые строки в функциях генерации SQL-запроса:
+
+ [source, python]
+ ----
+ def generateTableSQL(self, str_include : str = "") -> str :
+    ...
+    str_result += # новые строки здесь
+    str_result += f");"
+ ...
+
+ def fillTableSQL(self, element : BaseEntity, str_include : str = "") -> str :
+    ...
+    str_result += f"\t  {NOV(element.biblios)}, {NOV(element.ex_biblios)},\n"
+ ...
+ # новые строки здесь
+ ----
+
+* В `Storages.py` добавить новое хранилище сущностей как дополнительное  к существующим. А также добавить выбор хранилища в необходимых местах (`match`/`case`)
+
+** В конструктор, в `__init__`
+
+** Далее, в функции `append` прописать выбор текущего хранилища по `keyword` из конфига для добавления новой сущности в него. 
+
+ [source, python]
+ ----
+ match keyword :
+     case config.ConfigKeywords.sources :
+         self.current_storage = self.source_storage
+     ...
+     # код выбора здесь
+ ----
+
+** Далее, в функции `saveAndRegisterEntitites` добавить выбор в двух местах:
+*** при выборе типа сущности, которая будет регистрироваться как внешняя ссылка для объекта, ссылка которого находится у текущего
+ 
+ [source, python]
+ ----
+    match keyword : 
+        case config.ConfigKeywords.dates : 
+            register_keyword = config.ConfigKeywords.ex_dates
+        ...
+        # код выбора здесь
+ ----
+
+*** при обходе текста, наполненном ссылками на другие сущности, в месте определения `storage` для поиска сущностей и сохранения внешних ссылок (где наша сущность - внешняя для них), а также `save_keyword` для определения типа сохраняемой сущности для текущей
+ 
+ [source, python]
+ ----
+    match entity_keyword :
+        case config.ParseKeywords.date : 
+            storage = self.date_storage
+            save_keyword = config.ConfigKeywords.dates
+        ...
+        # код выбора здесь
+ ----
+
+** Дополнить методы `Storages`-класса с учётом новодобавленной сущности (в частности, в массив для функций, генерирующих SQL) в необходимом для сущности порядке следования.
+
+* Далее, в файле `cli.py` дополнить конструктор `self.storages` новым хранилищем
+
+* Далее, в файле процесса `parse.py` в функции `getEntity` нужно описать процесс создания сущности
+** Через `dict.get(keyword, None)` спарсить специфические значения
+** В `match`/`case` по `keyword` добавить логику создания сущности:
+ 
+ [source, python]
+ ----
+    ...
+    case config.ConfigKeywords.places :
+        entity_to_append = Place( name=name, 
+                                  id=id, 
+                                  description=description, 
+                                  geo=geo )
+        ...
+        # логика здесь
+ ----
+
+* При необходимости, если у сущности есть поля, которые стоит обрабатывать на ссылки, в функции `parseFile` стоит добавить:
+ 
+[source, python]
+----
+   ...
+   if description :
+       if storages.saveAndRegisterEntitites(description, patternTextInclusion(), keyword, id) == 2 :
+           res_code = 2
+   ...
+   # код обработки здесь
+----
+
+* Далее, в функции `parse` добавить путь к `yaml`-файлу с описанием сущности, прописать, что делать, если он не будет задан, например:
+
+[source, python]
+----
+    if not biblios_path :
+        biblios_path = path_folder.joinpath("biblios.yaml")
+----
+
+** Далее, добавить в перечисление (просто переменную) код выполнения функции `parseFile` для нашей сущности, добавить в массив `codes` дополнительную `2`, после внутри цикла `for` прописать обновление кода в массиве
+
+[source, python]
+----
+if codes[source_code] == 2 and 1 not in codes:
+    codes[source_code] = parseFile(sources_path, config.ConfigKeywords.sources, storages)
+# логика для обновления кода для сущности здесь
+----
+
+* Если путь до `yaml`-файла будет проложен самостоятельно, в вызове `cli.py:main` необходимо его прописать
+
+* Проверить работоспособность новой конфигурации
+
+Такая сложность добавления зависит главным образом от неавтоматизированных интерфейсов связи SQL базы данных и CLI, генерирующую SQL файл, а также невозможностью предусмотреть и нежеланием ограничивать действия пользователя
