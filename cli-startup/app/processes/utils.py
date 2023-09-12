@@ -23,7 +23,7 @@ def patternTextInclusion() -> pyparsing.ParserElement :
         Для поиска { таких : 1 } [ ИМЯ ] вставок шаблон
     """
 
-    keyword = pyparsing.alphas
+    keyword = pyparsing.alphas + "_"
     number = pyparsing.nums
     name = pyparsing.alphanums + " _-/\\:()?!" + pyparsing.ppu.Cyrillic.alphanums # TODO to config
 

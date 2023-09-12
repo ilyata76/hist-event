@@ -26,7 +26,9 @@ class BaseEntity(BaseModel) :
     sources : set[int] | None = None
     ex_sources : set[int] | None = None # ссылки от внешних источников
     others : set[int] | None = None
-    ex_others : set[int] | None = None
+    ex_others : set[int] | None = None #
+    source_fragments : set[int] | None = None
+    ex_source_fragments : set[int] | None = None #
 
 
 class BaseStorage() :

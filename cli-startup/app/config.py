@@ -41,13 +41,14 @@ class ParseKeywords :
     source = "source"
     other = "other"
     event = "event"
+    source_fragment = "source_fragment"
 
 
 class ConfigKeywords :
     """
         Для парсинга.
             Определяют константы для конфигов каждой из моделей
-    """    
+    """
     name : str = "name"
     id : str = "id"
     events : str = "events"
@@ -74,6 +75,8 @@ class ConfigKeywords :
     min : str = "min"
     max : str = "max"
     level : str = "level"
+    # source_fragment специфика
+    source : str = "source"
     ##
     dates : str = "dates"
     persons : str = "persons"
@@ -87,3 +90,5 @@ class ConfigKeywords :
     ex_others : str = "ex_others"
     events : str = "events"
     ex_events : str = "ex_events"
+    source_fragments : str = "source_fragments"
+    ex_source_fragments : str = "ex_source_fragments"

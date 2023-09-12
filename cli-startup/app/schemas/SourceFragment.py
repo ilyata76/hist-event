@@ -1,5 +1,5 @@
 """
-    Схемы, определяющие дату как сущность
+    Схемы, определяющие фрагмент исторического источника как сущность
 """
 from loguru import logger
 from schemas.Entity import BaseEntity, BaseStorage
@@ -8,60 +8,48 @@ from config import ConfigKeywords
 from processes.utils import NOV
 
 
-class Date(BaseEntity) :
+class SourceFragment(BaseEntity) :
     """
-        Модель, описывающая сущность даты
+        Модель, описывающая сущность фрагмента исторического источника
     """
-    date : str | None = None # date
-    time : str | None = None # time
-    start : str | None = None # datetime
-    end : str | None = None # datetime
-    start_date : str | None = None # date
-    start_time : str | None = None # time
-    end_date : str | None = None # date
-    end_time : str | None = None # time
+    source : int | None = None
 
 
-class DateStorage(BaseStorage) :
+class SourceFragmentStorage(BaseStorage) :
     """
-        Класс управления набором дат.
+        Класс управления набором фрагментов источников.
         Используется в первую очередь для лёгкого доступа 
             и регистрации других сущностей.
     """
 
-    def append(self, date : Date) -> bool :
-        logger.info(f"Добавление даты {date} в {self.name}")
-        return super().append(date)
+    def append(self, source_fragment : SourceFragment) -> bool :
+        logger.info(f"Добавление фрагмента источника {source_fragment} в {self.name}")
+        return super().append(source_fragment)
     
-    def get(self, id : int) -> Date | None :
-        logger.info(f"Получение даты {id} из {self.name}")
+    def get(self, id : int) -> SourceFragment | None :
+        logger.info(f"Получение фрагмента источника {id} из {self.name}")
         return super().get(id)
     
     def registerEntity(self, id : int, entity_id : int, field : str) -> bool :
-        logger.info(f"Регистрация в хранилище дат {self.name} новой сущности {entity_id}[{field}] для {id}")
+        logger.info(f"Регистрация в хранилище фрагментов источников {self.name} новой сущности {entity_id}[{field}] для {id}")
         return super().registerEntity(id, entity_id, field)
     
-    ###################
+    ##################
 
     def dropTableSQL(self) -> str:
-        return super().dropTableSQL() + " -- банк дат, на которые будут ссылаться другие сущности"
+        return super().dropTableSQL() + " -- банк ФРАГМЕНТОВ исторических разных источников"
 
 
     def generateTableSQL(self) -> str:
         """
-            Генерация SQL таблицы для даты
+            Генерация SQL таблицы для источника
         """
         return inspect.cleandoc( f"""
                                     CREATE TABLE {self.name} (
                                     	{ConfigKeywords.id} INTEGER PRIMARY KEY,
-                                    	{ConfigKeywords.name} TEXT,
-                                    	{ConfigKeywords.date} DATE,
-                                        {ConfigKeywords.time} TIME,
-                                        {ConfigKeywords.start_date} DATE,
-                                        {ConfigKeywords.start_time} TIME,
-                                        {ConfigKeywords.end_date} DATE,
-                                        {ConfigKeywords.end_time} TIME,
+                                    	{ConfigKeywords.name} TEXT NOT NULL,
                                     	{ConfigKeywords.description} TEXT,
+                                        {ConfigKeywords.source} INTEGER NOT NULL,
                                     	{ConfigKeywords.events} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_events} INTEGER ARRAY,
                                     	{ConfigKeywords.dates} INTEGER ARRAY,
@@ -75,7 +63,9 @@ class DateStorage(BaseStorage) :
                                     	{ConfigKeywords.others} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_others} INTEGER ARRAY,
                                         {ConfigKeywords.source_fragments} INTEGER ARRAY,
-                                        {ConfigKeywords.ex_source_fragments} INTEGER ARRAY
+                                        {ConfigKeywords.ex_source_fragments} INTEGER ARRAY,
+
+                                            CONSTRAINT FK_source_id FOREIGN KEY (source) REFERENCES sources(id)
                                     );
                                     """ ) + super().generateTableSQL()
     
@@ -89,15 +79,14 @@ class DateStorage(BaseStorage) :
 
         for key in self.storage :
             x = self.storage[key]
-            if type(x) is Date :
+            if type(x) is SourceFragment :
                 ary.append(inspect.cleandoc(f"""(
-                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.date)}, {NOV(x.time)}, 
-                                                    {NOV(x.start_date)}, {NOV(x.start_time)}, {NOV(x.end_date)}, {NOV(x.end_time)}, {NOV(x.description)}, 
+                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.description)}, {NOV(x.source)},
                                                     {NOV(x.events)}, {NOV(x.ex_events)}, {NOV(x.dates)}, {NOV(x.ex_dates)},
                                                     {NOV(x.places)}, {NOV(x.ex_places)}, {NOV(x.persons)}, {NOV(x.ex_persons)},
                                                     {NOV(x.sources)}, {NOV(x.ex_sources)}, {NOV(x.others)}, {NOV(x.ex_others)},
                                                     {NOV(x.source_fragments)}, {NOV(x.ex_source_fragments)}
-                                                )""") ) 
+                                                )""") )
         result += ",\n".join(ary)
         result += ";"
-        return result + super().fillTableSQL()
+        return result  + super().fillTableSQL()

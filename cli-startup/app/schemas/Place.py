@@ -62,7 +62,9 @@ class PlaceStorage(BaseStorage) :
                                     	{ConfigKeywords.sources} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_sources} INTEGER ARRAY,
                                     	{ConfigKeywords.others} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_others} INTEGER ARRAY
+                                    	{ConfigKeywords.ex_others} INTEGER ARRAY,
+                                        {ConfigKeywords.source_fragments} INTEGER ARRAY,
+                                        {ConfigKeywords.ex_source_fragments} INTEGER ARRAY
                                     );
                                     """ ) + super().generateTableSQL()
     
@@ -81,7 +83,8 @@ class PlaceStorage(BaseStorage) :
                                                     {NOV(x.id)}, {NOV(x.name)}, {NOV(x.geo)}, {NOV(x.description)}, 
                                                     {NOV(x.events)}, {NOV(x.ex_events)}, {NOV(x.dates)}, {NOV(x.ex_dates)},
                                                     {NOV(x.places)}, {NOV(x.ex_places)}, {NOV(x.persons)}, {NOV(x.ex_persons)},
-                                                    {NOV(x.sources)}, {NOV(x.ex_sources)}, {NOV(x.others)}, {NOV(x.ex_others)}
+                                                    {NOV(x.sources)}, {NOV(x.ex_sources)}, {NOV(x.others)}, {NOV(x.ex_others)},
+                                                    {NOV(x.source_fragments)}, {NOV(x.ex_source_fragments)}
                                                 )""") )
         result += ",\n".join(ary)
         result += ";"

@@ -12,3 +12,9 @@ sources :
     author: "Абоба боба бибиович"
     date: 4
     link: "http://aboba"
+
+source_fragments :
+  - id: 1
+    name: "ссылка на главу с жопой"
+    source: 1
+    detail: "Глава пятая, строка двадцатая, улица Пушкина, дом Колотушкина"

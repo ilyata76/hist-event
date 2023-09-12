@@ -13,6 +13,7 @@ from schemas.Source import Source
 from schemas.Other import Other
 from schemas.Event import Event
 from schemas.Storages import Storages, BaseEntity
+from schemas.SourceFragment import SourceFragment
 
 from processes.utils import patternTextInclusion, dictFromYaml
 
@@ -47,6 +48,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
     level = dict_entity.get(config.ConfigKeywords.level, None)
     start = dict_entity.get(config.ConfigKeywords.start, None)
     end = dict_entity.get(config.ConfigKeywords.end, None)
+    source = dict_entity.get(config.ConfigKeywords.source, None)
         
     entity_to_append = None # сущность для возвращения
 
@@ -65,6 +67,20 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
             else :
                 res_code = 2
                 logger.warning(f"Такой даты для источника={id} - date={date} - не существует")
+                entity_to_append = None
+
+        
+        case config.ConfigKeywords.source_fragments :
+            # исторический источник
+
+            if storages.source_storage.get(int(source)) :
+                entity_to_append = SourceFragment( name=name, 
+                                                   id=id, 
+                                                   description=description,
+                                                   source=int(source) )
+            else :
+                res_code = 2
+                logger.warning(f"Такого источника для фрагмента источника={id} - source={source} - не существует")
                 entity_to_append = None
 
 
@@ -263,19 +279,22 @@ def parse(path_folder : Path,
         if not events_path :
             events_path = path_folder.joinpath("events.yaml")
 
-        source_code, date_code, place_code, person_code, other_code,event_code = 2, 2, 2, 2, 2, 2
+        source_code, source_fragment_code, date_code, place_code, person_code, other_code,event_code = 2, 2, 2, 2, 2, 2, 2
 
         for i in range(config.max_reparse_count) :
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
             print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i}\n\n"+"##"*50)
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
-            codes = [source_code, date_code, place_code, person_code, other_code, event_code]
-            soc, dac, plc, pec, otc, evc = 0, 1, 2, 3, 4, 5
+            codes = [source_code, source_fragment_code, date_code, place_code, person_code, other_code, event_code]
+            soc, sfc, dac, plc, pec, otc, evc = 0, 1, 2, 3, 4, 5, 6
 
             if source_code == 2 and 1 not in codes:
                 source_code = parseFile(sources_path, config.ConfigKeywords.sources, storages)
                 codes[soc] = source_code
+            if source_fragment_code == 2 and 1 not in codes:
+                source_fragment_code = parseFile(sources_path, config.ConfigKeywords.source_fragments, storages)
+                codes[soc] = source_fragment_code
             if date_code == 2 and 1 not in codes:
                 date_code = parseFile(dates_path, config.ConfigKeywords.dates, storages)
                 codes[dac] = date_code

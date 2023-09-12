@@ -10,6 +10,7 @@ from schemas.Place import PlaceStorage
 from schemas.Person import PersonStorage
 from schemas.Other import OtherStorage
 from schemas.Event import EventStorage
+from schemas.SourceFragment import SourceFragmentStorage
 
 import config
 import pyparsing
@@ -26,13 +27,15 @@ class Storages() :
                  place_storage : PlaceStorage,
                  person_storage : PersonStorage,
                  other_storage : OtherStorage,
-                 event_storage : EventStorage ) :
+                 event_storage : EventStorage,
+                 source_fragment_storage : SourceFragmentStorage ) :
         self.source_storage = source_storage
         self.date_storage = date_storage
         self.place_storage = place_storage
         self.person_storage = person_storage
         self.other_storage = other_storage
         self.event_storage = event_storage
+        self.source_fragment_storage = source_fragment_storage
 
 
     def append(self, id : int , keyword : str, 
@@ -53,6 +56,8 @@ class Storages() :
                 self.current_storage = self.other_storage
             case config.ConfigKeywords.events :
                 self.current_storage = self.event_storage
+            case config.ConfigKeywords.source_fragments :
+                self.current_storage = self.source_fragment_storage
             case _ :
                 logger.error(f"Такого keyword={keyword} не существует!")
                 return False
@@ -115,6 +120,8 @@ class Storages() :
                     register_keyword = config.ConfigKeywords.ex_others
                 case config.ConfigKeywords.events : 
                     register_keyword = config.ConfigKeywords.ex_events
+                case config.ConfigKeywords.source_fragments :
+                    register_keyword = config.ConfigKeywords.ex_source_fragments
                 case _ : raise Exception("Нет такого типа!")
 
             # теперь прочитаем текст на наличие {ссылок:1}[x]
@@ -131,6 +138,7 @@ class Storages() :
                 save_keyword = None
                 # а также storage, которые будет хранить её как ВНЕШНЮЮ ССЫЛКУ
                 storage = BaseStorage()
+                
                 match entity_keyword :
                     case config.ParseKeywords.date : 
                         storage = self.date_storage
@@ -150,6 +158,9 @@ class Storages() :
                     case config.ParseKeywords.event :
                         storage = self.event_storage
                         save_keyword = config.ConfigKeywords.events
+                    case config.ParseKeywords.source_fragment :
+                        storage = self.source_fragment_storage
+                        save_keyword = config.ConfigKeywords.source_fragments
                     case _ : raise Exception("Нет такого типа!")
 
                 # проверить, что сущность-ссылка существует в хранилище
@@ -199,7 +210,7 @@ class Storages() :
             Удалить таблиц, если те существуют
         """
         logger.debug("Удаление таблиц SQL через Storages")
-        return "\n\n".join([x.dropTableSQL() for x in [self.date_storage, self.source_storage,
+        return "\n\n".join([x.dropTableSQL() for x in [self.date_storage, self.source_storage, self.source_fragment_storage,
                                                        self.place_storage, self.person_storage, 
                                                        self.other_storage, self.event_storage]])
     
@@ -211,6 +222,7 @@ class Storages() :
         logger.debug("Генерация таблиц SQL через Storages")
         return "\n\n".join([self.date_storage.generateTableSQL(),
                             self.source_storage.generateTableSQL(),
+                            self.source_fragment_storage.generateTableSQL(),
                             self.place_storage.generateTableSQL(),
                             self.person_storage.generateTableSQL(),
                             self.other_storage.generateTableSQL(),
@@ -224,6 +236,7 @@ class Storages() :
         logger.debug("Заполнение таблиц SQL через Storages")
         return "\n\n".join([self.date_storage.fillTableSQL(),
                             self.source_storage.fillTableSQL(),
+                            self.source_fragment_storage.fillTableSQL(),
                             self.place_storage.fillTableSQL(),
                             self.person_storage.fillTableSQL(),
                             self.other_storage.fillTableSQL(),
