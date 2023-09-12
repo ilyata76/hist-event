@@ -1,27 +1,34 @@
 import sys
 from loguru import logger
 import config
-from cli.cli import StartupCLI
 
 #######################
 
-logger.remove(0)
+def configure_logger() : 
+    """
 
-logger.add(sys.stderr, level="WARNING")
+    """
+    logger.remove(0)
 
-if config.debug : 
-    if config.use_console_debug : 
-        logger.add(sys.stdout, level="DEBUG")
-    logger.add("debug.log", format="{time} {level} {message}", level="DEBUG", rotation="4 MB", compression="zip")
-else : 
-    if config.use_console_debug : 
-        logger.add(sys.stdout, level="INFO")
-    logger.add("log.log", format="{time} {level} {message}", level="INFO", rotation="4 MB", compression="zip")
+    logger.add(sys.stderr, level="WARNING")
 
-#######################
+    if config.debug : 
+        if config.use_console_debug : 
+            logger.add(sys.stdout, level="DEBUG")
+        logger.add("debug.log", format="{time} {level} {message}", level="DEBUG", rotation="4 MB", compression="zip")
+    else : 
+        if config.use_console_debug : 
+            logger.add(sys.stdout, level="INFO")
+        logger.add("log.log", format="{time} {level} {message}", level="INFO", rotation="4 MB", compression="zip")
+
 
 
 def main() :
+    configure_logger()
+    print("A")
+
+    from cli.cli import StartupCLI
+    
     a = StartupCLI()
     a.run()
 

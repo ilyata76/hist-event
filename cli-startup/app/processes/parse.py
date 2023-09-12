@@ -137,7 +137,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                                           date=int(date) )
             else :
                 res_code = 2
-                logger.error(f"Такой даты для события - date={date} - не существует")
+                logger.warning(f"Такой даты для события - date={date} - не существует")
                 entity_to_append = None 
 
 
@@ -286,7 +286,7 @@ def parse(path_folder : Path,
                 break
 
         if 2 in codes or 1 in codes :
-            logger.error(f"РАБОТА ОТРАБОТАЛА НЕПРАВИЛЬНО codes={codes}")
+            logger.error(f"ПРОГРАММА ОТРАБОТАЛА НЕПРАВИЛЬНО codes={codes}")
         else :
             logger.info(f"УСПЕШНЫЙ ПАРСИНГ")
 

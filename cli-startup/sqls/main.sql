@@ -178,7 +178,7 @@ INSERT INTO dates VALUES
     '{1}', null, null, null
 ),
 (
-    '2', 'название"', '2023-08-23', null, 
+    '2', 'название', '2023-08-23', null, 
     null, null, null, null, 'Многострочное описание события 2 ({source : 1}[источник]) а теперь здесь есть ссылка на {person:1}[челика]', 
     null, null, null, null,
     null, '{1}', null, null,

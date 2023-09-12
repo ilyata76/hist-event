@@ -84,33 +84,23 @@ class StartupCLI(cli.Application):
             self.log("Работа программы завершена корректно")
 
         except Exception as exc: 
-            self.log("Работа программы завершена некорректно")
-            logger.error("Программа завершила свою работу некорректно")
+            self.log("Работа программы завершена некорректно exc={exc}", exc=exc)
+            logger.error("Программа завершила свою работу некорректно exc={exc}", exc=exc)
 
 
     @cli.switch("--yaml-folder", str)
-    def setPathFolder(self, path_yaml_folder : Path) :
+    def setPathYamlFolder(self, path_yaml_folder : Path) :
         """
             Установить путь до папки с YAML файлами
         """
         self.path_yaml_folder = path_yaml_folder
-
-        message = "Установлена папка для всех YAML файлов {path}"
-
-        logger.info(message, path=path_yaml_folder)
-        if self.verbose :
-            print(message.format(path=path_yaml_folder))
+        self.log("Установлена папка для всех YAML файлов {path}", path=self.path_yaml_folder)
 
 
     @cli.switch("--sql-folder", str)
-    def setPathFolder(self, path_sql_folder : Path) :
+    def setPathSQLFolder(self, path_sql_folder : Path) :
         """
             Установить путь до папки с будущими SQL файлами
         """
         self.path_sql_folder = path_sql_folder
-
-        message = "Установлена папка для всех YAML файлов {path}"
-
-        logger.info(message, path=path_sql_folder)
-        if self.verbose :
-            print(message.format(path=path_sql_folder))
+        self.log("Установлена папка для всех SQL файлов {path}", path=self.path_sql_folder)

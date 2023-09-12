@@ -155,7 +155,7 @@ class Storages() :
                 # проверить, что сущность-ссылка существует в хранилище
                 if not storage.get(entity_id) :
                     res_code = 2
-                    logger.error(f"Сущности {entity_id}[{entity_keyword}] в хранилище ещё не существует!")
+                    logger.warning(f"Сущности {entity_id}[{entity_keyword}] в хранилище ещё не существует!")
                     continue
                     # raise Exception(f"Сущности {entity_id}[{entity_keyword}] в хранилище \
                     #                  ещё не существует!")

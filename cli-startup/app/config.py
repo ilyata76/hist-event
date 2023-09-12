@@ -4,9 +4,21 @@
 import os
 
 yaml_folder = str(os.environ.get("YAML_FOLDER", "./yamls"))
+
 sql_folder = str(os.environ.get("SQL_FOLDER", "./sqls"))
-debug = bool(os.environ.get("DEBUG_MODE", False))
-use_console_debug = bool(os.environ.get("DEBUG_CONSOLE", False))
+
+debug = os.environ.get("DEBUG_MODE", "false")
+if debug.lower() == "false" or debug.lower() == "no" :
+    debug = False
+else :
+    debug = True
+
+use_console_debug = os.environ.get("DEBUG_CONSOLE", "false")
+if use_console_debug.lower() == "false" or use_console_debug.lower() == "no" :
+    use_console_debug = False
+else :
+    use_console_debug = True
+
 max_reparse_count = int(os.environ.get("MAX_REPARSE_COUNT", 10))
 
 
