@@ -29,5 +29,6 @@ def generateSQL(storages : Storages) -> str | None:
         result += "COMMIT;\n\n"
         logger.info("КОНЕЦ ГЕНЕРАЦИИ SQL")
         return result
-    except :
+    except Exception as exc:
+        logger.error("При генерации SQL произошла ошибка exc={exc}", exc=exc)
         return None

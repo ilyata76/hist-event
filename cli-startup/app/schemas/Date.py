@@ -51,34 +51,14 @@ class DateStorage(BaseStorage) :
         """
             Генерация SQL таблицы для даты
         """
-        return inspect.cleandoc( f"""
-                                    CREATE TABLE {self.name} (
-                                    	{ConfigKeywords.id} INTEGER PRIMARY KEY,
-                                    	{ConfigKeywords.name} TEXT,
-                                    	{ConfigKeywords.date} DATE,
-                                        {ConfigKeywords.time} TIME,
-                                        {ConfigKeywords.start_date} DATE,
-                                        {ConfigKeywords.start_time} TIME,
-                                        {ConfigKeywords.end_date} DATE,
-                                        {ConfigKeywords.end_time} TIME,
-                                    	{ConfigKeywords.description} TEXT,
-                                    	{ConfigKeywords.events} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_events} INTEGER ARRAY,
-                                    	{ConfigKeywords.dates} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_dates} INTEGER ARRAY,
-                                    	{ConfigKeywords.places} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_places} INTEGER ARRAY,
-                                    	{ConfigKeywords.persons} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_persons} INTEGER ARRAY,
-                                    	{ConfigKeywords.sources} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_sources} INTEGER ARRAY,
-                                    	{ConfigKeywords.others} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_others} INTEGER ARRAY,
-                                        {ConfigKeywords.source_fragments} INTEGER ARRAY,
-                                        {ConfigKeywords.ex_source_fragments} INTEGER ARRAY
-                                    );
-                                    """ ) + super().generateTableSQL()
-    
+        str_include  = f"\t{ConfigKeywords.date} DATE,\n"
+        str_include += f"\t{ConfigKeywords.time} TIME,\n"
+        str_include += f"\t{ConfigKeywords.start_date} DATE,\n"
+        str_include += f"\t{ConfigKeywords.start_time} TIME,\n"
+        str_include += f"\t{ConfigKeywords.end_date} DATE,\n"
+        str_include += f"\t{ConfigKeywords.end_time} TIME"
+        return super().generateTableSQL(str_include)
+
 
     def fillTableSQL(self) -> str:
         """
@@ -90,14 +70,12 @@ class DateStorage(BaseStorage) :
         for key in self.storage :
             x = self.storage[key]
             if type(x) is Date :
-                ary.append(inspect.cleandoc(f"""(
-                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.date)}, {NOV(x.time)}, 
-                                                    {NOV(x.start_date)}, {NOV(x.start_time)}, {NOV(x.end_date)}, {NOV(x.end_time)}, {NOV(x.description)}, 
-                                                    {NOV(x.events)}, {NOV(x.ex_events)}, {NOV(x.dates)}, {NOV(x.ex_dates)},
-                                                    {NOV(x.places)}, {NOV(x.ex_places)}, {NOV(x.persons)}, {NOV(x.ex_persons)},
-                                                    {NOV(x.sources)}, {NOV(x.ex_sources)}, {NOV(x.others)}, {NOV(x.ex_others)},
-                                                    {NOV(x.source_fragments)}, {NOV(x.ex_source_fragments)}
-                                                )""") ) 
+                str_include  = f"\t  {NOV(x.date)}, {NOV(x.time)},\n"
+                str_include += f"\t  {NOV(x.start_date)}, {NOV(x.start_time)},\n"
+                str_include += f"\t  {NOV(x.end_date)}, {NOV(x.end_time)}"
+                str_result = super().fillTableSQL(x, str_include)
+                ary.append(str_result)
+
         result += ",\n".join(ary)
         result += ";"
-        return result + super().fillTableSQL()
+        return result

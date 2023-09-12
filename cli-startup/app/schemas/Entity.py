@@ -3,6 +3,8 @@
 """
 from loguru import logger
 from pydantic import BaseModel
+from config import ConfigKeywords
+from processes.utils import NOV
 
 
 class BaseEntity(BaseModel) :
@@ -107,15 +109,54 @@ class BaseStorage() :
         return self.registerEntity(id, entity_id, field)
     
 
-    def dropTableSQL(self) -> str : 
+    def dropTableSQL(self, str_include : str = "") -> str : 
         logger.debug(f"Удаление таблиц SQL для {self.name}")
         return f"""DROP TABLE IF EXISTS {self.name} CASCADE;"""
-    def generateTableSQL(self) -> str : 
+    
+
+
+    
+    def generateTableSQL(self, str_include : str = "") -> str :
         logger.debug(f"Создание таблиц SQL для {self.name}")
-        return ""
-    def fillTableSQL(self) -> str : 
+
+        str_result  = f"CREATE TABLE {self.name} (\n"
+        str_result += f"\t{ConfigKeywords.id} INTEGER PRIMARY KEY,\n"
+        str_result += f"\t{ConfigKeywords.name} TEXT,\n"
+        str_result += f"\t{ConfigKeywords.description} TEXT,\n"
+        if str_include : str_result += f"{str_include},\n"
+        str_result += f"\t{ConfigKeywords.events} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_events} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.dates} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_dates} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.places} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_places} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.persons} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_persons} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.sources} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_sources} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.others} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_others} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.source_fragments} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_source_fragments} INTEGER ARRAY\n"
+        str_result += f");"
+
+        return str_result
+    
+
+    def fillTableSQL(self, element : BaseEntity, str_include : str = "") -> str :
         logger.debug(f"Заполнение таблиц SQL для {self.name}")
-        return ""
+
+        str_result  = f"\t( {NOV(element.id)}, {NOV(element.name)}, {NOV(element.description)},\n"
+        if str_include : str_result += f"{str_include},\n"
+        str_result += f"\t  {NOV(element.events)}, {NOV(element.ex_events)},\n"
+        str_result += f"\t  {NOV(element.dates)}, {NOV(element.ex_dates)},\n"
+        str_result += f"\t  {NOV(element.places)}, {NOV(element.ex_places)},\n"
+        str_result += f"\t  {NOV(element.persons)}, {NOV(element.ex_persons)},\n"
+        str_result += f"\t  {NOV(element.sources)}, {NOV(element.ex_sources)},\n"
+        str_result += f"\t  {NOV(element.others)}, {NOV(element.ex_others)},\n"
+        str_result += f"\t  {NOV(element.source_fragments)}, {NOV(element.ex_source_fragments)} )"
+
+        return str_result
 
 
     def __str__(self) -> str :

@@ -47,33 +47,12 @@ class EventStorage(BaseStorage) :
         """
             Генерация SQL таблицы для даты
         """
-        return inspect.cleandoc( f"""
-                                    CREATE TABLE {self.name} (
-                                    	{ConfigKeywords.id} INTEGER PRIMARY KEY,
-                                    	{ConfigKeywords.name} TEXT NOT NULL,
-                                    	{ConfigKeywords.date} INTEGER NOT NULL,
-                                        {ConfigKeywords.min} TEXT NOT NULL,
-                                        {ConfigKeywords.max} TEXT NOT NULL,
-                                        {ConfigKeywords.level} TEXT,
-                                    	{ConfigKeywords.description} TEXT,
-                                    	{ConfigKeywords.events} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_events} INTEGER ARRAY,
-                                    	{ConfigKeywords.dates} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_dates} INTEGER ARRAY,
-                                    	{ConfigKeywords.places} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_places} INTEGER ARRAY,
-                                    	{ConfigKeywords.persons} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_persons} INTEGER ARRAY,
-                                    	{ConfigKeywords.sources} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_sources} INTEGER ARRAY,
-                                    	{ConfigKeywords.others} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_others} INTEGER ARRAY,
-                                        {ConfigKeywords.source_fragments} INTEGER ARRAY,
-                                        {ConfigKeywords.ex_source_fragments} INTEGER ARRAY,
-
-	                                        CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id)
-                                    );
-                                    """ ) + super().generateTableSQL()
+        str_include  = f"\t{ConfigKeywords.date} INTEGER NOT NULL,\n"
+        str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id),\n"
+        str_include += f"\t{ConfigKeywords.min} TEXT NOT NULL,\n"
+        str_include += f"\t{ConfigKeywords.max} TEXT NOT NULL,\n"
+        str_include += f"\t{ConfigKeywords.level} TEXT"
+        return super().generateTableSQL(str_include)
     
 
     def fillTableSQL(self) -> str:
@@ -86,13 +65,12 @@ class EventStorage(BaseStorage) :
         for key in self.storage :
             x = self.storage[key]
             if type(x) is Event :
-                ary.append(inspect.cleandoc(f"""(
-                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.date)}, {NOV(x.min)}, {NOV(x.max)}, {NOV(x.level)}, {NOV(x.description)}, 
-                                                    {NOV(x.events)}, {NOV(x.ex_events)}, {NOV(x.dates)}, {NOV(x.ex_dates)},
-                                                    {NOV(x.places)}, {NOV(x.ex_places)}, {NOV(x.persons)}, {NOV(x.ex_persons)},
-                                                    {NOV(x.sources)}, {NOV(x.ex_sources)}, {NOV(x.others)}, {NOV(x.ex_others)},
-                                                    {NOV(x.source_fragments)}, {NOV(x.ex_source_fragments)}
-                                                )""") ) 
+                str_include  = f"\t  {NOV(x.date)},\n"
+                str_include += f"\t  {NOV(x.min)},\n"
+                str_include += f"\t  {NOV(x.max)},\n"
+                str_include += f"\t  {NOV(x.level)}"
+                str_result = super().fillTableSQL(x, str_include)
+                ary.append(str_result)
         result += ",\n".join(ary)
         result += ";"
-        return result + super().fillTableSQL()
+        return result
