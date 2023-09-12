@@ -3,7 +3,7 @@
         для базы данных, её генерации
 """
 from loguru import logger
-from schemas.Storages import Storages
+from schemas import Storages
 
 ################### ГЛАВНЫЙ ПРОЦЕСС
 

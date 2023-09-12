@@ -1,25 +1,16 @@
 """
     Файл, отвечающий за работу с YAML-файлами и моделями.
 """
+import datetime
 from loguru import logger
 from pathlib import Path
 
-import config
-
-from schemas.Date import Date
-from schemas.Person import Person
-from schemas.Place import Place
-from schemas.Source import Source
-from schemas.Other import Other
-from schemas.Event import Event
-from schemas.Storages import Storages, BaseEntity
-from schemas.SourceFragment import SourceFragment
-from schemas.Biblio import Biblio
-from schemas.BiblioFragment import BiblioFragment
-
+from schemas import BaseEntity, Date, Person, Place, Event, Other,\
+                    Source, SourceFragment, Biblio, BiblioFragment,\
+                    Storages
 from processes.utils import patternTextInclusion, dictFromYaml
+from config import ConfigKeywords, max_reparse_count
 
-import datetime
 
 ############
 
@@ -37,29 +28,29 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
     start_date, start_time, end_date, end_time = None, None, None, None
     time = None
 
-    name = dict_entity.get(config.ConfigKeywords.name, None)
-    description = dict_entity.get(config.ConfigKeywords.description, None)
-    link = dict_entity.get(config.ConfigKeywords.link, None)
-    author = dict_entity.get(config.ConfigKeywords.author, None)
-    date = dict_entity.get(config.ConfigKeywords.date, None)
-    person = dict_entity.get(config.ConfigKeywords.person, None)
-    geo = dict_entity.get(config.ConfigKeywords.geo, None)
-    meta = dict_entity.get(config.ConfigKeywords.meta, None)
-    min = dict_entity.get(config.ConfigKeywords.min, None)
-    max = dict_entity.get(config.ConfigKeywords.max, None)
-    level = dict_entity.get(config.ConfigKeywords.level, None)
-    start = dict_entity.get(config.ConfigKeywords.start, None)
-    end = dict_entity.get(config.ConfigKeywords.end, None)
-    source = dict_entity.get(config.ConfigKeywords.source, None)
-    state = dict_entity.get(config.ConfigKeywords.state, None)
-    period = dict_entity.get(config.ConfigKeywords.period, None)
-    biblio = dict_entity.get(config.ConfigKeywords.biblio, None)
+    name = dict_entity.get(ConfigKeywords.name, None)
+    description = dict_entity.get(ConfigKeywords.description, None)
+    link = dict_entity.get(ConfigKeywords.link, None)
+    author = dict_entity.get(ConfigKeywords.author, None)
+    date = dict_entity.get(ConfigKeywords.date, None)
+    person = dict_entity.get(ConfigKeywords.person, None)
+    geo = dict_entity.get(ConfigKeywords.geo, None)
+    meta = dict_entity.get(ConfigKeywords.meta, None)
+    min = dict_entity.get(ConfigKeywords.min, None)
+    max = dict_entity.get(ConfigKeywords.max, None)
+    level = dict_entity.get(ConfigKeywords.level, None)
+    start = dict_entity.get(ConfigKeywords.start, None)
+    end = dict_entity.get(ConfigKeywords.end, None)
+    source = dict_entity.get(ConfigKeywords.source, None)
+    state = dict_entity.get(ConfigKeywords.state, None)
+    period = dict_entity.get(ConfigKeywords.period, None)
+    biblio = dict_entity.get(ConfigKeywords.biblio, None)
         
     entity_to_append = None # сущность для возвращения
 
     match keyword : # добавим в Storage в зависимости от типа читаемого файла
 
-        case config.ConfigKeywords.sources :
+        case ConfigKeywords.sources :
             # исторический источник
 
             if storages.date_storage.get(int(date)) :
@@ -75,7 +66,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                 entity_to_append = None
 
         
-        case config.ConfigKeywords.source_fragments :
+        case ConfigKeywords.source_fragments :
             # исторический источник
 
             if storages.source_storage.get(int(source)) :
@@ -89,7 +80,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                 entity_to_append = None
 
 
-        case config.ConfigKeywords.dates : 
+        case ConfigKeywords.dates : 
             # дата (может быть интервалом)
 
             if date : 
@@ -123,7 +114,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                                      end=end )
 
 
-        case config.ConfigKeywords.places :
+        case ConfigKeywords.places :
             # место
 
             entity_to_append = Place( name=name, 
@@ -132,7 +123,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                                       geo=geo )
 
 
-        case config.ConfigKeywords.persons :
+        case ConfigKeywords.persons :
             # историческая личность
 
             # Для персоналии должна быть зарегистрирована дата в dates.yaml,
@@ -149,7 +140,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                 entity_to_append = None 
 
 
-        case config.ConfigKeywords.others :
+        case ConfigKeywords.others :
             # "Другое"
             entity_to_append = Other( name=name, 
                                       id=id, 
@@ -157,7 +148,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                                       meta=meta )
 
 
-        case config.ConfigKeywords.events :
+        case ConfigKeywords.events :
             # "Ивент"
 
             # Для ивента должна быть зарегистрирована дата в dates.yaml,
@@ -175,7 +166,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                 entity_to_append = None 
 
 
-        case config.ConfigKeywords.biblios :
+        case ConfigKeywords.biblios :
             entity_to_append = Biblio( name=name, 
                                        id=id, 
                                        description=description, 
@@ -185,7 +176,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                                        period=period,
                                        date=date )
 
-        case config.ConfigKeywords.biblio_fragments :
+        case ConfigKeywords.biblio_fragments :
             if storages.biblio_storage.get(int(biblio)) :
                 entity_to_append = BiblioFragment( name=name, 
                                                    id=id, 
@@ -232,7 +223,7 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
         for dict_entity in dict_entities :
             # получим по ключевым словам параметры нашей сущности, если те имеются
 
-            id = dict_entity.get(config.ConfigKeywords.id, None)
+            id = dict_entity.get(ConfigKeywords.id, None)
 
             res_code, entity_to_append = getEntity(dict_entity, keyword, id, storages)
 
@@ -240,9 +231,9 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
                 continue
            
             # прочитаем ещё раз текстовые поля, поддерживающие вставку
-            min = dict_entity.get(config.ConfigKeywords.min, None)
-            max = dict_entity.get(config.ConfigKeywords.max, None)
-            description = dict_entity.get(config.ConfigKeywords.description, None)
+            min = dict_entity.get(ConfigKeywords.min, None)
+            max = dict_entity.get(ConfigKeywords.max, None)
+            description = dict_entity.get(ConfigKeywords.description, None)
 
             # добавим сущность
             if not storages.append(id, keyword, entity_to_append) :
@@ -313,30 +304,30 @@ def parse(path_folder : Path,
 
         codes = [2, 2, 2, 2, 2, 2, 2, 2, 2]
 
-        for i in range(config.max_reparse_count) :
+        for i in range(max_reparse_count) :
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
             print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i}\n\n"+"##"*50)
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
 
             if codes[source_code] == 2 and 1 not in codes:
-                codes[source_code] = parseFile(sources_path, config.ConfigKeywords.sources, storages)
+                codes[source_code] = parseFile(sources_path, ConfigKeywords.sources, storages)
             if codes[source_fragment_code] == 2 and 1 not in codes:
-                codes[source_fragment_code] = parseFile(sources_path, config.ConfigKeywords.source_fragments, storages)
+                codes[source_fragment_code] = parseFile(sources_path, ConfigKeywords.source_fragments, storages)
             if codes[date_code] == 2 and 1 not in codes:
-                codes[date_code] = parseFile(dates_path, config.ConfigKeywords.dates, storages)
+                codes[date_code] = parseFile(dates_path, ConfigKeywords.dates, storages)
             if codes[place_code] == 2 and 1 not in codes:
-                codes[place_code] = parseFile(places_path, config.ConfigKeywords.places, storages)
+                codes[place_code] = parseFile(places_path, ConfigKeywords.places, storages)
             if codes[person_code] == 2 and 1 not in codes:
-                codes[person_code] = parseFile(persons_path, config.ConfigKeywords.persons, storages)
+                codes[person_code] = parseFile(persons_path, ConfigKeywords.persons, storages)
             if codes[other_code] == 2 and 1 not in codes:
-                codes[other_code] = parseFile(others_path, config.ConfigKeywords.others, storages)
+                codes[other_code] = parseFile(others_path, ConfigKeywords.others, storages)
             if codes[event_code] == 2 and 1 not in codes:
-                codes[event_code] = parseFile(events_path, config.ConfigKeywords.events, storages)
+                codes[event_code] = parseFile(events_path, ConfigKeywords.events, storages)
             if codes[biblio_code] == 2 and 1 not in codes:
-                codes[biblio_code] = parseFile(biblios_path, config.ConfigKeywords.biblios, storages)
+                codes[biblio_code] = parseFile(biblios_path, ConfigKeywords.biblios, storages)
             if codes[biblio_fragment_code] == 2 and 1 not in codes:
-                codes[biblio_fragment_code] = parseFile(biblios_path, config.ConfigKeywords.biblio_fragments, storages)
+                codes[biblio_fragment_code] = parseFile(biblios_path, ConfigKeywords.biblio_fragments, storages)
 
             if 1 in codes :
                 logger.error(f"Ошибка на итерации {i}")

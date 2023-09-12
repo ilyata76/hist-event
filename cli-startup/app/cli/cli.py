@@ -5,13 +5,11 @@ from pathlib import Path
 from plumbum import cli
 from loguru import logger
 
-import config
-from processes.parse import parse
-from processes.generateSQL import generateSQL
-from schemas.Storages import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
-                                PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
-                                BiblioStorage, BiblioFragmentStorage
-
+from processes import parse, generateSQL
+from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
+                    PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
+                    BiblioStorage, BiblioFragmentStorage
+from config import ConfigKeywords, yaml_folder, sql_folder
 
 class StartupCLI(cli.Application):
     """
@@ -27,15 +25,15 @@ class StartupCLI(cli.Application):
     
 
     storages = Storages(
-        source_storage=SourceStorage(name=config.ConfigKeywords.sources), 
-        source_fragment_storage=SourceFragmentStorage(name=config.ConfigKeywords.source_fragments),
-        date_storage=DateStorage(config.ConfigKeywords.dates),
-        place_storage=PlaceStorage(config.ConfigKeywords.places), 
-        person_storage=PersonStorage(config.ConfigKeywords.persons),
-        other_storage=OtherStorage(config.ConfigKeywords.others),
-        event_storage=EventStorage(config.ConfigKeywords.events),
-        biblio_storage=BiblioStorage(config.ConfigKeywords.biblios),
-        biblio_fragment_storage=BiblioFragmentStorage(config.ConfigKeywords.biblio_fragments)
+        source_storage=SourceStorage(name=ConfigKeywords.sources), 
+        source_fragment_storage=SourceFragmentStorage(name=ConfigKeywords.source_fragments),
+        date_storage=DateStorage(ConfigKeywords.dates),
+        place_storage=PlaceStorage(ConfigKeywords.places), 
+        person_storage=PersonStorage(ConfigKeywords.persons),
+        other_storage=OtherStorage(ConfigKeywords.others),
+        event_storage=EventStorage(ConfigKeywords.events),
+        biblio_storage=BiblioStorage(ConfigKeywords.biblios),
+        biblio_fragment_storage=BiblioFragmentStorage(ConfigKeywords.biblio_fragments)
     )
 
 
@@ -60,12 +58,12 @@ class StartupCLI(cli.Application):
         try :
             path_yaml_folder = Path(self.path_yaml_folder)
         except AttributeError:
-            path_yaml_folder = Path(config.yaml_folder)
+            path_yaml_folder = Path(yaml_folder)
 
         try :
             path_sql_folder = Path(self.path_sql_folder)
         except AttributeError:
-            path_sql_folder = Path(config.sql_folder)
+            path_sql_folder = Path(sql_folder)
 
         try : 
             self.log("Начинаем парсинг")

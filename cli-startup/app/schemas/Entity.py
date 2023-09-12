@@ -1,8 +1,8 @@
 """
     Схемы, определяющие сущность и основные операции над сущностью
 """
-from loguru import logger
 from pydantic import BaseModel
+from loguru import logger
 from config import ConfigKeywords
 from processes.utils import NOV
 

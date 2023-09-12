@@ -2,8 +2,7 @@
     Схемы, определяющие фрагмент библиографического источника как сущность
 """
 from loguru import logger
-from schemas.Entity import BaseEntity, BaseStorage
-import inspect
+from schemas import BaseEntity, BaseStorage
 from config import ConfigKeywords
 from processes.utils import NOV
 

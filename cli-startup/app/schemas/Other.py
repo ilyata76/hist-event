@@ -2,10 +2,9 @@
     Схемы, определяющие "ДРУГОЕ" как сущность
 """
 from loguru import logger
-from schemas.Entity import BaseEntity, BaseStorage
-import inspect
-from processes.utils import NOV
+from schemas import BaseEntity, BaseStorage
 from config import ConfigKeywords
+from processes.utils import NOV
 
 
 class Other(BaseEntity) :
