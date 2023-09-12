@@ -13,6 +13,7 @@ class Person(BaseEntity) :
         Модель, описывающая сущность персоналии
     """
     person : str
+    date : int # даты жизни
 
 
 class PersonStorage(BaseStorage) :
@@ -50,6 +51,7 @@ class PersonStorage(BaseStorage) :
                                     	{ConfigKeywords.name} TEXT NOT NULL,
                                     	{ConfigKeywords.person} TEXT NOT NULL,
                                     	{ConfigKeywords.description} TEXT,
+                                        {ConfigKeywords.date} INTEGER NOT NULL,
                                     	{ConfigKeywords.events} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_events} INTEGER ARRAY,
                                     	{ConfigKeywords.dates} INTEGER ARRAY,
@@ -61,7 +63,9 @@ class PersonStorage(BaseStorage) :
                                     	{ConfigKeywords.sources} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_sources} INTEGER ARRAY,
                                     	{ConfigKeywords.others} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_others} INTEGER ARRAY
+                                    	{ConfigKeywords.ex_others} INTEGER ARRAY,
+
+                                            CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id)
                                     );
                                     """ ) + super().generateTableSQL()
     
@@ -77,7 +81,7 @@ class PersonStorage(BaseStorage) :
             x = self.storage[key]
             if type(x) is Person :
                 ary.append(inspect.cleandoc(f"""(
-                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.person)}, {NOV(x.description)}, 
+                                                    {NOV(x.id)}, {NOV(x.name)}, {NOV(x.person)}, {NOV(x.description)}, {NOV(x.date)},
                                                     {NOV(x.events)}, {NOV(x.ex_events)}, {NOV(x.dates)}, {NOV(x.ex_dates)},
                                                     {NOV(x.places)}, {NOV(x.ex_places)}, {NOV(x.persons)}, {NOV(x.ex_persons)},
                                                     {NOV(x.sources)}, {NOV(x.ex_sources)}, {NOV(x.others)}, {NOV(x.ex_others)}

@@ -25,10 +25,9 @@ def configure_logger() :
 
 def main() :
     configure_logger()
-    print("A")
-
-    from cli.cli import StartupCLI
     
+    from cli.cli import StartupCLI
+
     a = StartupCLI()
     a.run()
 

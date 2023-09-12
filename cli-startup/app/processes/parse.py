@@ -109,10 +109,18 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
         case config.ConfigKeywords.persons :
             # историческая личность
 
-            entity_to_append = Person( name=name, 
-                                       id=id, 
-                                       description=description, 
-                                       person=person )
+            # Для персоналии должна быть зарегистрирована дата в dates.yaml,
+            # т.к. date поле есть ссылка FK
+            if storages.date_storage.get(int(date)) :
+                entity_to_append = Person( name=name, 
+                                           id=id, 
+                                           description=description, 
+                                           person=person,
+                                           date=date )
+            else :
+                res_code = 2
+                logger.warning(f"Такой даты для персоналии={id} - date={date} - не существует")
+                entity_to_append = None 
 
 
         case config.ConfigKeywords.others :
@@ -137,7 +145,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                                           date=int(date) )
             else :
                 res_code = 2
-                logger.warning(f"Такой даты для события - date={date} - не существует")
+                logger.warning(f"Такой даты для события={id} - date={date} - не существует")
                 entity_to_append = None 
 
 

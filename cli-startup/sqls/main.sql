@@ -91,6 +91,7 @@ CREATE TABLE persons (
     name TEXT NOT NULL,
     person TEXT NOT NULL,
     description TEXT,
+    date INTEGER NOT NULL,
     events INTEGER ARRAY,
     ex_events INTEGER ARRAY,
     dates INTEGER ARRAY,
@@ -102,7 +103,9 @@ CREATE TABLE persons (
     sources INTEGER ARRAY,
     ex_sources INTEGER ARRAY,
     others INTEGER ARRAY,
-    ex_others INTEGER ARRAY
+    ex_others INTEGER ARRAY,
+
+        CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id)
 );
 
 CREATE TABLE others (
@@ -216,13 +219,13 @@ INSERT INTO places VALUES
 
 INSERT INTO persons VALUES 
 (
-    '1', 'Абоба Максим Маркович', 'Абоба Максим Маркович', 'Абоба Максим Маркович родился {date:1}[сегодня] в городе {place:1}[Жепа] ({source : 1}[источник])', 
+    '1', 'Абоба Максим Маркович', 'Абоба Максим Маркович', 'Абоба Максим Маркович родился {date:1}[сегодня] в городе {place:1}[Жепа] ({source : 1}[источник])', '1',
     null, '{1, 6}', '{1}', null,
     '{1}', null, null, '{2}',
     '{1}', null, null, '{1}'
 ),
 (
-    '2', 'Абоба Марк Андреевич', 'Абоба Максим Маркович', 'Абоба-старший родился задолго до {date:3}[авг путча], но только после этого он эмигрировал в {place:1}[Жепу]. Тогда как {person:1}[Абоба Максим] остался. ({source:1}[источник])', 
+    '2', 'Абоба Марк Андреевич', 'Абоба Максим Маркович', 'Абоба-старший родился задолго до {date:3}[авг путча], но только после этого он эмигрировал в {place:1}[Жепу]. Тогда как {person:1}[Абоба Максим] остался. ({source:1}[источник])', '2',
     null, null, '{3}', null,
     '{1}', null, '{1}', null,
     '{1}', null, null, null
