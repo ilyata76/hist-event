@@ -13,7 +13,7 @@ class Place(BaseEntity) :
         Модель, описывающая сущность места
     """
     geo : str | None = None
-    name : str # обязательный
+    name : str | None = None
 
 
 class PlaceStorage(BaseStorage) :

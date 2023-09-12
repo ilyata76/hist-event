@@ -199,7 +199,7 @@ class Storages() :
             Удалить таблиц, если те существуют
         """
         logger.debug("Удаление таблиц SQL через Storages")
-        return "\n\n".join([x.dropTableSQL() for x in [self.source_storage, self.date_storage,
+        return "\n\n".join([x.dropTableSQL() for x in [self.date_storage, self.source_storage,
                                                        self.place_storage, self.person_storage, 
                                                        self.other_storage, self.event_storage]])
     
@@ -209,8 +209,8 @@ class Storages() :
             Генерация таблиц
         """
         logger.debug("Генерация таблиц SQL через Storages")
-        return "\n\n".join([self.source_storage.generateTableSQL(),
-                            self.date_storage.generateTableSQL(),
+        return "\n\n".join([self.date_storage.generateTableSQL(),
+                            self.source_storage.generateTableSQL(),
                             self.place_storage.generateTableSQL(),
                             self.person_storage.generateTableSQL(),
                             self.other_storage.generateTableSQL(),
@@ -222,8 +222,8 @@ class Storages() :
             Наполнение таблиц
         """
         logger.debug("Заполнение таблиц SQL через Storages")
-        return "\n\n".join([self.source_storage.fillTableSQL(),
-                            self.date_storage.fillTableSQL(),
+        return "\n\n".join([self.date_storage.fillTableSQL(),
+                            self.source_storage.fillTableSQL(),
                             self.place_storage.fillTableSQL(),
                             self.person_storage.fillTableSQL(),
                             self.other_storage.fillTableSQL(),

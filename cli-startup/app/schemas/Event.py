@@ -12,9 +12,9 @@ class Event(BaseEntity) :
     """
         Модель, описывающая сущность события
     """
-    date : int # ссылка на дату
-    min : str
-    max : str
+    date : int | None = None # ссылка на дату
+    min : str | None = None
+    max : str | None = None
     level : str | None = None
 
 

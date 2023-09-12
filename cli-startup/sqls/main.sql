@@ -3,9 +3,9 @@
 
 BEGIN;
 
-DROP TABLE IF EXISTS sources CASCADE; -- банк исторических разных источников
-
 DROP TABLE IF EXISTS dates CASCADE; -- банк дат, на которые будут ссылаться другие сущности
+
+DROP TABLE IF EXISTS sources CASCADE; -- банк исторических разных источников
 
 DROP TABLE IF EXISTS places CASCADE; -- банк всяческих мест
 
@@ -21,27 +21,6 @@ COMMIT;
 -- СОЗДАТЬ ТАБЛИЦЫ 
 
 BEGIN;
-
-CREATE TABLE sources (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    date TEXT,
-    description TEXT,
-    author TEXT NOT NULL,
-    link TEXT,
-    events INTEGER ARRAY,
-    ex_events INTEGER ARRAY,
-    dates INTEGER ARRAY,
-    ex_dates INTEGER ARRAY,
-    places INTEGER ARRAY,
-    ex_places INTEGER ARRAY,
-    persons INTEGER ARRAY,
-    ex_persons INTEGER ARRAY,
-    sources INTEGER ARRAY,
-    ex_sources INTEGER ARRAY,
-    others INTEGER ARRAY,
-    ex_others INTEGER ARRAY
-);
 
 CREATE TABLE dates (
     id INTEGER PRIMARY KEY,
@@ -65,6 +44,29 @@ CREATE TABLE dates (
     ex_sources INTEGER ARRAY,
     others INTEGER ARRAY,
     ex_others INTEGER ARRAY
+);
+
+CREATE TABLE sources (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    date INTEGER NOT NULL,
+    description TEXT,
+    author TEXT NOT NULL,
+    link TEXT,
+    events INTEGER ARRAY,
+    ex_events INTEGER ARRAY,
+    dates INTEGER ARRAY,
+    ex_dates INTEGER ARRAY,
+    places INTEGER ARRAY,
+    ex_places INTEGER ARRAY,
+    persons INTEGER ARRAY,
+    ex_persons INTEGER ARRAY,
+    sources INTEGER ARRAY,
+    ex_sources INTEGER ARRAY,
+    others INTEGER ARRAY,
+    ex_others INTEGER ARRAY,
+
+        CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id)
 );
 
 CREATE TABLE places (
@@ -158,20 +160,6 @@ COMMIT;
 
 BEGIN;
 
-INSERT INTO sources VALUES 
-(
-    '1', 'Запись из личного архива №123321. Может быть автор.', '1 авг', 'Описание источника. Автор. Доступно по ссылке http://aboba', 'Абоба боба бибиович', 'http://aboba',
-    null, '{1, 6}', null, '{1, 2, 5}',
-    null, '{1}', null, '{1, 2}',
-    null, '{2}', null, '{1}'
-),
-(
-    '2', 'Запись из личного архива №123321-2. Может быть автор.', 'IX-XX вв.', 'Описание источника. Автор. Доступно по ссылке http://aboba {source:1}[родительский источник]', 'Абоба боба бибиович', 'http://aboba',
-    null, '{2, 6}', null, null,
-    null, null, null, null,
-    '{1}', null, null, null
-);
-
 INSERT INTO dates VALUES 
 (
     '1', 'название', '2023-08-23', '10:10:10', 
@@ -184,7 +172,7 @@ INSERT INTO dates VALUES
     '2', 'название', '2023-08-23', null, 
     null, null, null, null, 'Многострочное описание события 2 ({source : 1}[источник]) а теперь здесь есть ссылка на {person:1}[челика]', 
     null, null, null, null,
-    null, '{1}', null, null,
+    null, '{1}', '{1}', null,
     '{1}', null, null, null
 ),
 (
@@ -209,6 +197,20 @@ INSERT INTO dates VALUES
     '{1}', null, null, null
 );
 
+INSERT INTO sources VALUES 
+(
+    '1', 'Запись из личного архива №123321. Может быть автор.', '3', 'Описание источника. Автор. Доступно по ссылке http://aboba', 'Абоба боба бибиович', 'http://aboba',
+    null, '{1, 6}', null, '{1, 2, 5}',
+    null, '{1}', null, '{1, 2}',
+    null, '{2}', null, '{1}'
+),
+(
+    '2', 'Запись из личного архива №123321-2. Может быть автор.', '4', 'Описание источника. Автор. Доступно по ссылке http://aboba {source:1}[родительский источник]', 'Абоба боба бибиович', 'http://aboba',
+    null, '{2, 6}', null, null,
+    null, null, null, null,
+    '{1}', null, null, null
+);
+
 INSERT INTO places VALUES 
 (
     '1', 'Жепа', 'геолокация или имя или ещё чего', 'Город Жепа основан в {date:4}[основание города жепа] мог бы быть, но так не случилось, поэтому в {date:3}[какое-то контекстное название] тоже ничего не получилось, а в {date:2}[склонение] вообще так не получилось, что до сих пор не получается. ({source : 1}[источник])', 
@@ -220,7 +222,7 @@ INSERT INTO places VALUES
 INSERT INTO persons VALUES 
 (
     '1', 'Абоба Максим Маркович', 'Абоба Максим Маркович', 'Абоба Максим Маркович родился {date:1}[сегодня] в городе {place:1}[Жепа] ({source : 1}[источник])', '1',
-    null, '{1, 6}', '{1}', null,
+    null, '{1, 6}', '{1}', '{2}',
     '{1}', null, null, '{2}',
     '{1}', null, null, '{1}'
 ),

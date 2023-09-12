@@ -12,9 +12,9 @@ class Source(BaseEntity) :
     """
         Модель, описывающая сущность исторического источника
     """
-    author : str
+    author : str | None = None
     link : str | None = None
-    date : str | None = None
+    date : int | None = None # ссылка на date FK
 
 
 class SourceStorage(BaseStorage) :
@@ -50,7 +50,7 @@ class SourceStorage(BaseStorage) :
                                     CREATE TABLE {self.name} (
                                     	{ConfigKeywords.id} INTEGER PRIMARY KEY,
                                     	{ConfigKeywords.name} TEXT NOT NULL,
-                                    	{ConfigKeywords.date} TEXT,
+                                    	{ConfigKeywords.date} INTEGER NOT NULL,
                                     	{ConfigKeywords.description} TEXT,
                                         {ConfigKeywords.author} TEXT NOT NULL,
                                         {ConfigKeywords.link} TEXT,
@@ -65,7 +65,9 @@ class SourceStorage(BaseStorage) :
                                     	{ConfigKeywords.sources} INTEGER ARRAY,
                                     	{ConfigKeywords.ex_sources} INTEGER ARRAY,
                                     	{ConfigKeywords.others} INTEGER ARRAY,
-                                    	{ConfigKeywords.ex_others} INTEGER ARRAY
+                                    	{ConfigKeywords.ex_others} INTEGER ARRAY,
+
+                                            CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id)
                                     );
                                     """ ) + super().generateTableSQL()
     

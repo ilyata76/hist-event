@@ -55,12 +55,17 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
         case config.ConfigKeywords.sources :
             # исторический источник
 
-            entity_to_append = Source( name=name, 
-                                       id=id, 
-                                       description=description,
-                                       link=link, 
-                                       author=author, 
-                                       date=date )
+            if storages.date_storage.get(int(date)) :
+                entity_to_append = Source( name=name, 
+                                           id=id, 
+                                           description=description,
+                                           link=link, 
+                                           author=author, 
+                                           date=date )
+            else :
+                res_code = 2
+                logger.warning(f"Такой даты для источника={id} - date={date} - не существует")
+                entity_to_append = None
 
 
         case config.ConfigKeywords.dates : 
@@ -262,6 +267,7 @@ def parse(path_folder : Path,
 
         for i in range(config.max_reparse_count) :
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
+            print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i}\n\n"+"##"*50)
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
             codes = [source_code, date_code, place_code, person_code, other_code, event_code]
@@ -294,8 +300,10 @@ def parse(path_folder : Path,
                 break
 
         if 2 in codes or 1 in codes :
+            print("##"*50 + f"\n\n\t\t БЕЗУСПЕШНО codes={codes}\n\n"+"##"*50)
             logger.error(f"ПРОГРАММА ОТРАБОТАЛА НЕПРАВИЛЬНО codes={codes}")
         else :
+            print("##"*50 + f"\n\n\t\t УСПЕХ\n\n"+"##"*50)
             logger.info(f"УСПЕШНЫЙ ПАРСИНГ")
 
         logger.info("Конец операции ОБЩЕГО парсинга")
@@ -303,5 +311,6 @@ def parse(path_folder : Path,
 
 
     except Exception as exc :
+        print("##"*50 + f"\n\n\t\t ОШИБКА exc={exc}\n\n"+"##"*50)
         logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА exc={exc}", exc=exc)
         return None
