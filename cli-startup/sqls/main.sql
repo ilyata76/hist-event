@@ -146,7 +146,7 @@ CREATE TABLE biblio_fragments (
 	name TEXT,
 	description TEXT,
 	biblio INTEGER NOT NULL,
-		CONSTRAINT FK_biblio_id FOREIGN KEY (biblio) REFERENCES sources(id),
+		CONSTRAINT FK_biblio_id FOREIGN KEY (biblio) REFERENCES biblios(id),
 	events INTEGER ARRAY,
 	ex_events INTEGER ARRAY,
 	dates INTEGER ARRAY,

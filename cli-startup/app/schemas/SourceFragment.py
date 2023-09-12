@@ -45,7 +45,7 @@ class SourceFragmentStorage(BaseStorage) :
             Генерация SQL таблицы для источника
         """
         str_include  = f"\t{ConfigKeywords.source} INTEGER NOT NULL,\n"
-        str_include += f"\t\tCONSTRAINT FK_source_id FOREIGN KEY (source) REFERENCES sources(id)"
+        str_include += f"\t\tCONSTRAINT FK_source_id FOREIGN KEY ({ConfigKeywords.source}) REFERENCES {ConfigKeywords.sources}({ConfigKeywords.id})"
         return super().generateTableSQL(str_include)
     
 

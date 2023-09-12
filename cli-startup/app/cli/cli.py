@@ -27,15 +27,15 @@ class StartupCLI(cli.Application):
     
 
     storages = Storages(
-        source_storage=SourceStorage(name="sources"), 
-        source_fragment_storage=SourceFragmentStorage(name="source_fragments"),
-        date_storage=DateStorage(name="dates"),
-        place_storage=PlaceStorage(name="places"), 
-        person_storage=PersonStorage(name="persons"),
-        other_storage=OtherStorage(name="others"),
-        event_storage=EventStorage(name="events"),
-        biblio_storage=BiblioStorage(name="biblios"),
-        biblio_fragment_storage=BiblioFragmentStorage(name="biblio_fragments")
+        source_storage=SourceStorage(name=config.ConfigKeywords.sources), 
+        source_fragment_storage=SourceFragmentStorage(name=config.ConfigKeywords.source_fragments),
+        date_storage=DateStorage(config.ConfigKeywords.dates),
+        place_storage=PlaceStorage(config.ConfigKeywords.places), 
+        person_storage=PersonStorage(config.ConfigKeywords.persons),
+        other_storage=OtherStorage(config.ConfigKeywords.others),
+        event_storage=EventStorage(config.ConfigKeywords.events),
+        biblio_storage=BiblioStorage(config.ConfigKeywords.biblios),
+        biblio_fragment_storage=BiblioFragmentStorage(config.ConfigKeywords.biblio_fragments)
     )
 
 

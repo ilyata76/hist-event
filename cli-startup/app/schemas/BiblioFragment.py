@@ -45,7 +45,7 @@ class BiblioFragmentStorage(BaseStorage) :
             Генерация SQL таблицы для б. источника
         """
         str_include  = f"\t{ConfigKeywords.biblio} INTEGER NOT NULL,\n"
-        str_include += f"\t\tCONSTRAINT FK_biblio_id FOREIGN KEY (biblio) REFERENCES sources(id)"
+        str_include += f"\t\tCONSTRAINT FK_biblio_id FOREIGN KEY ({ConfigKeywords.biblio}) REFERENCES {ConfigKeywords.biblios}({ConfigKeywords.id})"
         return super().generateTableSQL(str_include)
     
 

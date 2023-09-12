@@ -46,7 +46,7 @@ class PersonStorage(BaseStorage) :
             Генерация SQL таблицы для даты
         """
         str_include  = f"\t{ConfigKeywords.date} INTEGER NOT NULL,\n"
-        str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id),\n"
+        str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY ({ConfigKeywords.date}) REFERENCES {ConfigKeywords.dates}({ConfigKeywords.id}),\n"
         str_include += f"\t{ConfigKeywords.person} TEXT NOT NULL"
         return super().generateTableSQL(str_include)
     
