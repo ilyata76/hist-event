@@ -14,6 +14,8 @@ from schemas.Other import Other
 from schemas.Event import Event
 from schemas.Storages import Storages, BaseEntity
 from schemas.SourceFragment import SourceFragment
+from schemas.Biblio import Biblio
+from schemas.BiblioFragment import BiblioFragment
 
 from processes.utils import patternTextInclusion, dictFromYaml
 
@@ -49,6 +51,9 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
     start = dict_entity.get(config.ConfigKeywords.start, None)
     end = dict_entity.get(config.ConfigKeywords.end, None)
     source = dict_entity.get(config.ConfigKeywords.source, None)
+    state = dict_entity.get(config.ConfigKeywords.state, None)
+    period = dict_entity.get(config.ConfigKeywords.period, None)
+    biblio = dict_entity.get(config.ConfigKeywords.biblio, None)
         
     entity_to_append = None # сущность для возвращения
 
@@ -170,6 +175,27 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                 entity_to_append = None 
 
 
+        case config.ConfigKeywords.biblios :
+            entity_to_append = Biblio( name=name, 
+                                       id=id, 
+                                       description=description, 
+                                       author=author,
+                                       link=link,
+                                       state=state,
+                                       period=period,
+                                       date=date )
+
+        case config.ConfigKeywords.biblio_fragments :
+            if storages.biblio_storage.get(int(biblio)) :
+                entity_to_append = BiblioFragment( name=name, 
+                                                   id=id, 
+                                                   description=description,
+                                                   biblio=biblio )
+            else :
+                res_code = 2
+                logger.warning(f"Такого источника для фрагмента библиографического источника={id} - source={source} - не существует")
+                entity_to_append = None
+
 
 
     return res_code, entity_to_append
@@ -255,7 +281,8 @@ def parse(path_folder : Path,
           places_path : Path | None = None, 
           sources_path : Path | None = None,
           others_path : Path | None = None,
-          events_path : Path | None = None):
+          events_path : Path | None = None,
+          biblios_path : Path | None = None):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
@@ -278,38 +305,38 @@ def parse(path_folder : Path,
             others_path = path_folder.joinpath("others.yaml")
         if not events_path :
             events_path = path_folder.joinpath("events.yaml")
+        if not biblios_path :
+            biblios_path = path_folder.joinpath("biblios.yaml")
 
-        source_code, source_fragment_code, date_code, place_code, person_code, other_code,event_code = 2, 2, 2, 2, 2, 2, 2
+        source_code, source_fragment_code, date_code, place_code, person_code,\
+              other_code, event_code, biblio_code, biblio_fragment_code = 0, 1, 2, 3, 4, 5, 6, 7, 8
+
+        codes = [2, 2, 2, 2, 2, 2, 2, 2, 2]
 
         for i in range(config.max_reparse_count) :
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
             print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i}\n\n"+"##"*50)
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
-            codes = [source_code, source_fragment_code, date_code, place_code, person_code, other_code, event_code]
-            soc, sfc, dac, plc, pec, otc, evc = 0, 1, 2, 3, 4, 5, 6
 
-            if source_code == 2 and 1 not in codes:
-                source_code = parseFile(sources_path, config.ConfigKeywords.sources, storages)
-                codes[soc] = source_code
-            if source_fragment_code == 2 and 1 not in codes:
-                source_fragment_code = parseFile(sources_path, config.ConfigKeywords.source_fragments, storages)
-                codes[soc] = source_fragment_code
-            if date_code == 2 and 1 not in codes:
-                date_code = parseFile(dates_path, config.ConfigKeywords.dates, storages)
-                codes[dac] = date_code
-            if place_code == 2 and 1 not in codes:
-                place_code = parseFile(places_path, config.ConfigKeywords.places, storages)
-                codes[plc] = place_code
-            if person_code == 2 and 1 not in codes:
-                person_code = parseFile(persons_path, config.ConfigKeywords.persons, storages)
-                codes[pec] = person_code
-            if other_code == 2 and 1 not in codes:
-                other_code = parseFile(others_path, config.ConfigKeywords.others, storages)
-                codes[otc] = other_code
-            if event_code == 2 and 1 not in codes:
-                event_code = parseFile(events_path, config.ConfigKeywords.events, storages)
-                codes[evc] = event_code
+            if codes[source_code] == 2 and 1 not in codes:
+                codes[source_code] = parseFile(sources_path, config.ConfigKeywords.sources, storages)
+            if codes[source_fragment_code] == 2 and 1 not in codes:
+                codes[source_fragment_code] = parseFile(sources_path, config.ConfigKeywords.source_fragments, storages)
+            if codes[date_code] == 2 and 1 not in codes:
+                codes[date_code] = parseFile(dates_path, config.ConfigKeywords.dates, storages)
+            if codes[place_code] == 2 and 1 not in codes:
+                codes[place_code] = parseFile(places_path, config.ConfigKeywords.places, storages)
+            if codes[person_code] == 2 and 1 not in codes:
+                codes[person_code] = parseFile(persons_path, config.ConfigKeywords.persons, storages)
+            if codes[other_code] == 2 and 1 not in codes:
+                codes[other_code] = parseFile(others_path, config.ConfigKeywords.others, storages)
+            if codes[event_code] == 2 and 1 not in codes:
+                codes[event_code] = parseFile(events_path, config.ConfigKeywords.events, storages)
+            if codes[biblio_code] == 2 and 1 not in codes:
+                codes[biblio_code] = parseFile(biblios_path, config.ConfigKeywords.biblios, storages)
+            if codes[biblio_fragment_code] == 2 and 1 not in codes:
+                codes[biblio_fragment_code] = parseFile(biblios_path, config.ConfigKeywords.biblio_fragments, storages)
 
             if 1 in codes :
                 logger.error(f"Ошибка на итерации {i}")

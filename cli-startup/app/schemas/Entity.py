@@ -31,6 +31,10 @@ class BaseEntity(BaseModel) :
     ex_others : set[int] | None = None #
     source_fragments : set[int] | None = None
     ex_source_fragments : set[int] | None = None #
+    biblios : set[int] | None = None
+    ex_biblios : set[int] | None = None
+    biblio_fragments : set[int] | None = None
+    ex_biblio_fragments : set[int] | None = None
 
 
 class BaseStorage() :
@@ -137,7 +141,11 @@ class BaseStorage() :
         str_result += f"\t{ConfigKeywords.others} INTEGER ARRAY,\n"
         str_result += f"\t{ConfigKeywords.ex_others} INTEGER ARRAY,\n"
         str_result += f"\t{ConfigKeywords.source_fragments} INTEGER ARRAY,\n"
-        str_result += f"\t{ConfigKeywords.ex_source_fragments} INTEGER ARRAY\n"
+        str_result += f"\t{ConfigKeywords.ex_source_fragments} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.biblios} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_biblios} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.biblio_fragments} INTEGER ARRAY,\n"
+        str_result += f"\t{ConfigKeywords.ex_biblio_fragments} INTEGER ARRAY\n"
         str_result += f");"
 
         return str_result
@@ -154,7 +162,9 @@ class BaseStorage() :
         str_result += f"\t  {NOV(element.persons)}, {NOV(element.ex_persons)},\n"
         str_result += f"\t  {NOV(element.sources)}, {NOV(element.ex_sources)},\n"
         str_result += f"\t  {NOV(element.others)}, {NOV(element.ex_others)},\n"
-        str_result += f"\t  {NOV(element.source_fragments)}, {NOV(element.ex_source_fragments)} )"
+        str_result += f"\t  {NOV(element.source_fragments)}, {NOV(element.ex_source_fragments)},\n"
+        str_result += f"\t  {NOV(element.biblios)}, {NOV(element.ex_biblios)},\n"
+        str_result += f"\t  {NOV(element.biblio_fragments)}, {NOV(element.ex_biblio_fragments)} )"
 
         return str_result
 

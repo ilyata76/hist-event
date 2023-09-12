@@ -9,7 +9,8 @@ import config
 from processes.parse import parse
 from processes.generateSQL import generateSQL
 from schemas.Storages import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
-                                PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage
+                                PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
+                                BiblioStorage, BiblioFragmentStorage
 
 
 class StartupCLI(cli.Application):
@@ -32,7 +33,9 @@ class StartupCLI(cli.Application):
         place_storage=PlaceStorage(name="places"), 
         person_storage=PersonStorage(name="persons"),
         other_storage=OtherStorage(name="others"),
-        event_storage=EventStorage(name="events")
+        event_storage=EventStorage(name="events"),
+        biblio_storage=BiblioStorage(name="biblios"),
+        biblio_fragment_storage=BiblioFragmentStorage(name="biblio_fragments")
     )
 
 

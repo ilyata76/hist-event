@@ -42,6 +42,8 @@ class ParseKeywords :
     other = "other"
     event = "event"
     source_fragment = "source_fragment"
+    biblio = "biblio"
+    biblio_fragment = "biblio_fragment"
 
 
 class ConfigKeywords :
@@ -77,6 +79,11 @@ class ConfigKeywords :
     level : str = "level"
     # source_fragment специфика
     source : str = "source"
+    # biblio специфика
+    state : str = "state"
+    period : str = "period"
+    # biblio_fragment специфика
+    biblio : str = "biblio"
     ##
     dates : str = "dates"
     persons : str = "persons"
@@ -92,3 +99,7 @@ class ConfigKeywords :
     ex_events : str = "ex_events"
     source_fragments : str = "source_fragments"
     ex_source_fragments : str = "ex_source_fragments"
+    biblios : str = "biblios"
+    ex_biblios : str = "ex_biblios"
+    biblio_fragments : str = "biblio_fragments"
+    ex_biblio_fragments : str = "ex_biblio_fragments"
