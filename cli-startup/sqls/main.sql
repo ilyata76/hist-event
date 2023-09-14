@@ -573,7 +573,7 @@ COMMIT;
 
 BEGIN;
 
-DROP TABLE IF EXISTS eventsbonds CASCADE;
+DROP VIEW IF EXISTS eventsbonds CASCADE;
 DROP VIEW IF EXISTS bondswithoutid CASCADE;
 
 CREATE OR REPLACE VIEW bondswithoutid
@@ -581,7 +581,7 @@ CREATE OR REPLACE VIEW bondswithoutid
         FROM bonds
 ;
 
-CREATE TABLE eventsbonds 
+CREATE OR REPLACE VIEW eventsbonds 
     AS SELECT * 
         FROM events as e
         JOIN bondswithoutid as b

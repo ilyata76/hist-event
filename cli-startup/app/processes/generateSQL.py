@@ -14,7 +14,7 @@ def eventsAndBonds() :
         Создать представление, в котором будут события с их связями
     """
     return cleandoc(f"""
-    DROP TABLE IF EXISTS {ConfigKeywords.eventsbonds} CASCADE;
+    DROP VIEW IF EXISTS {ConfigKeywords.eventsbonds} CASCADE;
     DROP VIEW IF EXISTS {ConfigKeywords.bondswithoutid} CASCADE;
 
     CREATE OR REPLACE VIEW {ConfigKeywords.bondswithoutid}
@@ -22,7 +22,7 @@ def eventsAndBonds() :
             FROM {ConfigKeywords.bonds}
     ;
 
-    CREATE TABLE {ConfigKeywords.eventsbonds} 
+    CREATE OR REPLACE VIEW {ConfigKeywords.eventsbonds} 
         AS SELECT * 
             FROM {ConfigKeywords.events} as e
             JOIN {ConfigKeywords.bondswithoutid} as b
