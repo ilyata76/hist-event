@@ -71,6 +71,8 @@ class ConfigKeywords :
     # source специфика
     link : str = "link"
     author : str = "author"
+    type : str = "type"
+    subtype : str = "subtype"
     # other специфика
     meta : str = "meta"
     # event специфика

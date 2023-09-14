@@ -14,6 +14,8 @@ class Source(BaseEntity) :
     author : str | None = None
     link : str | None = None
     date : int | None = None # ссылка на date FK
+    type : str | None = None
+    subtype : str | None = None
 
 
 class SourceStorage(BaseStorage) :
@@ -48,7 +50,9 @@ class SourceStorage(BaseStorage) :
         str_include  = f"\t{ConfigKeywords.author} TEXT NOT NULL,\n"
         str_include += f"\t{ConfigKeywords.link} TEXT,\n"
         str_include += f"\t{ConfigKeywords.date} INTEGER NOT NULL,\n"
-        str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY ({ConfigKeywords.date}) REFERENCES {ConfigKeywords.dates}({ConfigKeywords.id})"
+        str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY ({ConfigKeywords.date}) REFERENCES {ConfigKeywords.dates}({ConfigKeywords.id}), \n"
+        str_include += f"\t{ConfigKeywords.type} TEXT,\n"
+        str_include += f"\t{ConfigKeywords.subtype} TEXT"
         return super().generateTableSQL(str_include)
     
 
@@ -62,7 +66,8 @@ class SourceStorage(BaseStorage) :
         for key in self.storage :
             x = self.storage[key]
             if type(x) is Source :
-                str_include  = f"\t  {NOV(x.author)}, {NOV(x.link)}, {NOV(x.date)}"
+                str_include  = f"\t  {NOV(x.author)}, {NOV(x.link)}, {NOV(x.date)},\n"
+                str_include += f"\t  {NOV(x.type)}, {NOV(x.subtype)}"
                 str_result = super().fillTableSQL(x, str_include)
                 ary.append(str_result)
         result += ",\n".join(ary)

@@ -45,6 +45,8 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
     state = dict_entity.get(ConfigKeywords.state, None)
     period = dict_entity.get(ConfigKeywords.period, None)
     biblio = dict_entity.get(ConfigKeywords.biblio, None)
+    type = dict_entity.get(ConfigKeywords.type, None)
+    subtype = dict_entity.get(ConfigKeywords.subtype, None)
         
     entity_to_append = None # сущность для возвращения
 
@@ -59,7 +61,9 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
                                            description=description,
                                            link=link, 
                                            author=author, 
-                                           date=date )
+                                           date=date,
+                                           type=type,
+                                           subtype=subtype )
             else :
                 res_code = 2
                 logger.warning(f"Такой даты для источника={id} - date={date} - не существует")

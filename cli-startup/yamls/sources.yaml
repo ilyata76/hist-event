@@ -12,6 +12,8 @@ sources :
     author: "Абоба боба бибиович"
     date: 4
     link: "http://aboba"
+    type: "тип"
+    subtype: "подтип"
 
 source_fragments :
   - id: 1
