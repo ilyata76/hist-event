@@ -2,8 +2,36 @@
     Файл, отвечающий за генерацию SQL-файла или запроса
         для базы данных, её генерации
 """
+from inspect import cleandoc
 from loguru import logger
 from schemas import Storages, BondStorage
+from config import ConfigKeywords
+
+
+
+def eventsAndBonds() :
+    """
+        Создать представление, в котором будут события с их связями
+    """
+    return cleandoc(f"""
+    DROP TABLE IF EXISTS {ConfigKeywords.eventsbonds} CASCADE;
+    DROP VIEW IF EXISTS {ConfigKeywords.bondswithoutid} CASCADE;
+
+    CREATE OR REPLACE VIEW {ConfigKeywords.bondswithoutid}
+        AS SELECT {ConfigKeywords.event}, {ConfigKeywords.parents}, {ConfigKeywords.childs}, {ConfigKeywords.prerequisites}
+            FROM {ConfigKeywords.bonds}
+    ;
+
+    CREATE TABLE {ConfigKeywords.eventsbonds} 
+        AS SELECT * 
+            FROM {ConfigKeywords.events} as e
+            JOIN {ConfigKeywords.bondswithoutid} as b
+                ON e.{ConfigKeywords.id} = b.{ConfigKeywords.event}
+    ;
+    """)
+
+
+
 
 ################### ГЛАВНЫЙ ПРОЦЕСС
 
@@ -29,6 +57,9 @@ def generateSQL(storages : Storages, bond_storage : BondStorage) -> str | None:
         result += "BEGIN;\n\n"
         result += storages.fillTablesSQL() + "\n\n"
         result += bond_storage.fillTableSQL() + "\n\n"
+        result += "COMMIT;\n\n"
+        result += "BEGIN;\n\n"
+        result += eventsAndBonds() + "\n\n"
         result += "COMMIT;\n\n"
         logger.info("КОНЕЦ ГЕНЕРАЦИИ SQL")
         return result

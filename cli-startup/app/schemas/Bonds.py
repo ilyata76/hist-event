@@ -1,5 +1,5 @@
 """
-    //
+    Схемы управления абстракцией связей
 """
 from pydantic import BaseModel
 from loguru import logger
@@ -8,7 +8,7 @@ from processes.utils import NOV
 
 class Bond(BaseModel) :
     """
-        //
+        Определяет связь как абстракцию (отличается от остальных сущностей)
     """
     event : int | None = None # id envets FK
     parents : set[int] | None = None
@@ -19,7 +19,7 @@ class Bond(BaseModel) :
 
 class BondStorage() :
     """
-        //
+        Управление связями (необобщается до сущностей)
     """
 
     def __init__(self, name = None) :

@@ -571,3 +571,22 @@ INSERT INTO bonds (event, parents, childs, prerequisites) VALUES
 
 COMMIT;
 
+BEGIN;
+
+DROP TABLE IF EXISTS eventsbonds CASCADE;
+DROP VIEW IF EXISTS bondswithoutid CASCADE;
+
+CREATE OR REPLACE VIEW bondswithoutid
+    AS SELECT event, parents, childs, prerequisites
+        FROM bonds
+;
+
+CREATE TABLE eventsbonds 
+    AS SELECT * 
+        FROM events as e
+        JOIN bondswithoutid as b
+            ON e.id = b.event
+;
+
+COMMIT;
+

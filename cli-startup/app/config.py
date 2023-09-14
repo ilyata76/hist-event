@@ -111,3 +111,6 @@ class ConfigKeywords :
     biblio_fragments : str = "biblio_fragments"
     ex_biblio_fragments : str = "ex_biblio_fragments"
     bonds : str = "bonds"
+    #
+    bondswithoutid : str = "bondswithoutid"
+    eventsbonds : str = "eventsbonds"
