@@ -45,8 +45,8 @@ class PersonStorage(BaseStorage) :
             Генерация SQL таблицы для даты
         """
         str_include  = f"\t{ConfigKeywords.date} INTEGER NOT NULL,\n"
-        str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY ({ConfigKeywords.date}) REFERENCES {ConfigKeywords.dates}({ConfigKeywords.id}),\n"
-        str_include += f"\t{ConfigKeywords.person} TEXT NOT NULL"
+        str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY ({ConfigKeywords.date}) REFERENCES {ConfigKeywords.dates}({ConfigKeywords.id})"
+        #str_include += f"\t{ConfigKeywords.person} TEXT NOT NULL"
         return super().generateTableSQL(str_include)
     
 
@@ -60,7 +60,7 @@ class PersonStorage(BaseStorage) :
         for key in self.storage :
             x = self.storage[key]
             if type(x) is Person :
-                str_include  = f"\t  {NOV(x.date)}, {NOV(x.person)}"
+                str_include  = f"\t  {NOV(x.date)}" #, {NOV(x.person)}
                 str_result = super().fillTableSQL(x, str_include)
                 ary.append(str_result)
         

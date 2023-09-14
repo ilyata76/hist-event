@@ -66,7 +66,6 @@ CREATE TABLE persons (
 	description TEXT,
 	date INTEGER NOT NULL,
 		CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id),
-	person TEXT NOT NULL,
 	events INTEGER ARRAY,
 	ex_events INTEGER ARRAY,
 	dates INTEGER ARRAY,
@@ -363,7 +362,7 @@ INSERT INTO dates VALUES
 
 INSERT INTO persons VALUES 
 	( '1', 'Абоба Максим Маркович', 'Абоба Максим Маркович родился {date:1}[сегодня] в городе {place:1}[Жепа] ({source : 1}[источник])',
-	  '1', 'Абоба Максим Маркович',
+	  '1',
 	  null, '{1, 6}',
 	  '{1}', '{2}',
 	  '{1}', null,
@@ -374,7 +373,7 @@ INSERT INTO persons VALUES
 	  null, null,
 	  null, null ),
 	( '2', 'Абоба Марк Андреевич', 'Абоба-старший родился задолго до {date:3}[авг путча], но только после этого он эмигрировал в {place:1}[Жепу]. Тогда как {person:1}[Абоба Максим] остался. ({source:1}[источник])',
-	  '2', 'Абоба Максим Маркович',
+	  '2',
 	  null, null,
 	  '{3}', null,
 	  '{1}', null,

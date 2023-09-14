@@ -33,7 +33,6 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
     link = dict_entity.get(ConfigKeywords.link, None)
     author = dict_entity.get(ConfigKeywords.author, None)
     date = dict_entity.get(ConfigKeywords.date, None)
-    person = dict_entity.get(ConfigKeywords.person, None)
     geo = dict_entity.get(ConfigKeywords.geo, None)
     meta = dict_entity.get(ConfigKeywords.meta, None)
     min = dict_entity.get(ConfigKeywords.min, None)
@@ -140,8 +139,7 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
             if storages.date_storage.get(int(date)) :
                 entity_to_append = Person( name=name, 
                                            id=id, 
-                                           description=description, 
-                                           person=person,
+                                           description=description,
                                            date=date )
             else :
                 res_code = 2
