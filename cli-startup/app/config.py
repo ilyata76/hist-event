@@ -86,6 +86,11 @@ class ConfigKeywords :
     period : str = "period"
     # biblio_fragment специфика
     biblio : str = "biblio"
+    # bond специфика
+    event : str = "event"
+    parents : str = "parents"
+    childs : str = "childs"
+    prerequisites : str = "prerequisites"
     ##
     dates : str = "dates"
     persons : str = "persons"
@@ -105,3 +110,4 @@ class ConfigKeywords :
     ex_biblios : str = "ex_biblios"
     biblio_fragments : str = "biblio_fragments"
     ex_biblio_fragments : str = "ex_biblio_fragments"
+    bonds : str = "bonds"

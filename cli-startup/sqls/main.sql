@@ -21,6 +21,8 @@ DROP TABLE IF EXISTS others CASCADE; -- банк всего остального
 
 DROP TABLE IF EXISTS events CASCADE; -- банк событий, главной сущности базы данных
 
+DROP TABLE IF EXISTS bonds CASCADE;
+
 COMMIT;
 
 
@@ -275,6 +277,15 @@ CREATE TABLE events (
 	biblio_fragments INTEGER ARRAY,
 	ex_biblio_fragments INTEGER ARRAY
 );
+
+CREATE TABLE bonds (
+	id SERIAL PRIMARY KEY,
+	event INTEGER NOT NULL,
+		CONSTRAINT FK_event_id FOREIGN KEY (id) REFERENCES events(id),
+	parents INTEGER ARRAY,
+	childs INTEGER ARRAY,
+	prerequisites INTEGER ARRAY
+); -- таблица связей
 
 COMMIT;
 
@@ -550,6 +561,12 @@ INSERT INTO events VALUES
 	  null, null,
 	  null, null,
 	  null, null,
+	  null, null );
+
+INSERT INTO bonds (event, parents, childs, prerequisites) VALUES 
+	( '1', '{2, 3}',
+	  '{4, 5, 6}', null ),
+	( '2', '{1, 3}',
 	  null, null );
 
 COMMIT;

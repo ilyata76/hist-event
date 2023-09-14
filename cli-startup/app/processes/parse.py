@@ -7,7 +7,7 @@ from pathlib import Path
 
 from schemas import BaseEntity, Date, Person, Place, Event, Other,\
                     Source, SourceFragment, Biblio, BiblioFragment,\
-                    Storages
+                    Storages, Bond, BondStorage
 from processes.utils import patternTextInclusion, dictFromYaml
 from config import ConfigKeywords, max_reparse_count
 
@@ -225,7 +225,7 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
 
         if not dict_entities :
             raise Exception(f"{keyword} : {path} : возникла ошибка во время обхода файла (результат None)")
-        if type(dict_entities) is dict : 
+        if type(dict_entities) is dict or type(dict_entities) == dict: 
             # если результат - один словарь, а не много
             dict_entities = [dict_entities]
 
@@ -276,13 +276,15 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
 
 def parse(path_folder : Path,
           storages : Storages,
+          bond_storage : BondStorage,
           dates_path : Path | None = None, 
           persons_path : Path | None = None,
           places_path : Path | None = None, 
           sources_path : Path | None = None,
           others_path : Path | None = None,
           events_path : Path | None = None,
-          biblios_path : Path | None = None):
+          biblios_path : Path | None = None,
+          bonds_path : Path | None = None):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
@@ -307,6 +309,8 @@ def parse(path_folder : Path,
             events_path = path_folder.joinpath("events.yaml")
         if not biblios_path :
             biblios_path = path_folder.joinpath("biblios.yaml")
+        if not bonds_path :
+            bonds_path = path_folder.joinpath("bonds.yaml")
 
         source_code, source_fragment_code, date_code, place_code, person_code,\
               other_code, event_code, biblio_code, biblio_fragment_code = 0, 1, 2, 3, 4, 5, 6, 7, 8
@@ -354,15 +358,63 @@ def parse(path_folder : Path,
         if 2 in codes or 1 in codes :
             print("##"*50 + f"\n\n\t\t БЕЗУСПЕШНО codes={codes}\n\n"+"##"*50)
             logger.error(f"ПРОГРАММА ОТРАБОТАЛА НЕПРАВИЛЬНО codes={codes}")
+            raise Exception(f"Программа отработала неправильно codes={codes}")
         else :
             print("##"*50 + f"\n\n\t\t УСПЕХ\n\n"+"##"*50)
             logger.info(f"УСПЕШНЫЙ ПАРСИНГ")
 
+
+        ######## ТЕПЕРЬ СВЯЗИ ОТДЕЛЬНО
+
+        bonds = dictFromYaml(bonds_path)[ConfigKeywords.bonds]
+
+        if type(bonds) == dict or type(bonds) is dict:
+            bonds = [bonds]
+
+        toList = lambda x : list[x] if type(x) != list and x is not None else x
+        checkEvents = lambda lst : [storages.event_storage.get(x) is not None for x in lst]
+        printMessage = lambda msg : {"log": logger.error(msg), "exc": Exception(msg)}
+        
+        for dict_bond in bonds :
+            event = dict_bond.get(ConfigKeywords.event, None)
+            parents = dict_bond.get(ConfigKeywords.parents, None)
+            childs = dict_bond.get(ConfigKeywords.childs, None)
+            prerequisites = dict_bond.get(ConfigKeywords.prerequisites, None)
+
+            if parents and event in parents :
+                raise printMessage(f"Попытка прописать к событию={event} родителя в виде себя")["exc"]
+            if childs and event in childs :
+                raise printMessage(f"Попытка прописать к событию={event} ребёнка в виде себя")["exc"]
+            if prerequisites and event in prerequisites :
+                raise printMessage(f"Попытка прописать к событию={event} предпосылку в виде себя")["exc"]
+
+            parents, childs, prerequisites = toList(parents), toList(childs), toList(prerequisites)
+
+            if storages.event_storage.get(event) :
+                if parents and False in checkEvents(parents): 
+                    raise printMessage(f"Попытка прописать к событию={event} несуществующего родителя")["exc"]
+                if childs and False in checkEvents(childs) :
+                    raise printMessage(f"Попытка прописать к событию={event} несуществующего ребёнка")["exc"]
+                if prerequisites and False in checkEvents(prerequisites) :
+                    raise printMessage(f"Попытка прописать к событию={event} несуществующую предпосылку")["exc"]
+                
+                bond_storage.append(Bond(event=event,
+                                         parents=parents,
+                                         childs=childs,
+                                         prerequisites=prerequisites))
+            else :
+                raise printMessage(f"Попытка прописать связи к несуществующему событию={event}")["exc"]
+    
+        print("##"*50 + f"\n\n\t\t ПОЛНЫЙ УСПЕХ (СВЯЗИ)\n\n"+"##"*50)
+        logger.info(f"УСПЕШНЫЙ ПАРСИНГ СВЯЗЕЙ")
+
+        ########
+
         logger.info("Конец операции ОБЩЕГО парсинга")
-        return storages
+        return storages, bond_storage
 
 
     except Exception as exc :
         print("##"*50 + f"\n\n\t\t ОШИБКА exc={exc}\n\n"+"##"*50)
         logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА exc={exc}", exc=exc)
-        return None
+        return None, None

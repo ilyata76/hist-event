@@ -8,7 +8,7 @@ from loguru import logger
 from processes import parse, generateSQL
 from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
                     PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
-                    BiblioStorage, BiblioFragmentStorage
+                    BiblioStorage, BiblioFragmentStorage, BondStorage
 from config import ConfigKeywords, yaml_folder, sql_folder
 
 class StartupCLI(cli.Application):
@@ -16,13 +16,12 @@ class StartupCLI(cli.Application):
         CLI-приложение. Задачи: парсить файлы, создавать скрипты SQL
     """
 
-
-
     ## Флаги
 
     verbose = cli.Flag(["v", "verbose"], 
                        help = "If given, I will be very talkative")
     
+    ##
 
     storages = Storages(
         source_storage=SourceStorage(name=ConfigKeywords.sources), 
@@ -35,6 +34,8 @@ class StartupCLI(cli.Application):
         biblio_storage=BiblioStorage(ConfigKeywords.biblios),
         biblio_fragment_storage=BiblioFragmentStorage(ConfigKeywords.biblio_fragments)
     )
+
+    bond_storage = BondStorage(ConfigKeywords.bonds)
 
 
     ## Для внутреннего пользования
@@ -67,15 +68,15 @@ class StartupCLI(cli.Application):
 
         try : 
             self.log("Начинаем парсинг")
-            self.storages = parse(path_yaml_folder, self.storages)
-            if not self.storages :
+            self.storages, self.bond_storage = parse(path_yaml_folder, self.storages, self.bond_storage)
+            if not self.storages or not self.bond_storage :
                 logger.error("Произошла ошибка при обработке входных файлов!")
                 raise Exception("Произошла ошибка при обработке входных файлов!")
             #self.log("Теперь хранилища storages []->:\n\n{stor}\n\n", stor=self.storages)
 
 
             self.log("Начинаем генерацию SQL")
-            string = generateSQL(self.storages)
+            string = generateSQL(self.storages, self.bond_storage)
             if not string :
                 logger.error("Произошла ошибка при обработке данных и генерации SQL-запроса")
                 raise Exception("Произошла ошибка при обработке данных и генерации SQL-запроса")
