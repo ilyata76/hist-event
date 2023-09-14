@@ -56,14 +56,19 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
             # исторический источник
 
             if storages.date_storage.get(int(date)) :
-                entity_to_append = Source( name=name, 
-                                           id=id, 
-                                           description=description,
-                                           link=link, 
-                                           author=author, 
-                                           date=date,
-                                           type=type,
-                                           subtype=subtype )
+                if storages.person_storage.get(int(author)) :
+                    entity_to_append = Source( name=name, 
+                                               id=id, 
+                                               description=description,
+                                               link=link, 
+                                               author=author, 
+                                               date=date,
+                                               type=type,
+                                               subtype=subtype )
+                else :
+                    res_code = 2
+                    logger.warning(f"Такой персоналии для источника={id} - author={author} - не существует")
+                    entity_to_append = None
             else :
                 res_code = 2
                 logger.warning(f"Такой даты для источника={id} - date={date} - не существует")
@@ -309,29 +314,35 @@ def parse(path_folder : Path,
         codes = [2, 2, 2, 2, 2, 2, 2, 2, 2]
 
         for i in range(max_reparse_count) :
-            logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} \n\n\n")
-            print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i}\n\n"+"##"*50)
+            logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n\n")
+            print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n"+"##"*50)
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
+
+            if codes[biblio_code] == 2 and 1 not in codes:
+                codes[biblio_code] = parseFile(biblios_path, ConfigKeywords.biblios, storages)
+            if codes[biblio_fragment_code] == 2 and 1 not in codes:
+                codes[biblio_fragment_code] = parseFile(biblios_path, ConfigKeywords.biblio_fragments, storages)
 
             if codes[source_code] == 2 and 1 not in codes:
                 codes[source_code] = parseFile(sources_path, ConfigKeywords.sources, storages)
             if codes[source_fragment_code] == 2 and 1 not in codes:
                 codes[source_fragment_code] = parseFile(sources_path, ConfigKeywords.source_fragments, storages)
+
             if codes[date_code] == 2 and 1 not in codes:
                 codes[date_code] = parseFile(dates_path, ConfigKeywords.dates, storages)
+            
             if codes[place_code] == 2 and 1 not in codes:
                 codes[place_code] = parseFile(places_path, ConfigKeywords.places, storages)
+            
             if codes[person_code] == 2 and 1 not in codes:
                 codes[person_code] = parseFile(persons_path, ConfigKeywords.persons, storages)
+            
             if codes[other_code] == 2 and 1 not in codes:
                 codes[other_code] = parseFile(others_path, ConfigKeywords.others, storages)
+            
             if codes[event_code] == 2 and 1 not in codes:
                 codes[event_code] = parseFile(events_path, ConfigKeywords.events, storages)
-            if codes[biblio_code] == 2 and 1 not in codes:
-                codes[biblio_code] = parseFile(biblios_path, ConfigKeywords.biblios, storages)
-            if codes[biblio_fragment_code] == 2 and 1 not in codes:
-                codes[biblio_fragment_code] = parseFile(biblios_path, ConfigKeywords.biblio_fragments, storages)
 
             if 1 in codes :
                 logger.error(f"Ошибка на итерации {i}")

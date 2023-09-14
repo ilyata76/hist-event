@@ -5,6 +5,8 @@ BEGIN;
 
 DROP TABLE IF EXISTS dates CASCADE; -- банк дат, на которые будут ссылаться другие сущности
 
+DROP TABLE IF EXISTS persons CASCADE; -- банк исторических личностей, или по-другому персон
+
 DROP TABLE IF EXISTS sources CASCADE; -- банк исторических разных источников
 
 DROP TABLE IF EXISTS source_fragments CASCADE; -- банк ФРАГМЕНТОВ исторических разных источников
@@ -14,8 +16,6 @@ DROP TABLE IF EXISTS biblios CASCADE; -- банк библиографическ
 DROP TABLE IF EXISTS biblio_fragments CASCADE; -- банк ФРАГМЕНТОВ Библиографических источников
 
 DROP TABLE IF EXISTS places CASCADE; -- банк всяческих мест
-
-DROP TABLE IF EXISTS persons CASCADE; -- банк исторических личностей, или по-другому персон
 
 DROP TABLE IF EXISTS others CASCADE; -- банк всего остального, что не попало ни в какую из категорий
 
@@ -58,11 +58,39 @@ CREATE TABLE dates (
 	ex_biblio_fragments INTEGER ARRAY
 );
 
+CREATE TABLE persons (
+	id INTEGER PRIMARY KEY,
+	name TEXT,
+	description TEXT,
+	date INTEGER NOT NULL,
+		CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id),
+	person TEXT NOT NULL,
+	events INTEGER ARRAY,
+	ex_events INTEGER ARRAY,
+	dates INTEGER ARRAY,
+	ex_dates INTEGER ARRAY,
+	places INTEGER ARRAY,
+	ex_places INTEGER ARRAY,
+	persons INTEGER ARRAY,
+	ex_persons INTEGER ARRAY,
+	sources INTEGER ARRAY,
+	ex_sources INTEGER ARRAY,
+	others INTEGER ARRAY,
+	ex_others INTEGER ARRAY,
+	source_fragments INTEGER ARRAY,
+	ex_source_fragments INTEGER ARRAY,
+	biblios INTEGER ARRAY,
+	ex_biblios INTEGER ARRAY,
+	biblio_fragments INTEGER ARRAY,
+	ex_biblio_fragments INTEGER ARRAY
+);
+
 CREATE TABLE sources (
 	id INTEGER PRIMARY KEY,
 	name TEXT,
 	description TEXT,
-	author TEXT NOT NULL,
+	author INTEGER NOT NULL,
+		CONSTRAINT FK_person_id FOREIGN KEY (author) REFERENCES persons(id), 
 	link TEXT,
 	date INTEGER NOT NULL,
 		CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id), 
@@ -174,33 +202,6 @@ CREATE TABLE places (
 	name TEXT,
 	description TEXT,
 	geo TEXT,
-	events INTEGER ARRAY,
-	ex_events INTEGER ARRAY,
-	dates INTEGER ARRAY,
-	ex_dates INTEGER ARRAY,
-	places INTEGER ARRAY,
-	ex_places INTEGER ARRAY,
-	persons INTEGER ARRAY,
-	ex_persons INTEGER ARRAY,
-	sources INTEGER ARRAY,
-	ex_sources INTEGER ARRAY,
-	others INTEGER ARRAY,
-	ex_others INTEGER ARRAY,
-	source_fragments INTEGER ARRAY,
-	ex_source_fragments INTEGER ARRAY,
-	biblios INTEGER ARRAY,
-	ex_biblios INTEGER ARRAY,
-	biblio_fragments INTEGER ARRAY,
-	ex_biblio_fragments INTEGER ARRAY
-);
-
-CREATE TABLE persons (
-	id INTEGER PRIMARY KEY,
-	name TEXT,
-	description TEXT,
-	date INTEGER NOT NULL,
-		CONSTRAINT FK_date_id FOREIGN KEY (date) REFERENCES dates(id),
-	person TEXT NOT NULL,
 	events INTEGER ARRAY,
 	ex_events INTEGER ARRAY,
 	dates INTEGER ARRAY,
@@ -349,9 +350,33 @@ INSERT INTO dates VALUES
 	  '{1}', null,
 	  null, null );
 
+INSERT INTO persons VALUES 
+	( '1', 'Абоба Максим Маркович', 'Абоба Максим Маркович родился {date:1}[сегодня] в городе {place:1}[Жепа] ({source : 1}[источник])',
+	  '1', 'Абоба Максим Маркович',
+	  null, '{1, 6}',
+	  '{1}', '{2}',
+	  '{1}', null,
+	  null, '{2}',
+	  '{1}', null,
+	  null, '{1}',
+	  null, null,
+	  null, null,
+	  null, null ),
+	( '2', 'Абоба Марк Андреевич', 'Абоба-старший родился задолго до {date:3}[авг путча], но только после этого он эмигрировал в {place:1}[Жепу]. Тогда как {person:1}[Абоба Максим] остался. ({source:1}[источник])',
+	  '2', 'Абоба Максим Маркович',
+	  null, null,
+	  '{3}', null,
+	  '{1}', null,
+	  '{1}', null,
+	  '{1}', null,
+	  null, null,
+	  null, null,
+	  null, null,
+	  null, null );
+
 INSERT INTO sources VALUES 
 	( '1', 'Запись из личного архива №123321. Может быть автор.', 'Описание источника. Автор. Доступно по ссылке http://aboba',
-	  'Абоба боба бибиович', 'http://aboba', '3',
+	  '1', 'http://aboba', '3',
 	  null, null,
 	  null, '{1, 6}',
 	  null, '{1, 2, 5}',
@@ -363,7 +388,7 @@ INSERT INTO sources VALUES
 	  null, null,
 	  null, null ),
 	( '2', 'Запись из личного архива №123321-2. Может быть автор.', 'Описание источника. Автор. Доступно по ссылке http://aboba {source:1}[родительский источник]',
-	  'Абоба боба бибиович', 'http://aboba', '4',
+	  '2', 'http://aboba', '4',
 	  'тип', 'подтип',
 	  null, '{2, 6}',
 	  null, null,
@@ -422,30 +447,6 @@ INSERT INTO places VALUES
 	  '{2, 3, 4}', null,
 	  null, null,
 	  null, '{1, 2}',
-	  '{1}', null,
-	  null, null,
-	  null, null,
-	  null, null,
-	  null, null );
-
-INSERT INTO persons VALUES 
-	( '1', 'Абоба Максим Маркович', 'Абоба Максим Маркович родился {date:1}[сегодня] в городе {place:1}[Жепа] ({source : 1}[источник])',
-	  '1', 'Абоба Максим Маркович',
-	  null, '{1, 6}',
-	  '{1}', '{2}',
-	  '{1}', null,
-	  null, '{2}',
-	  '{1}', null,
-	  null, '{1}',
-	  null, null,
-	  null, null,
-	  null, null ),
-	( '2', 'Абоба Марк Андреевич', 'Абоба-старший родился задолго до {date:3}[авг путча], но только после этого он эмигрировал в {place:1}[Жепу]. Тогда как {person:1}[Абоба Максим] остался. ({source:1}[источник])',
-	  '2', 'Абоба Максим Маркович',
-	  null, null,
-	  '{3}', null,
-	  '{1}', null,
-	  '{1}', null,
 	  '{1}', null,
 	  null, null,
 	  null, null,

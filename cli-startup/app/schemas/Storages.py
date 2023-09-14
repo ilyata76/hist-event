@@ -178,7 +178,7 @@ class Storages() :
                 # проверить, что сущность-ссылка существует в хранилище
                 if not storage.get(entity_id) :
                     res_code = 2
-                    logger.warning(f"Сущности {entity_id}[{entity_keyword}] в хранилище ещё не существует!")
+                    logger.warning(f"Сущности {entity_id}[{entity_keyword}] в хранилище ещё не существует! для добавления {keyword}")
                     continue
                     # raise Exception(f"Сущности {entity_id}[{entity_keyword}] в хранилище \
                     #                  ещё не существует!")
@@ -225,12 +225,12 @@ class Storages() :
             для внутреннего пользования функций для SQL-генерации
         """
         return [ self.date_storage, 
+                 self.person_storage, 
                  self.source_storage, 
                  self.source_fragment_storage,
                  self.biblio_storage, 
                  self.biblio_fragment_storage,
                  self.place_storage, 
-                 self.person_storage, 
                  self.other_storage, 
                  self.event_storage ]
 

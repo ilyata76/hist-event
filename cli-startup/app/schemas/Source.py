@@ -11,7 +11,7 @@ class Source(BaseEntity) :
     """
         Модель, описывающая сущность исторического источника
     """
-    author : str | None = None
+    author : int | None = None # ссылка на person FK
     link : str | None = None
     date : int | None = None # ссылка на date FK
     type : str | None = None
@@ -47,7 +47,8 @@ class SourceStorage(BaseStorage) :
         """
             Генерация SQL таблицы для источника
         """
-        str_include  = f"\t{ConfigKeywords.author} TEXT NOT NULL,\n"
+        str_include  = f"\t{ConfigKeywords.author} INTEGER NOT NULL,\n"
+        str_include += f"\t\tCONSTRAINT FK_person_id FOREIGN KEY ({ConfigKeywords.author}) REFERENCES {ConfigKeywords.persons}({ConfigKeywords.id}), \n"
         str_include += f"\t{ConfigKeywords.link} TEXT,\n"
         str_include += f"\t{ConfigKeywords.date} INTEGER NOT NULL,\n"
         str_include += f"\t\tCONSTRAINT FK_date_id FOREIGN KEY ({ConfigKeywords.date}) REFERENCES {ConfigKeywords.dates}({ConfigKeywords.id}), \n"
