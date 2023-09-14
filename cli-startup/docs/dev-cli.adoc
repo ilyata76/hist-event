@@ -1,7 +1,9 @@
-## Добавить новую сущность
+# Руководство разработчика
+
+## Добавить новую сущность на уровне кода
 Сущность - главный и почти что единственный элемент cli-приложения, добавление новой сущности затрагивает почти все процессы его работы. Здесь описано, в какие из них нужно прямое вмешательство.
 
-### Чтобы добавить новую сущность на уровне кода, необходимо:
+Чтобы добавить новую сущность на уровне кода, необходимо:
 
 * В файле `config.py` в классе `ParseKeyword` определить константы и ключевые слова, которые будут использоваться при проходе текстов (например, description-поля) для таких форм: `{>КЛЮЧЕВОЕ СЛОВО<:ID}[замещающий текст]`
 
@@ -163,3 +165,70 @@ if codes[source_code] == 2 and 1 not in codes:
 * Проверить работоспособность новой конфигурации
 
 Такая сложность добавления зависит главным образом от неавтоматизированных интерфейсов связи SQL базы данных и CLI, генерирующую SQL файл, а также невозможностью предусмотреть и нежеланием ограничивать действия пользователя
+
+
+## Добавить поля к уже существующей сущности на уровне кода
+
+Чтобы добавить новые поля, необходимо:
+
+* В файле `config.py` прописать в `ConfigKeyword` новые поля
+
+[source, python]
+----
+class ConfigKeywords :
+    name : str = "name"
+    id : str = "id"
+    ...
+    # код здесь
+----
+
+* В `schemas` в модели сущности прописать новые поля
+
+[source, python]
+----
+class Source(BaseEntity) :
+    ...
+    type : str | None = None
+    subtype : str | None = None
+    # новые поля
+----
+
+* Там же, но уже в хранилище сущности в функциях генерации SQL-запросов, прописать новые поля
+
+[source, python]
+----
+def generateTableSQL(self) -> str:
+    ...
+    str_include += f"\t{ConfigKeywords.type} TEXT,\n"
+    str_include += f"\t{ConfigKeywords.subtype} TEXT"
+    # новые поля
+    return super().generateTableSQL(str_include)
+...
+
+def fillTableSQL(self) -> str:
+    ...
+            str_include += f"\t  {NOV(x.type)}, {NOV(x.subtype)}"
+            # новые поля
+            str_result = super().fillTableSQL(x, str_include)
+    ...
+    return result
+----
+
+* В `parse.py/getEntity` прописать в строке `.get` для новых полей, а также добавить в `match`/`case` при создании сущности новые поля
+
+[source, python]
+----
+def getEntity(dict_entity : dict, keyword : str, id : int,
+              storages : Storages) -> [int, BaseEntity] :
+    ...
+    type = dict_entity.get(ConfigKeywords.type, None)
+    subtype = dict_entity.get(ConfigKeywords.subtype, None)
+    # новые .get здесь
+    ...
+    match keyword :
+        case X :
+            # добавление здесь
+    ...
+----
+
+* Проверить работоспособность новой конфигурации
