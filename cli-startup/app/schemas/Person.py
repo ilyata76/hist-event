@@ -11,7 +11,6 @@ class Person(BaseEntity) :
     """
         Модель, описывающая сущность персоналии
     """
-    person : str | None = None
     date : int | None = None # даты жизни
 
 
