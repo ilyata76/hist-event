@@ -9,7 +9,7 @@ from processes import parse, generateSQL, validate
 from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
                     PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
                     BiblioStorage, BiblioFragmentStorage, BondStorage, Paths
-from config import ConfigKeywords, yaml_folder as config_yaml_folder, sql_folder as config_sql_folder
+from config import ConfigKeywords
 
 class StartupCLI(cli.Application):
     """
@@ -61,6 +61,8 @@ class StartupCLI(cli.Application):
 
         try : 
 
+            print(self.paths.dates_path)
+
             self.log("Начинаем валидацию полей")
             errors = validate(self.paths)
             if errors and len(errors) > 0 :
@@ -111,3 +113,12 @@ class StartupCLI(cli.Application):
         """
         self.paths.path_sql_folder = path_sql_folder
         self.log("Установлена папка для всех SQL файлов {path}", path=self.paths.path_sql_folder)
+
+    
+    @cli.switch("--main-sql-file", str)
+    def setMainSQLFile(self, main_sql_file : Path) :
+        """
+            Установить путь до главного SQL файла
+        """
+        self.paths.main_sql_path = main_sql_file
+        self.log("Установлена папка для главного выходного SQL файла {path}", path=self.paths.main_sql_path)

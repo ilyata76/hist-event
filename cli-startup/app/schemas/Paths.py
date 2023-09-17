@@ -1,6 +1,7 @@
 from pathlib import Path
+from typing import Any
 from config import yaml_folder as config_yaml_folder,\
-                    sql_folder as config_sql_folder
+                    sql_folder as config_sql_folder, ConfigPathKeywords
 
 
 class Paths() :
@@ -19,65 +20,52 @@ class Paths() :
                        biblios_path : Path | None = None,
                        bonds_path : Path | None = None,
                        main_sql_path : Path | None = None) :
-        self.__path_yaml_folder = path_yaml_folder
-        self.__path_sql_folder = path_sql_folder
-        self.__dates_path = dates_path
-        self.__persons_path = persons_path
-        self.__places_path = places_path
-        self.__sources_path = sources_path
-        self.__others_path = others_path
-        self.__events_path = events_path
-        self.__biblios_path = biblios_path
-        self.__bonds_path = bonds_path
-        self.__main_sql_path = main_sql_path
+        self.path_yaml_folder = path_yaml_folder
+        self.path_sql_folder = path_sql_folder
+        self.dates_path = dates_path
+        self.persons_path = persons_path
+        self.places_path = places_path
+        self.sources_path = sources_path
+        self.others_path = others_path
+        self.events_path = events_path
+        self.biblios_path = biblios_path
+        self.bonds_path = bonds_path
+        self.main_sql_path = main_sql_path
 
 
-    def __returnPath(self, path: Path, str_path: str, sql : bool = False) :
-        if sql :
-            return path if path else self.__path_sql_folder.joinpath(str_path)
-        return path if path else self.__path_yaml_folder.joinpath(str_path)
 
+    def __getattribute__(self, __name: str) -> Any:
 
-    @property
-    def path_yaml_folder(self):
-        return self.__path_yaml_folder
-    
-    @property 
-    def path_sql_folder(self) :
-        return self.__path_sql_folder
+        # обобщить на property не получилось ((
+        # выводит в рекурсию (
 
-    @property
-    def dates_path(self) :
-        return self.__returnPath(self.__dates_path, "dates.yaml")
+        def returnFilePath(str_path: str = "", path: Any = object.__getattribute__(self, __name), sql : bool = False) :
+            if path:
+                path = Path(path)
+            if sql :
+                return path if path else self.path_sql_folder.joinpath(str_path)
+            return path if path else self.path_yaml_folder.joinpath(str_path)
 
-    @property
-    def persons_path(self) :
-        return self.__returnPath(self.__persons_path, "persons.yaml")
-
-    @property
-    def places_path(self) :
-        return self.__returnPath(self.__places_path, "places.yaml")
-
-    @property
-    def sources_path(self) :
-        return self.__returnPath(self.__sources_path, "sources.yaml")
-
-    @property
-    def others_path(self) :
-        return self.__returnPath(self.__others_path, "others.yaml")
-
-    @property
-    def events_path(self) :
-        return self.__returnPath(self.__events_path, "events.yaml")
-
-    @property
-    def biblios_path(self) :
-        return self.__returnPath(self.__biblios_path, "biblios.yaml")
-
-    @property
-    def bonds_path(self) :
-        return self.__returnPath(self.__bonds_path, "bonds.yaml")
-    
-    @property
-    def main_sql_path(self) :
-        return self.__returnPath(self.__main_sql_path, "main.sql", sql=True)
+        match __name :
+            case ConfigPathKeywords.path_yaml_folder :
+                return Path(object.__getattribute__(self, __name))
+            case ConfigPathKeywords.path_sql_folder :
+                return Path(object.__getattribute__(self, __name))
+            case ConfigPathKeywords.dates_path :
+                return returnFilePath(ConfigPathKeywords.dates_default_path)
+            case ConfigPathKeywords.persons_path :
+                return returnFilePath(ConfigPathKeywords.persons_default_path)
+            case ConfigPathKeywords.places_path :
+                return returnFilePath(ConfigPathKeywords.places_default_path)
+            case ConfigPathKeywords.sources_path :
+                return returnFilePath(ConfigPathKeywords.sources_default_path)
+            case ConfigPathKeywords.others_path :
+                return returnFilePath(ConfigPathKeywords.others_default_path)
+            case ConfigPathKeywords.events_path :
+                return returnFilePath(ConfigPathKeywords.events_default_path)
+            case ConfigPathKeywords.biblios_path :
+                return returnFilePath(ConfigPathKeywords.biblios_default_path)
+            case ConfigPathKeywords.bonds_path :
+                return returnFilePath(ConfigPathKeywords.bonds_default_path)
+            case ConfigPathKeywords.main_sql_path :
+                return returnFilePath(ConfigPathKeywords.main_sql_default_path)

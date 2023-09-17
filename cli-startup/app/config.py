@@ -114,3 +114,33 @@ class ConfigKeywords :
     #
     bondswithoutid : str = "bondswithoutid"
     eventsbonds : str = "eventsbonds"
+
+
+class ConfigPathKeywords:
+    """
+        Ключевые слова для путей, главным образом для класса Paths
+    """
+    path_yaml_folder = "path_yaml_folder"
+    path_sql_folder = "path_sql_folder"
+    dates_path = "dates_path"
+    persons_path = "persons_path"
+    places_path = "places_path"
+    sources_path = "sources_path"
+    others_path = "others_path"
+    events_path = "events_path"
+    biblios_path = "biblios_path"
+    bonds_path = "bonds_path"
+    main_sql_path = "main_sql_path"
+    
+    # пути отсчитываются от path-yaml-folder
+    dates_default_path = "dates.yaml"
+    persons_default_path = "persons.yaml"
+    places_default_path = "places.yaml"
+    sources_default_path = "sources.yaml"
+    others_default_path = "others.yaml"
+    events_default_path = "events.yaml"
+    biblios_default_path = "biblios.yaml"
+    bonds_default_path = "bonds.yaml"
+    
+    # от path-sql-folder
+    main_sql_default_path = "main.sql"
