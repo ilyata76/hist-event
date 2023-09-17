@@ -9,7 +9,7 @@ from schemas import BaseEntity, Date, Person, Place, Event, Other,\
                     Source, SourceFragment, Biblio, BiblioFragment,\
                     Storages, Bond, BondStorage, Paths
 from processes.utils import patternTextInclusion, dictFromYaml
-from config import ConfigKeywords, max_reparse_count
+from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
 
 
 ############
@@ -274,7 +274,8 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
 
 def parse(paths : Paths,
           storages : Storages,
-          bond_storage : BondStorage):
+          bond_storage : BondStorage,
+          max_reparse : int = config_max_reparse_count):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
@@ -289,7 +290,7 @@ def parse(paths : Paths,
 
         codes = [2, 2, 2, 2, 2, 2, 2, 2, 2]
 
-        for i in range(max_reparse_count) :
+        for i in range(max_reparse) :
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n\n")
             #print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n"+"##"*50)
             # Цикл разрешает некоторое количество взаимных вложенностей
@@ -329,7 +330,7 @@ def parse(paths : Paths,
 
         if 2 in codes or 1 in codes :
             #print("##"*50 + f"\n\n\t\t БЕЗУСПЕШНО codes={codes}\n\n"+"##"*50)
-            logger.error(f"ПРОГРАММА ОТРАБОТАЛА НЕПРАВИЛЬНО codes={codes}")
+            logger.error(f"ПРОГРАММА ОТРАБОТАЛА НЕПРАВИЛЬНО (код 2 означает, что недостаточно обходов было) codes={codes}")
             raise Exception(f"Программа отработала неправильно codes={codes}")
         else :
             #print("##"*50 + f"\n\n\t\t УСПЕХ\n\n"+"##"*50)

@@ -9,7 +9,7 @@ from processes import parse, generateSQL, validate
 from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
                     PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
                     BiblioStorage, BiblioFragmentStorage, BondStorage, Paths
-from config import ConfigKeywords
+from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
 
 class StartupCLI(cli.Application):
     """
@@ -36,6 +36,8 @@ class StartupCLI(cli.Application):
     )
 
     bond_storage = BondStorage(ConfigKeywords.bonds)
+
+    reparse_count = config_max_reparse_count
 
     paths = Paths()
 
@@ -70,7 +72,8 @@ class StartupCLI(cli.Application):
             ##################
 
             self.log("Начинаем парсинг")
-            self.storages, self.bond_storage = parse(self.paths, self.storages, self.bond_storage)
+            self.storages, self.bond_storage = parse(self.paths, self.storages, self.bond_storage, 
+                                                     self.reparse_count)
             if not self.storages or not self.bond_storage :
                 logger.error("Произошла ошибка при обработке входных файлов!")
                 raise Exception("Произошла ошибка при обработке входных файлов!")
@@ -192,3 +195,12 @@ class StartupCLI(cli.Application):
         """
         self.paths.main_sql_path = main_sql_path
         self.log("Установлена папка для главного выходного SQL файла {path}", path=self.paths.main_sql_path)
+
+
+    @cli.switch("--reparse", int)
+    def setMainSQLFile(self, value : int) :
+        """
+            Установить максимальное количество обходов файлов
+        """
+        self.reparse_count = value
+        self.log("Максимальное количество обходов - {value}", value=self.reparse_count)
