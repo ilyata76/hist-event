@@ -5,7 +5,7 @@ from pathlib import Path
 from plumbum import cli
 from loguru import logger
 
-from processes import parse, generateSQL
+from processes import parse, generateSQL, validate
 from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
                     PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
                     BiblioStorage, BiblioFragmentStorage, BondStorage, Paths
@@ -60,11 +60,22 @@ class StartupCLI(cli.Application):
         """
 
         try : 
+
+            self.log("Начинаем валидацию полей")
+            errors = validate(self.paths)
+            if errors and len(errors) > 0 :
+                logger.error(f"Файлы не прошли валидацию на заполнение полей. errors={errors}")
+                raise Exception(f"Файлы не прошли валидацию на заполнение полей. errors={errors}")
+
+            ##################
+
             self.log("Начинаем парсинг")
             self.storages, self.bond_storage = parse(self.paths, self.storages, self.bond_storage)
             if not self.storages or not self.bond_storage :
                 logger.error("Произошла ошибка при обработке входных файлов!")
                 raise Exception("Произошла ошибка при обработке входных файлов!")
+            
+            ##################
 
             self.log("Начинаем генерацию SQL")
             string = generateSQL(self.storages, self.bond_storage)
@@ -74,6 +85,8 @@ class StartupCLI(cli.Application):
             
             with open(self.paths.main_sql_path, "w", encoding="utf-8") as file :
                 file.write(string)
+
+            ##################
 
             self.log("Работа программы завершена корректно")
 

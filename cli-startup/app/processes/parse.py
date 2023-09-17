@@ -388,5 +388,5 @@ def parse(paths : Paths,
 
     except Exception as exc :
         #print("##"*50 + f"\n\n\t\t ОШИБКА exc={exc}\n\n"+"##"*50)
-        logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА exc={exc}", exc=exc)
+        logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА {t}: exc={exc}", t=type(exc), exc=exc)
         return None, None

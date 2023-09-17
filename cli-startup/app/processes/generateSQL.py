@@ -64,5 +64,5 @@ def generateSQL(storages : Storages, bond_storage : BondStorage) -> str | None:
         logger.info("КОНЕЦ ГЕНЕРАЦИИ SQL")
         return result
     except Exception as exc:
-        logger.error("При генерации SQL произошла ошибка exc={exc}", exc=exc)
+        logger.error("При генерации SQL произошла ошибка {t} exc={exc}", t=type(exc), exc=exc)
         return None
