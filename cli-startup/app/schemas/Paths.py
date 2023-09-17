@@ -68,4 +68,4 @@ class Paths() :
             case ConfigPathKeywords.bonds_path :
                 return returnFilePath(ConfigPathKeywords.bonds_default_path)
             case ConfigPathKeywords.main_sql_path :
-                return returnFilePath(ConfigPathKeywords.main_sql_default_path)
+                return returnFilePath(ConfigPathKeywords.main_sql_default_path, sql = True)
