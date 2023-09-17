@@ -61,8 +61,6 @@ class StartupCLI(cli.Application):
 
         try : 
 
-            print(self.paths.dates_path)
-
             self.log("Начинаем валидацию полей")
             errors = validate(self.paths)
             if errors and len(errors) > 0 :
@@ -106,6 +104,78 @@ class StartupCLI(cli.Application):
         self.log("Установлена папка для всех YAML файлов {path}", path=self.paths.path_yaml_folder)
 
 
+    @cli.switch("--dates-file", str)
+    def setPathDatesFile(self, dates_path : Path) :
+        """
+            Установить путь до YAML файла с датами
+        """
+        self.paths.dates_path = dates_path
+        self.log("Установлена папка для YAML файла с датами {path}", path=self.paths.dates_path)
+
+
+    @cli.switch("--persons-file", str)
+    def setPathPersonsFile(self, persons_path : Path) :
+        """
+            Установить путь до YAML файла с персоналиями
+        """
+        self.paths.persons_path = persons_path
+        self.log("Установлена папка для YAML файла с персоналиями {path}", path=self.paths.persons_path)
+
+
+    @cli.switch("--places-file", str)
+    def setPathPlacesFile(self, places_path : Path) :
+        """
+            Установить путь до YAML файла с местами
+        """
+        self.paths.places_path = places_path
+        self.log("Установлена папка для YAML файла с местами {path}", path=self.paths.places_path)
+
+
+    @cli.switch("--sources-file", str)
+    def setPathSourcesFile(self, sources_path : Path) :
+        """
+            Установить путь до YAML файла с ист. источниками
+        """
+        self.paths.sources_path = sources_path
+        self.log("Установлена папка для YAML файла с ист. источниками {path}", path=self.paths.sources_path)
+
+
+    @cli.switch("--others-file", str)
+    def setPathOthersFile(self, others_path : Path) :
+        """
+            Установить путь до YAML файла с "другим"
+        """
+        self.paths.others_path = others_path
+        self.log("Установлена папка для YAML файла с \"другим\" {path}", path=self.paths.others_path)
+
+
+    @cli.switch("--events-file", str)
+    def setPathEventsFile(self, events_path : Path) :
+        """
+            Установить путь до YAML файла с событиями
+        """
+        self.paths.events_path = events_path
+        self.log("Установлена папка для YAML файла с событиями {path}", path=self.paths.events_path)
+
+
+    @cli.switch("--biblios-file", str)
+    def setPathBibliosFile(self, biblios_path : Path) :
+        """
+            Установить путь до YAML файла с библиографией
+        """
+        self.paths.biblios_path = biblios_path
+        self.log("Установлена папка для YAML файла с библиографией {path}", path=self.paths.biblios_path)
+
+
+    @cli.switch("--bonds-file", str)
+    def setPathBondsFile(self, bonds_path : Path) :
+        """
+            Установить путь до YAML файла со связями событий
+        """
+        self.paths.bonds_path = bonds_path
+        self.log("Установлена папка для YAML файла со связями событий  {path}", path=self.paths.bonds_path)
+
+
     @cli.switch("--sql-folder", str)
     def setPathSQLFolder(self, path_sql_folder : Path) :
         """
@@ -116,9 +186,9 @@ class StartupCLI(cli.Application):
 
     
     @cli.switch("--main-sql-file", str)
-    def setMainSQLFile(self, main_sql_file : Path) :
+    def setMainSQLFile(self, main_sql_path : Path) :
         """
-            Установить путь до главного SQL файла
+            Установить путь до SQL файла с главным выводом
         """
-        self.paths.main_sql_path = main_sql_file
+        self.paths.main_sql_path = main_sql_path
         self.log("Установлена папка для главного выходного SQL файла {path}", path=self.paths.main_sql_path)
