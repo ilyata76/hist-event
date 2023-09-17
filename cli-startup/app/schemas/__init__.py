@@ -10,3 +10,4 @@ from schemas.Source import Source, SourceStorage
 from schemas.SourceFragment import SourceFragment, SourceFragmentStorage
 from schemas.Storages import Storages
 from schemas.Bonds import Bond, BondStorage
+from schemas.Paths import Paths

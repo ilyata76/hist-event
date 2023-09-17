@@ -8,8 +8,8 @@ from loguru import logger
 from processes import parse, generateSQL
 from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
                     PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
-                    BiblioStorage, BiblioFragmentStorage, BondStorage
-from config import ConfigKeywords, yaml_folder, sql_folder
+                    BiblioStorage, BiblioFragmentStorage, BondStorage, Paths
+from config import ConfigKeywords, yaml_folder as config_yaml_folder, sql_folder as config_sql_folder
 
 class StartupCLI(cli.Application):
     """
@@ -37,6 +37,8 @@ class StartupCLI(cli.Application):
 
     bond_storage = BondStorage(ConfigKeywords.bonds)
 
+    paths = Paths()
+
 
     ## Для внутреннего пользования
 
@@ -56,24 +58,13 @@ class StartupCLI(cli.Application):
         """
             Главный запуск = запуск всех операций
         """
-        try :
-            path_yaml_folder = Path(self.path_yaml_folder)
-        except AttributeError:
-            path_yaml_folder = Path(yaml_folder)
-
-        try :
-            path_sql_folder = Path(self.path_sql_folder)
-        except AttributeError:
-            path_sql_folder = Path(sql_folder)
 
         try : 
             self.log("Начинаем парсинг")
-            self.storages, self.bond_storage = parse(path_yaml_folder, self.storages, self.bond_storage)
+            self.storages, self.bond_storage = parse(self.paths, self.storages, self.bond_storage)
             if not self.storages or not self.bond_storage :
                 logger.error("Произошла ошибка при обработке входных файлов!")
                 raise Exception("Произошла ошибка при обработке входных файлов!")
-            #self.log("Теперь хранилища storages []->:\n\n{stor}\n\n", stor=self.storages)
-
 
             self.log("Начинаем генерацию SQL")
             string = generateSQL(self.storages, self.bond_storage)
@@ -81,7 +72,7 @@ class StartupCLI(cli.Application):
                 logger.error("Произошла ошибка при обработке данных и генерации SQL-запроса")
                 raise Exception("Произошла ошибка при обработке данных и генерации SQL-запроса")
             
-            with open(path_sql_folder.joinpath("main.sql"), "w", encoding="utf-8") as file :
+            with open(self.paths.main_sql_path, "w", encoding="utf-8") as file :
                 file.write(string)
 
             self.log("Работа программы завершена корректно")
@@ -96,8 +87,8 @@ class StartupCLI(cli.Application):
         """
             Установить путь до папки с YAML файлами
         """
-        self.path_yaml_folder = path_yaml_folder
-        self.log("Установлена папка для всех YAML файлов {path}", path=self.path_yaml_folder)
+        self.paths.path_yaml_folder = path_yaml_folder
+        self.log("Установлена папка для всех YAML файлов {path}", path=self.paths.path_yaml_folder)
 
 
     @cli.switch("--sql-folder", str)
@@ -105,5 +96,5 @@ class StartupCLI(cli.Application):
         """
             Установить путь до папки с будущими SQL файлами
         """
-        self.path_sql_folder = path_sql_folder
-        self.log("Установлена папка для всех SQL файлов {path}", path=self.path_sql_folder)
+        self.paths.path_sql_folder = path_sql_folder
+        self.log("Установлена папка для всех SQL файлов {path}", path=self.paths.path_sql_folder)

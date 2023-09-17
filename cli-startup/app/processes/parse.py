@@ -7,7 +7,7 @@ from pathlib import Path
 
 from schemas import BaseEntity, Date, Person, Place, Event, Other,\
                     Source, SourceFragment, Biblio, BiblioFragment,\
-                    Storages, Bond, BondStorage
+                    Storages, Bond, BondStorage, Paths
 from processes.utils import patternTextInclusion, dictFromYaml
 from config import ConfigKeywords, max_reparse_count
 
@@ -272,17 +272,9 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
 
 ################### ГЛАВНЫЙ ПРОЦЕСС
 
-def parse(path_folder : Path,
+def parse(paths : Paths,
           storages : Storages,
-          bond_storage : BondStorage,
-          dates_path : Path | None = None, 
-          persons_path : Path | None = None,
-          places_path : Path | None = None, 
-          sources_path : Path | None = None,
-          others_path : Path | None = None,
-          events_path : Path | None = None,
-          biblios_path : Path | None = None,
-          bonds_path : Path | None = None):
+          bond_storage : BondStorage):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
@@ -292,24 +284,6 @@ def parse(path_folder : Path,
 
         logger.info("СОЗДАНИЕ ХРАНИЛИЩА")
 
-        # если не указаны пути до файлов - будем пробовать брать их из папки
-        if not dates_path :
-            dates_path = path_folder.joinpath("dates.yaml")
-        if not persons_path :
-            persons_path = path_folder.joinpath("persons.yaml")
-        if not places_path :
-            places_path = path_folder.joinpath("places.yaml")
-        if not sources_path :
-            sources_path = path_folder.joinpath("sources.yaml")
-        if not others_path :
-            others_path = path_folder.joinpath("others.yaml")
-        if not events_path :
-            events_path = path_folder.joinpath("events.yaml")
-        if not biblios_path :
-            biblios_path = path_folder.joinpath("biblios.yaml")
-        if not bonds_path :
-            bonds_path = path_folder.joinpath("bonds.yaml")
-
         source_code, source_fragment_code, date_code, place_code, person_code,\
               other_code, event_code, biblio_code, biblio_fragment_code = 0, 1, 2, 3, 4, 5, 6, 7, 8
 
@@ -317,34 +291,34 @@ def parse(path_folder : Path,
 
         for i in range(max_reparse_count) :
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n\n")
-            print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n"+"##"*50)
+            #print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n"+"##"*50)
             # Цикл разрешает некоторое количество взаимных вложенностей
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
 
             if codes[biblio_code] == 2 and 1 not in codes:
-                codes[biblio_code] = parseFile(biblios_path, ConfigKeywords.biblios, storages)
+                codes[biblio_code] = parseFile(paths.biblios_path, ConfigKeywords.biblios, storages)
             if codes[biblio_fragment_code] == 2 and 1 not in codes:
-                codes[biblio_fragment_code] = parseFile(biblios_path, ConfigKeywords.biblio_fragments, storages)
+                codes[biblio_fragment_code] = parseFile(paths.biblios_path, ConfigKeywords.biblio_fragments, storages)
 
             if codes[source_code] == 2 and 1 not in codes:
-                codes[source_code] = parseFile(sources_path, ConfigKeywords.sources, storages)
+                codes[source_code] = parseFile(paths.sources_path, ConfigKeywords.sources, storages)
             if codes[source_fragment_code] == 2 and 1 not in codes:
-                codes[source_fragment_code] = parseFile(sources_path, ConfigKeywords.source_fragments, storages)
+                codes[source_fragment_code] = parseFile(paths.sources_path, ConfigKeywords.source_fragments, storages)
 
             if codes[date_code] == 2 and 1 not in codes:
-                codes[date_code] = parseFile(dates_path, ConfigKeywords.dates, storages)
+                codes[date_code] = parseFile(paths.dates_path, ConfigKeywords.dates, storages)
             
             if codes[place_code] == 2 and 1 not in codes:
-                codes[place_code] = parseFile(places_path, ConfigKeywords.places, storages)
+                codes[place_code] = parseFile(paths.places_path, ConfigKeywords.places, storages)
             
             if codes[person_code] == 2 and 1 not in codes:
-                codes[person_code] = parseFile(persons_path, ConfigKeywords.persons, storages)
+                codes[person_code] = parseFile(paths.persons_path, ConfigKeywords.persons, storages)
             
             if codes[other_code] == 2 and 1 not in codes:
-                codes[other_code] = parseFile(others_path, ConfigKeywords.others, storages)
+                codes[other_code] = parseFile(paths.others_path, ConfigKeywords.others, storages)
             
             if codes[event_code] == 2 and 1 not in codes:
-                codes[event_code] = parseFile(events_path, ConfigKeywords.events, storages)
+                codes[event_code] = parseFile(paths.events_path, ConfigKeywords.events, storages)
 
             if 1 in codes :
                 logger.error(f"Ошибка на итерации {i}")
@@ -354,17 +328,17 @@ def parse(path_folder : Path,
                 break
 
         if 2 in codes or 1 in codes :
-            print("##"*50 + f"\n\n\t\t БЕЗУСПЕШНО codes={codes}\n\n"+"##"*50)
+            #print("##"*50 + f"\n\n\t\t БЕЗУСПЕШНО codes={codes}\n\n"+"##"*50)
             logger.error(f"ПРОГРАММА ОТРАБОТАЛА НЕПРАВИЛЬНО codes={codes}")
             raise Exception(f"Программа отработала неправильно codes={codes}")
         else :
-            print("##"*50 + f"\n\n\t\t УСПЕХ\n\n"+"##"*50)
+            #print("##"*50 + f"\n\n\t\t УСПЕХ\n\n"+"##"*50)
             logger.info(f"УСПЕШНЫЙ ПАРСИНГ")
 
 
         ######## ТЕПЕРЬ СВЯЗИ ОТДЕЛЬНО
 
-        bonds = dictFromYaml(bonds_path)[ConfigKeywords.bonds]
+        bonds = dictFromYaml(paths.bonds_path)[ConfigKeywords.bonds]
 
         if type(bonds) == dict or type(bonds) is dict:
             bonds = [bonds]
@@ -403,7 +377,7 @@ def parse(path_folder : Path,
             else :
                 raise printMessage(f"Попытка прописать связи к несуществующему событию={event}")["exc"]
     
-        print("##"*50 + f"\n\n\t\t ПОЛНЫЙ УСПЕХ (СВЯЗИ)\n\n"+"##"*50)
+        #print("##"*50 + f"\n\n\t\t ПОЛНЫЙ УСПЕХ (СВЯЗИ)\n\n"+"##"*50)
         logger.info(f"УСПЕШНЫЙ ПАРСИНГ СВЯЗЕЙ")
 
         ########
@@ -413,6 +387,6 @@ def parse(path_folder : Path,
 
 
     except Exception as exc :
-        print("##"*50 + f"\n\n\t\t ОШИБКА exc={exc}\n\n"+"##"*50)
+        #print("##"*50 + f"\n\n\t\t ОШИБКА exc={exc}\n\n"+"##"*50)
         logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА exc={exc}", exc=exc)
         return None, None
