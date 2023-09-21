@@ -11,6 +11,7 @@ from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonSt
                     BiblioStorage, BiblioFragmentStorage, BondStorage, Paths
 from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
 
+
 class StartupCLI(cli.Application):
     """
         CLI-приложение. Задачи: парсить файлы, создавать скрипты SQL

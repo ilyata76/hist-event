@@ -3,6 +3,7 @@ import yaml
 import pyparsing
 from loguru import logger
 
+
 def dictFromYaml(path : Path) -> dict | list[dict] | None:
     """
         Открыть файл .yaml по пути path, 

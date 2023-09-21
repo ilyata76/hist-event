@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "bc9d5382f38783647f186ddde5ad5ae9b49e8ce3b891229f27a3efc69bcc905c"
+            "sha256": "469408a890aac15d64a8efce93c7137e96bb9422871e113184173eb2f02347fc"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -196,6 +196,13 @@
             "markers": "python_version >= '3.7'",
             "version": "==2.6.3"
         },
+        "pyftpdlib": {
+            "hashes": [
+                "sha256:7ea3ce4137db8209af1f6b9ea020590f462c63ed7c7a1240bd596e4d3a7b656e"
+            ],
+            "index": "pypi",
+            "version": "==1.5.7"
+        },
         "pyparsing": {
             "hashes": [
                 "sha256:32c7c0b711493c72ff18a981d24f28aaf9c1fb7ed5e9667c9e84e3db623bdbfb",
@@ -290,11 +297,11 @@
         },
         "typing-extensions": {
             "hashes": [
-                "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36",
-                "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"
+                "sha256:8f92fc8806f9a6b641eaa5318da32b44d401efaac0f6678c9bc448ba3605faa0",
+                "sha256:df8e4339e9cb77357558cbdbceca33c303714cf861d1eef15e1070055ae8b7ef"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==4.7.1"
+            "markers": "python_version >= '3.8'",
+            "version": "==4.8.0"
         },
         "win32-setctime": {
             "hashes": [

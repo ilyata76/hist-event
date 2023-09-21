@@ -13,7 +13,7 @@ def validate(paths : Paths) -> list:
         Валидация правильности заполненности полей.
         Проверяет ТОЛЬКО правильность заполнения.
     """
-
+    logger.info("Начало процесса валидации")
     errors = []
 
     def memorizeError(message : str) -> None :
@@ -24,12 +24,15 @@ def validate(paths : Paths) -> list:
 
     try :
 
-        def tryToOpen(path : Path, keyword : str) -> dict | list[dict] | None:
+        def tryToOpen(path : Path, keyword : str) -> list[dict] | None:
             """
                 Замыкается на memorizeError. errors.append
             """
             try : 
-                return dictFromYaml(path)[keyword]
+                res = dictFromYaml(path)[keyword]
+                if type(res) == dict :
+                    res = [res]
+                return res
             except Exception as exc :
                 memorizeError(f"Ошибка во время открытия и чтения файла {keyword} по {path} {type(exc)}: exc={exc}")
                 return None
@@ -81,8 +84,10 @@ def validate(paths : Paths) -> list:
         if bonds := tryToOpen(paths.bonds_path, ConfigKeywords.bonds) :
             pass
 
+        logger.info("УСПЕШНЫЙ конец процесса валидации")
 
     except Exception as exc:
+        logger.info("БЕЗУСПЕШНЫЙ конец процесса валидации")
         memorizeError(f"Непредвиденная ошибка во время исполнения валидации {type(exc)}: exc={exc}")
 
 
