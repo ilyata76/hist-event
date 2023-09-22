@@ -4,6 +4,7 @@
 import datetime
 from loguru import logger
 from pathlib import Path
+from ftplib import FTP
 
 from schemas import BaseEntity, Date, Person, Place, Event, Other,\
                     Source, SourceFragment, Biblio, BiblioFragment,\
@@ -202,7 +203,8 @@ def getEntity(dict_entity : dict, keyword : str, id : int,
 
 ############ РАБОТА С ХРАНИЛИЩАМИ
 
-def parseFile(path : Path, keyword : str, storages : Storages) :
+def parseFile(path : Path, keyword : str, 
+              storages : Storages, ftp : FTP = FTP()) :
     """
         Парсит файл, изменяет классы Storage во время прохода.
             Регистрирует одни сущности в хранилищах других, если те будут встречены.
@@ -219,7 +221,7 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
                     path=path, keyword=keyword)
         
         # прочитаем YAML файл, возьмём часть от keyword
-        dict_entities = dictFromYaml(path)[keyword]
+        dict_entities = dictFromYaml(path, ftp)[keyword]
 
         if not dict_entities :
             raise Exception(f"{keyword} : {path} : возникла ошибка во время обхода файла (результат None)")
@@ -275,7 +277,8 @@ def parseFile(path : Path, keyword : str, storages : Storages) :
 def parse(paths : Paths,
           storages : Storages,
           bond_storage : BondStorage,
-          max_reparse : int = config_max_reparse_count):
+          max_reparse : int = config_max_reparse_count,
+          ftp : FTP = FTP()):
     """
         Главная функция. Возвращает набор классов, 
             из которых впоследствии будет собран SQL запрос
@@ -297,29 +300,29 @@ def parse(paths : Paths,
             # , которые не укладываются в иерархию (например, дата ссылается на человека)
 
             if codes[biblio_code] == 2 and 1 not in codes:
-                codes[biblio_code] = parseFile(paths.biblios_path, ConfigKeywords.biblios, storages)
+                codes[biblio_code] = parseFile(paths.biblios_path, ConfigKeywords.biblios, storages, ftp)
             if codes[biblio_fragment_code] == 2 and 1 not in codes:
-                codes[biblio_fragment_code] = parseFile(paths.biblios_path, ConfigKeywords.biblio_fragments, storages)
+                codes[biblio_fragment_code] = parseFile(paths.biblios_path, ConfigKeywords.biblio_fragments, storages, ftp)
 
             if codes[source_code] == 2 and 1 not in codes:
-                codes[source_code] = parseFile(paths.sources_path, ConfigKeywords.sources, storages)
+                codes[source_code] = parseFile(paths.sources_path, ConfigKeywords.sources, storages, ftp)
             if codes[source_fragment_code] == 2 and 1 not in codes:
-                codes[source_fragment_code] = parseFile(paths.sources_path, ConfigKeywords.source_fragments, storages)
+                codes[source_fragment_code] = parseFile(paths.sources_path, ConfigKeywords.source_fragments, storages, ftp)
 
             if codes[date_code] == 2 and 1 not in codes:
-                codes[date_code] = parseFile(paths.dates_path, ConfigKeywords.dates, storages)
+                codes[date_code] = parseFile(paths.dates_path, ConfigKeywords.dates, storages, ftp)
             
             if codes[place_code] == 2 and 1 not in codes:
-                codes[place_code] = parseFile(paths.places_path, ConfigKeywords.places, storages)
+                codes[place_code] = parseFile(paths.places_path, ConfigKeywords.places, storages, ftp)
             
             if codes[person_code] == 2 and 1 not in codes:
-                codes[person_code] = parseFile(paths.persons_path, ConfigKeywords.persons, storages)
+                codes[person_code] = parseFile(paths.persons_path, ConfigKeywords.persons, storages, ftp)
             
             if codes[other_code] == 2 and 1 not in codes:
-                codes[other_code] = parseFile(paths.others_path, ConfigKeywords.others, storages)
+                codes[other_code] = parseFile(paths.others_path, ConfigKeywords.others, storages, ftp)
             
             if codes[event_code] == 2 and 1 not in codes:
-                codes[event_code] = parseFile(paths.events_path, ConfigKeywords.events, storages)
+                codes[event_code] = parseFile(paths.events_path, ConfigKeywords.events, storages, ftp)
 
             if 1 in codes :
                 logger.error(f"Ошибка на итерации {i}")
@@ -339,7 +342,7 @@ def parse(paths : Paths,
 
         ######## ТЕПЕРЬ СВЯЗИ ОТДЕЛЬНО
 
-        bonds = dictFromYaml(paths.bonds_path)[ConfigKeywords.bonds]
+        bonds = dictFromYaml(paths.bonds_path, ftp)[ConfigKeywords.bonds]
 
         if type(bonds) == dict or type(bonds) is dict:
             bonds = [bonds]

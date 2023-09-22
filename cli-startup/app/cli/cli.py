@@ -4,12 +4,15 @@
 from pathlib import Path
 from plumbum import cli
 from loguru import logger
+from ftplib import FTP
+from io import BytesIO
 
 from processes import parse, generateSQL, validate
 from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
                     PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
                     BiblioStorage, BiblioFragmentStorage, BondStorage, Paths
-from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
+from config import ConfigKeywords, max_reparse_count as config_max_reparse_count,\
+                        ftp_host, ftp_port, ftp_password, ftp_username
 
 
 class StartupCLI(cli.Application):
@@ -61,11 +64,19 @@ class StartupCLI(cli.Application):
         """
             Главный запуск = запуск всех операций
         """
+        ftp = FTP()
 
         try : 
 
+            ####
+
+            ftp.connect(ftp_host, ftp_port)
+            ftp.login(ftp_username, ftp_password)
+
+            ###
+
             self.log("Начинаем валидацию полей")
-            errors = validate(self.paths)
+            errors = validate(self.paths, ftp)
             if errors and len(errors) > 0 :
                 logger.error(f"Файлы не прошли валидацию на заполнение полей. errors={errors}")
                 raise Exception(f"Файлы не прошли валидацию на заполнение полей. errors={errors}")
@@ -74,7 +85,7 @@ class StartupCLI(cli.Application):
 
             self.log("Начинаем парсинг")
             self.storages, self.bond_storage = parse(self.paths, self.storages, self.bond_storage, 
-                                                     self.reparse_count)
+                                                     self.reparse_count, ftp)
             if not self.storages or not self.bond_storage :
                 logger.error("Произошла ошибка при обработке входных файлов!")
                 raise Exception("Произошла ошибка при обработке входных файлов!")
@@ -87,8 +98,14 @@ class StartupCLI(cli.Application):
                 logger.error("Произошла ошибка при обработке данных и генерации SQL-запроса")
                 raise Exception("Произошла ошибка при обработке данных и генерации SQL-запроса")
             
-            with open(self.paths.main_sql_path, "w", encoding="utf-8") as file :
-                file.write(string)
+            byts = BytesIO(bytes(string, encoding="utf-8"))
+
+            try :
+                ftp.storbinary(f"STOR {self.paths.main_sql_path}", byts)
+            except Exception :
+                ftp.connect(ftp_host, ftp_port)
+                ftp.login(ftp_username, ftp_password)
+                ftp.storbinary(f"STOR {self.paths.main_sql_path}", byts)
 
             ##################
 
@@ -97,7 +114,13 @@ class StartupCLI(cli.Application):
         except Exception as exc: 
             self.log("Работа программы завершена некорректно exc={exc}", exc=exc)
             logger.error("Программа завершила свою работу некорректно exc={exc}", exc=exc)
+        finally :
+            ftp.close()
 
+
+    #########
+    # ПУТИ ДО ПАПОК И ФАЙЛОВ БУДУТ УСТАНАВЛИВАТЬСЯ ДЛЯ FTP-ХРАНИЛИЩА
+    #########
 
     @cli.switch("--yaml-folder", str)
     def setPathYamlFolder(self, path_yaml_folder : Path) :
@@ -199,7 +222,7 @@ class StartupCLI(cli.Application):
 
 
     @cli.switch("--reparse", int)
-    def setMainSQLFile(self, value : int) :
+    def setReparseCount(self, value : int) :
         """
             Установить максимальное количество обходов файлов
         """

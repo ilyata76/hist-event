@@ -2,13 +2,15 @@
     Валидация полей на правильность их заполнения
 """
 from pathlib import Path
+from ftplib import FTP
 from loguru import logger
 from config import ConfigKeywords
 from processes.utils import dictFromYaml
 from schemas import Paths
 
 
-def validate(paths : Paths) -> list:
+def validate(paths : Paths, 
+             ftp : FTP = FTP()) -> list:
     """
         Валидация правильности заполненности полей.
         Проверяет ТОЛЬКО правильность заполнения.
@@ -29,7 +31,8 @@ def validate(paths : Paths) -> list:
                 Замыкается на memorizeError. errors.append
             """
             try : 
-                res = dictFromYaml(path)[keyword]
+                nonlocal ftp
+                res = dictFromYaml(path, ftp)[keyword]
                 if type(res) == dict :
                     res = [res]
                 return res

@@ -113,7 +113,7 @@ class BaseStorage() :
         return self.registerEntity(id, entity_id, field)
     
 
-    def dropTableSQL(self, str_include : str = "") -> str : 
+    def dropTableSQL(self) -> str : 
         logger.debug(f"Удаление таблиц SQL для {self.name}")
         return f"""DROP TABLE IF EXISTS {self.name} CASCADE;"""
     

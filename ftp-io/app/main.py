@@ -1,8 +1,7 @@
 import sys
 from loguru import logger
 import config
-
-#######################
+from ftp.server import MyFTPServer
 
 logger_configured : bool = False
 
@@ -31,18 +30,7 @@ def configure_logger() :
     logger_configured = True
 
 
-
-def main() :
-    """
-        ЗАпуск CLI
-    """
+if __name__ == "__main__" :
     configure_logger()
-    
-    from cli.cli import StartupCLI
-
-    a = StartupCLI()
-    a.run()
-
-
-if __name__ == "__main__":
-    main()
+    server = MyFTPServer(config.ftp_host, config.ftp_port)
+    server.start()
