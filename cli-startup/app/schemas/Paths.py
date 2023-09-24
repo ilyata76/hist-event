@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 from config import yaml_folder as config_yaml_folder,\
-                    sql_folder as config_sql_folder, ConfigPathKeywords
+                    sql_folder as config_sql_folder, ConfigPathKeywords, ConfigKeywords
 
 
 class Paths() :
@@ -69,3 +69,21 @@ class Paths() :
                 return returnFilePath(ConfigPathKeywords.bonds_default_path)
             case ConfigPathKeywords.main_sql_path :
                 return returnFilePath(ConfigPathKeywords.main_sql_default_path, sql = True)
+            case _ :
+                return object.__getattribute__(self, __name)
+    
+    def __pathByKeywordDict(self) -> dict:
+        return {
+            ConfigKeywords.sources : self.sources_path,
+            ConfigKeywords.source_fragments : self.sources_path,
+            ConfigKeywords.dates : self.dates_path,
+            ConfigKeywords.places : self.places_path,
+            ConfigKeywords.persons : self.persons_path,
+            ConfigKeywords.others : self.others_path,
+            ConfigKeywords.events : self.events_path,
+            ConfigKeywords.biblios : self.biblios_path,
+            ConfigKeywords.biblio_fragments : self.biblios_path
+        }
+    
+    def pathByKeyword(self, keyword : str) -> str :
+        return self.__pathByKeywordDict().get(keyword, None)

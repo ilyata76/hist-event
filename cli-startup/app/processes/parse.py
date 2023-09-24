@@ -229,36 +229,34 @@ def parseFile(path : Path, keyword : str,
             # если результат - один словарь, а не много
             dict_entities = [dict_entities]
 
+        # цикл по сущностям в файле
         for dict_entity in dict_entities :
             # получим по ключевым словам параметры нашей сущности, если те имеются
 
             id = dict_entity.get(ConfigKeywords.id, None)
-
             res_code, entity_to_append = getEntity(dict_entity, keyword, id, storages)
 
             if not entity_to_append or res_code != 0:
                 continue
-           
+
+            # res_code == 0 V V V
+            # добавим сущность
+            if not storages.append(id, keyword, entity_to_append) :
+                raise Exception(f"Не удалость добавить сущность {entity_to_append} по {keyword}")
+
             # прочитаем ещё раз текстовые поля, поддерживающие вставку
             min = dict_entity.get(ConfigKeywords.min, None)
             max = dict_entity.get(ConfigKeywords.max, None)
             description = dict_entity.get(ConfigKeywords.description, None)
 
-            # добавим сущность
-            if not storages.append(id, keyword, entity_to_append) :
-                raise Exception(f"Не удалость добавить сущность {entity_to_append} по {keyword}")
-
             # будет регистрировать для добавленной сущности
             # другие, если в текстовых полях есть на них ссылки
             if description :
-                if storages.saveAndRegisterEntitites(description, patternTextInclusion(), keyword, id) == 2 :
-                    res_code = 2
+                res_code = storages.saveAndRegisterEntitites(description, patternTextInclusion(), keyword, id)
             if min :
-                if storages.saveAndRegisterEntitites(min, patternTextInclusion(), keyword, id) == 2:
-                    res_code = 2
+                res_code = storages.saveAndRegisterEntitites(min, patternTextInclusion(), keyword, id)
             if max :
-                if storages.saveAndRegisterEntitites(max, patternTextInclusion(), keyword, id) == 2 :
-                    res_code = 2
+                res_code = storages.saveAndRegisterEntitites(max, patternTextInclusion(), keyword, id)
 
     except Exception as exc :
         res_code = 1
@@ -266,11 +264,59 @@ def parseFile(path : Path, keyword : str,
                      path=path, keyword=keyword, exc=exc)
 
     finally: 
-        logger.info("Начало операции полного парсинга файла keyword={keyword} path={path} res_code={res_code}", 
+        logger.info("Конец операции полного парсинга файла keyword={keyword} path={path} res_code={res_code}", 
                         path=path, keyword=keyword, res_code=res_code)
 
         return res_code
 
+###########
+
+def parseBonds(paths : Paths, storages : Storages, 
+               bond_storage: BondStorage, ftp : FTP = FTP()) -> None :
+    """
+        Связи отдельно парсим, 
+            т.к. на них накладываются дополнительные условия
+    """
+    bonds = dictFromYaml(paths.bonds_path, ftp)[ConfigKeywords.bonds]
+
+    if type(bonds) == dict or type(bonds) is dict:
+        bonds = [bonds]
+
+    toList = lambda x : list[x] if type(x) != list and x is not None else x
+    checkEvents = lambda lst : [storages.event_storage.get(x) is not None for x in lst]
+    printMessage = lambda msg : {"log": logger.error(msg), "exc": Exception(msg)}
+    
+    for dict_bond in bonds :
+        event = dict_bond.get(ConfigKeywords.event, None)
+        parents = dict_bond.get(ConfigKeywords.parents, None)
+        childs = dict_bond.get(ConfigKeywords.childs, None)
+        prerequisites = dict_bond.get(ConfigKeywords.prerequisites, None)
+
+        if parents and event in parents :
+            raise printMessage(f"Попытка прописать к событию={event} родителя в виде себя")["exc"]
+        if childs and event in childs :
+            raise printMessage(f"Попытка прописать к событию={event} ребёнка в виде себя")["exc"]
+        if prerequisites and event in prerequisites :
+            raise printMessage(f"Попытка прописать к событию={event} предпосылку в виде себя")["exc"]
+
+        parents, childs, prerequisites = toList(parents), toList(childs), toList(prerequisites)
+
+        if storages.event_storage.get(event) :
+            if parents and False in checkEvents(parents): 
+                raise printMessage(f"Попытка прописать к событию={event} несуществующего родителя")["exc"]
+            if childs and False in checkEvents(childs) :
+                raise printMessage(f"Попытка прописать к событию={event} несуществующего ребёнка")["exc"]
+            if prerequisites and False in checkEvents(prerequisites) :
+                raise printMessage(f"Попытка прописать к событию={event} несуществующую предпосылку")["exc"]
+            
+            bond_storage.append(Bond(event=event,
+                                     parents=parents,
+                                     childs=childs,
+                                     prerequisites=prerequisites))
+        else :
+            raise printMessage(f"Попытка прописать связи к несуществующему событию={event}")["exc"]    
+
+    return None
 
 ################### ГЛАВНЫЙ ПРОЦЕСС
 
@@ -284,112 +330,63 @@ def parse(paths : Paths,
             из которых впоследствии будет собран SQL запрос
     """
     try : 
-        logger.info("Начало операции ОБЩЕГО парсинга")
+        codes = {
+            ConfigKeywords.sources : 2,
+            ConfigKeywords.source_fragments : 2,
+            ConfigKeywords.dates : 2,
+            ConfigKeywords.places : 2,
+            ConfigKeywords.persons : 2,
+            ConfigKeywords.others : 2,
+            ConfigKeywords.events : 2,
+            ConfigKeywords.biblios : 2,
+            ConfigKeywords.biblio_fragments : 2
+        }
 
-        logger.info("СОЗДАНИЕ ХРАНИЛИЩА")
 
-        source_code, source_fragment_code, date_code, place_code, person_code,\
-              other_code, event_code, biblio_code, biblio_fragment_code = 0, 1, 2, 3, 4, 5, 6, 7, 8
-        codes = [2]*9
+        def checkCodesOn2(code : int) -> bool :
+            """
+                Замыкается на codes, возвращает True, если нужно
+                    пропарсить файл ещё раз
+            """
+            nonlocal codes
+            return codes[code] == 2 and 1 not in list(codes.values())
 
-        for i in range(max_reparse) :
-            logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n\n")
-            #print("##"*50 + f"\n\n\t\t ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n"+"##"*50)
-            # Цикл разрешает некоторое количество взаимных вложенностей
-            # , которые не укладываются в иерархию (например, дата ссылается на человека)
+        def parseF(path : str, keyword : str) -> None :
+            """
+                Замыкается на codes,
+                    вызывает функцию парсинга и обновляет код-результат в codes
+            """
+            nonlocal codes, storages, ftp
+            codes[keyword] = parseFile(path, keyword, storages, ftp)
+            return None
+        
+        def checkAndParse(keyword : str) -> None :
+            """
+                Функция, объединяющая две сверху
+            """
+            if checkCodesOn2(keyword) : 
+                parseF(paths.pathByKeyword(keyword), keyword)
+            return None
 
-            if codes[biblio_code] == 2 and 1 not in codes:
-                codes[biblio_code] = parseFile(paths.biblios_path, ConfigKeywords.biblios, storages, ftp)
-            if codes[biblio_fragment_code] == 2 and 1 not in codes:
-                codes[biblio_fragment_code] = parseFile(paths.biblios_path, ConfigKeywords.biblio_fragments, storages, ftp)
 
-            if codes[source_code] == 2 and 1 not in codes:
-                codes[source_code] = parseFile(paths.sources_path, ConfigKeywords.sources, storages, ftp)
-            if codes[source_fragment_code] == 2 and 1 not in codes:
-                codes[source_fragment_code] = parseFile(paths.sources_path, ConfigKeywords.source_fragments, storages, ftp)
+        for _ in range(max_reparse) :
+            for keyword in list(codes.keys()) :
+                checkAndParse(keyword)
 
-            if codes[date_code] == 2 and 1 not in codes:
-                codes[date_code] = parseFile(paths.dates_path, ConfigKeywords.dates, storages, ftp)
-            
-            if codes[place_code] == 2 and 1 not in codes:
-                codes[place_code] = parseFile(paths.places_path, ConfigKeywords.places, storages, ftp)
-            
-            if codes[person_code] == 2 and 1 not in codes:
-                codes[person_code] = parseFile(paths.persons_path, ConfigKeywords.persons, storages, ftp)
-            
-            if codes[other_code] == 2 and 1 not in codes:
-                codes[other_code] = parseFile(paths.others_path, ConfigKeywords.others, storages, ftp)
-            
-            if codes[event_code] == 2 and 1 not in codes:
-                codes[event_code] = parseFile(paths.events_path, ConfigKeywords.events, storages, ftp)
-
-            if 1 in codes :
-                logger.error(f"Ошибка на итерации {i}")
+            if 1 in list(codes.values()) :
                 raise Exception("Непредвиденная ошибка - статус код одной из операций = 1 (см. лог)")
 
-            if 2 not in codes :
+            if 2 not in list(codes.values()) :
                 break
 
-        if 2 in codes or 1 in codes :
-            #print("##"*50 + f"\n\n\t\t БЕЗУСПЕШНО codes={codes}\n\n"+"##"*50)
-            logger.error(f"ПРОГРАММА ОТРАБОТАЛА НЕПРАВИЛЬНО (код 2 означает, что недостаточно обходов было) codes={codes}")
+        if 2 in list(codes.values()) or 1 in list(codes.values()) :
             raise Exception(f"Программа отработала неправильно codes={codes}")
-        else :
-            #print("##"*50 + f"\n\n\t\t УСПЕХ\n\n"+"##"*50)
-            logger.info(f"УСПЕШНЫЙ ПАРСИНГ")
-
 
         ######## ТЕПЕРЬ СВЯЗИ ОТДЕЛЬНО
-
-        bonds = dictFromYaml(paths.bonds_path, ftp)[ConfigKeywords.bonds]
-
-        if type(bonds) == dict or type(bonds) is dict:
-            bonds = [bonds]
-
-        toList = lambda x : list[x] if type(x) != list and x is not None else x
-        checkEvents = lambda lst : [storages.event_storage.get(x) is not None for x in lst]
-        printMessage = lambda msg : {"log": logger.error(msg), "exc": Exception(msg)}
+        parseBonds(paths, storages, bond_storage, ftp)
         
-        for dict_bond in bonds :
-            event = dict_bond.get(ConfigKeywords.event, None)
-            parents = dict_bond.get(ConfigKeywords.parents, None)
-            childs = dict_bond.get(ConfigKeywords.childs, None)
-            prerequisites = dict_bond.get(ConfigKeywords.prerequisites, None)
-
-            if parents and event in parents :
-                raise printMessage(f"Попытка прописать к событию={event} родителя в виде себя")["exc"]
-            if childs and event in childs :
-                raise printMessage(f"Попытка прописать к событию={event} ребёнка в виде себя")["exc"]
-            if prerequisites and event in prerequisites :
-                raise printMessage(f"Попытка прописать к событию={event} предпосылку в виде себя")["exc"]
-
-            parents, childs, prerequisites = toList(parents), toList(childs), toList(prerequisites)
-
-            if storages.event_storage.get(event) :
-                if parents and False in checkEvents(parents): 
-                    raise printMessage(f"Попытка прописать к событию={event} несуществующего родителя")["exc"]
-                if childs and False in checkEvents(childs) :
-                    raise printMessage(f"Попытка прописать к событию={event} несуществующего ребёнка")["exc"]
-                if prerequisites and False in checkEvents(prerequisites) :
-                    raise printMessage(f"Попытка прописать к событию={event} несуществующую предпосылку")["exc"]
-                
-                bond_storage.append(Bond(event=event,
-                                         parents=parents,
-                                         childs=childs,
-                                         prerequisites=prerequisites))
-            else :
-                raise printMessage(f"Попытка прописать связи к несуществующему событию={event}")["exc"]
-    
-        #print("##"*50 + f"\n\n\t\t ПОЛНЫЙ УСПЕХ (СВЯЗИ)\n\n"+"##"*50)
-        logger.info(f"УСПЕШНЫЙ ПАРСИНГ СВЯЗЕЙ")
-
-        ########
-
-        logger.info("Конец операции ОБЩЕГО парсинга")
         return storages, bond_storage
 
-
     except Exception as exc :
-        #print("##"*50 + f"\n\n\t\t ОШИБКА exc={exc}\n\n"+"##"*50)
         logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА {t}: exc={exc}", t=type(exc), exc=exc)
         return None, None
