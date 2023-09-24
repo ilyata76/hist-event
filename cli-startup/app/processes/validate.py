@@ -9,6 +9,32 @@ from processes.utils import dictFromYaml
 from schemas import Paths
 
 
+errors = []
+
+
+def memorizeError(message : str) -> None :
+    """
+        Замыкается на errors
+    """
+    global errors
+    logger.error(message)
+    errors.append(message)
+
+
+def tryToOpen(path : Path, keyword : str, ftp : FTP = FTP()) -> list[dict] | None:
+    """
+        Попытка открыть файл
+    """
+    try : 
+        res = dictFromYaml(path, ftp)[keyword]
+        if type(res) == dict :
+            res = [res]
+        return res
+    except Exception as exc :
+        memorizeError(f"Ошибка во время открытия и чтения файла {keyword} по {path} {type(exc)}: exc={exc}")
+        return None
+
+
 def validate(paths : Paths, 
              ftp : FTP = FTP()) -> list:
     """
@@ -16,75 +42,58 @@ def validate(paths : Paths,
         Проверяет ТОЛЬКО правильность заполнения.
     """
     logger.info("Начало процесса валидации")
-    errors = []
 
-    def memorizeError(message : str) -> None :
-        """Замыкается на errors"""
-        logger.error(message)
-        errors.append(message)
+    global errors
 
+    def openFile(keyword : str) :
+        nonlocal paths, ftp
+        return tryToOpen(paths.pathByKeyword(keyword), keyword, ftp)
 
     try :
-
-        def tryToOpen(path : Path, keyword : str) -> list[dict] | None:
-            """
-                Замыкается на memorizeError. errors.append
-            """
-            try : 
-                nonlocal ftp
-                res = dictFromYaml(path, ftp)[keyword]
-                if type(res) == dict :
-                    res = [res]
-                return res
-            except Exception as exc :
-                memorizeError(f"Ошибка во время открытия и чтения файла {keyword} по {path} {type(exc)}: exc={exc}")
-                return None
-
-
         ######## DATES 
 
-        if dates := tryToOpen(paths.dates_path, ConfigKeywords.dates) :
+        if dates := openFile(ConfigKeywords.dates) :
             pass
 
         ######## SOURCES AND FRAGMENTS
 
-        if sources := tryToOpen(paths.sources_path, ConfigKeywords.sources) :
+        if sources := openFile(ConfigKeywords.sources) :
             pass
 
-        if source_fragments := tryToOpen(paths.sources_path, ConfigKeywords.source_fragments) :
+        if source_fragments := openFile(ConfigKeywords.source_fragments) :
             pass
 
         ######## BIBLIOS AND FRAGMENTS
     
-        if biblios := tryToOpen(paths.biblios_path, ConfigKeywords.biblios) :
+        if biblios := openFile(ConfigKeywords.biblios) :
             pass
 
-        if biblio_fragments := tryToOpen(paths.biblios_path, ConfigKeywords.biblio_fragments) :
+        if biblio_fragments := openFile(ConfigKeywords.biblio_fragments) :
             pass
 
         ######## PLACES
 
-        if places := tryToOpen(paths.places_path, ConfigKeywords.places) :
+        if places := openFile(ConfigKeywords.places) :
             pass
 
         ######## PERSONS
 
-        if persons := tryToOpen(paths.persons_path, ConfigKeywords.persons) :
+        if persons := openFile(ConfigKeywords.persons) :
             pass
 
         ######## OTHERS
 
-        if others := tryToOpen(paths.others_path, ConfigKeywords.others) :
+        if others := openFile(ConfigKeywords.others) :
             pass
 
         ######## EVENTS
 
-        if events := tryToOpen(paths.events_path, ConfigKeywords.events) :
+        if events := openFile(ConfigKeywords.events) :
             pass
 
         ######## BONDS
 
-        if bonds := tryToOpen(paths.bonds_path, ConfigKeywords.bonds) :
+        if bonds := openFile(ConfigKeywords.bonds) :
             pass
 
         logger.info("УСПЕШНЫЙ конец процесса валидации")
@@ -92,7 +101,6 @@ def validate(paths : Paths,
     except Exception as exc:
         logger.info("БЕЗУСПЕШНЫЙ конец процесса валидации")
         memorizeError(f"Непредвиденная ошибка во время исполнения валидации {type(exc)}: exc={exc}")
-
 
     finally:    
         return errors

@@ -6,7 +6,7 @@ from loguru import logger
 from pathlib import Path
 from ftplib import FTP
 
-from schemas import BaseEntity, Date, Person, Place, Event, Other,\
+from schemas import Date, Person, Place, Event, Other,\
                     Source, SourceFragment, Biblio, BiblioFragment,\
                     Storages, Bond, BondStorage, Paths
 from processes.utils import patternTextInclusion, dictFromYaml
@@ -15,190 +15,235 @@ from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
 
 ############
 
-def getEntity(dict_entity : dict, keyword : str, id : int,
-              storages : Storages) -> [int, BaseEntity] :
+def sourceIsEntity(dict_entity : dict, id : int,
+                   storages : Storages):
+    """
+        Источник. Зависит от даты и автора-персоналии.
+    """
+    res_code, entity = 1, None
+    date = dict_entity.get(ConfigKeywords.date, None)
+    author = dict_entity.get(ConfigKeywords.author, None)
+
+    if storages.date_storage.get(int(date)) :
+        if storages.person_storage.get(int(author)) :
+            res_code, entity = 0, Source( name=dict_entity.get(ConfigKeywords.name, None), 
+                                          id=id, 
+                                          description=dict_entity.get(ConfigKeywords.description, None),
+                                          link=dict_entity.get(ConfigKeywords.link, None), 
+                                          author=author, 
+                                          date=date,
+                                          type=dict_entity.get(ConfigKeywords.type, None),
+                                          subtype=dict_entity.get(ConfigKeywords.subtype, None) )
+        else :
+            res_code, entity = 2, None
+            logger.warning(f"Такой персоналии для источника={id} - author={author} - не существует")
+    else :
+        res_code, entity = 2, None
+        logger.warning(f"Такой даты для источника={id} - date={date} - не существует")
+
+    return res_code, entity
+
+
+def sourceFragmentIsEntity(dict_entity : dict, id : int,
+                           storages : Storages) :
+    """
+        Фрагмент от источника. Зависит от самого источника
+    """
+    res_code, entity = 1, None
+    source = dict_entity.get(ConfigKeywords.source, None)
+    if storages.source_storage.get(int(source)) :
+        res_code, entity = 0, SourceFragment( name=dict_entity.get(ConfigKeywords.name, None), 
+                                              id=id, 
+                                              description=dict_entity.get(ConfigKeywords.description, None),
+                                              source=source )
+    else :
+        res_code, entity = 2, None
+        logger.warning(f"Такого источника для фрагмента источника={id} - source={source} - не существует")
+
+    return res_code, entity
+
+
+def dateIsEntity(dict_entity : dict, id : int):
+    """
+        Дата. Есть вариации заполнения полей.
+    """
+    res_code, entity = 1, None
+    start_date, start_time, end_date, end_time, time = None, None, None, None, None
+
+    start = dict_entity.get(ConfigKeywords.start, None)
+    end = dict_entity.get(ConfigKeywords.end, None)
+    date = dict_entity.get(ConfigKeywords.date, None)
+
+
+    def datetimeToDateNTime(date_time) :
+        """
+            Разделить datetime на date и time
+        """
+        time = None
+        temp_time = datetime.datetime.fromisoformat(date_time).time()
+        if not (temp_time.hour == temp_time.minute == temp_time.second == temp_time.microsecond == 0) : 
+            time = str(temp_time)
+        date = str(datetime.datetime.fromisoformat(date_time).date())
+        return date, time
+
+    if date : 
+        date, time = datetimeToDateNTime(date)
+    if start :
+        start_date, start_time = datetimeToDateNTime(start)
+    if end :
+        end_date, end_time = datetimeToDateNTime(end)
+
+    res_code, entity = 0, Date( name=dict_entity.get(ConfigKeywords.name, None), 
+                                id=id, 
+                                description=dict_entity.get(ConfigKeywords.description, None), 
+                                date=date, 
+                                time=time, 
+                                start_date=start_date, 
+                                start_time=start_time,
+                                end_date=end_date, 
+                                end_time=end_time, 
+                                start=start, 
+                                end=end )
+    
+    return res_code, entity
+
+
+def placeIsEntity(dict_entity : dict, id : int) :
+    """
+        Место
+    """
+    res_code, entity = 0, Place( name=dict_entity.get(ConfigKeywords.name, None), 
+                                 id=id, 
+                                 description=dict_entity.get(ConfigKeywords.description, None), 
+                                 geo=dict_entity.get(ConfigKeywords.geo, None) )
+    
+    return res_code, entity
+
+
+def personIsEntity(dict_entity : dict, id : int,
+                   storages : Storages) :
+    """
+        Зависит от date
+    """
+    res_code, entity = 1, None
+    date = dict_entity.get(ConfigKeywords.date, None)
+
+    if storages.date_storage.get(int(date)) :
+        res_code, entity = 0, Person( name=dict_entity.get(ConfigKeywords.name, None), 
+                                      id=id, 
+                                      description=dict_entity.get(ConfigKeywords.description, None),
+                                      date=date )
+    else :
+        res_code, entity = 2, None
+        logger.warning(f"Такой даты для персоналии={id} - date={date} - не существует")
+
+    return res_code, entity
+
+
+def otherIsEntity(dict_entity : dict, id : int) :
+    """
+        "Другое"
+    """
+    res_code, entity = 0, Other( name=dict_entity.get(ConfigKeywords.name, None), 
+                                 id=id, 
+                                 description=dict_entity.get(ConfigKeywords.description, None), 
+                                 meta=dict_entity.get(ConfigKeywords.meta, None) )
+    return res_code, entity
+
+
+def eventIsEntity(dict_entity : dict, id : int,
+                  storages : Storages) :
+    """
+        Событие
+    """
+    res_code, entity = 1, None
+    date = dict_entity.get(ConfigKeywords.date, None)
+
+    if storages.date_storage.get(int(date)) :
+        res_code, entity = 0, Event( name=dict_entity.get(ConfigKeywords.name, None), 
+                                     id=id, 
+                                     min=dict_entity.get(ConfigKeywords.min, None), 
+                                     max=dict_entity.get(ConfigKeywords.max, None), 
+                                     level=dict_entity.get(ConfigKeywords.level, None), 
+                                     date=date )
+    else :
+        res_code, entity = 2, None
+        logger.warning(f"Такой даты для события={id} - date={date} - не существует")
+    
+    return res_code, entity
+
+
+def biblioIsEntity(dict_entity : dict, id : int) :
+    """
+        Книги. Дата здесь - просто строка
+    """
+    res_code, entity = 0, Biblio( name=dict_entity.get(ConfigKeywords.name, None), 
+                                  id=id, 
+                                  description=dict_entity.get(ConfigKeywords.description, None), 
+                                  author=dict_entity.get(ConfigKeywords.author, None),
+                                  link=dict_entity.get(ConfigKeywords.link, None),
+                                  state=dict_entity.get(ConfigKeywords.state, None),
+                                  period=dict_entity.get(ConfigKeywords.period, None),
+                                  date=dict_entity.get(ConfigKeywords.date, None) )
+    return res_code, entity
+
+
+def biblioFragmentIsEntity(dict_entity : dict, id : int,
+                           storages : Storages) :
+    """
+        Зависит от библиографического источника
+    """
+    res_code, entity = 1, None
+    biblio = dict_entity.get(ConfigKeywords.biblio, None)
+
+    if storages.biblio_storage.get(int(biblio)) :
+        res_code, entity = 0, BiblioFragment( name=dict_entity.get(ConfigKeywords.name, None), 
+                                              id=id, 
+                                              description=dict_entity.get(ConfigKeywords.description, None),
+                                              biblio=biblio )
+    else :
+        res_code, entity = 2, None
+        logger.warning(f"Такого источника для фрагмента библиографического источника={id} - biblio={biblio} - не существует")
+
+    return res_code, entity
+
+############
+
+def getEntity(dict_entity : dict, keyword : str, 
+              id : int, storages : Storages):
     """
         Подразумевается, что все значения здесь - валидные.
         Вернёт 0, entity, если всё ОК.
         В противном случае - 2, None.
     """
-
-    # определение переменных заранее
-
-    res_code = 0
-    start_date, start_time, end_date, end_time = None, None, None, None
-    time = None
-
-    name = dict_entity.get(ConfigKeywords.name, None)
-    description = dict_entity.get(ConfigKeywords.description, None)
-    link = dict_entity.get(ConfigKeywords.link, None)
-    author = dict_entity.get(ConfigKeywords.author, None)
-    date = dict_entity.get(ConfigKeywords.date, None)
-    geo = dict_entity.get(ConfigKeywords.geo, None)
-    meta = dict_entity.get(ConfigKeywords.meta, None)
-    min = dict_entity.get(ConfigKeywords.min, None)
-    max = dict_entity.get(ConfigKeywords.max, None)
-    level = dict_entity.get(ConfigKeywords.level, None)
-    start = dict_entity.get(ConfigKeywords.start, None)
-    end = dict_entity.get(ConfigKeywords.end, None)
-    source = dict_entity.get(ConfigKeywords.source, None)
-    state = dict_entity.get(ConfigKeywords.state, None)
-    period = dict_entity.get(ConfigKeywords.period, None)
-    biblio = dict_entity.get(ConfigKeywords.biblio, None)
-    type = dict_entity.get(ConfigKeywords.type, None)
-    subtype = dict_entity.get(ConfigKeywords.subtype, None)
-        
-    entity_to_append = None # сущность для возвращения
+    res_code, entity_to_append = 0, None
 
     match keyword : # добавим в Storage в зависимости от типа читаемого файла
-
         case ConfigKeywords.sources :
-            # исторический источник
-
-            if storages.date_storage.get(int(date)) :
-                if storages.person_storage.get(int(author)) :
-                    entity_to_append = Source( name=name, 
-                                               id=id, 
-                                               description=description,
-                                               link=link, 
-                                               author=author, 
-                                               date=date,
-                                               type=type,
-                                               subtype=subtype )
-                else :
-                    res_code = 2
-                    logger.warning(f"Такой персоналии для источника={id} - author={author} - не существует")
-                    entity_to_append = None
-            else :
-                res_code = 2
-                logger.warning(f"Такой даты для источника={id} - date={date} - не существует")
-                entity_to_append = None
-
-        
+            res_code, entity_to_append = sourceIsEntity(dict_entity, 
+                                                        id, storages)
         case ConfigKeywords.source_fragments :
-            # исторический источник
-
-            if storages.source_storage.get(int(source)) :
-                entity_to_append = SourceFragment( name=name, 
-                                                   id=id, 
-                                                   description=description,
-                                                   source=int(source) )
-            else :
-                res_code = 2
-                logger.warning(f"Такого источника для фрагмента источника={id} - source={source} - не существует")
-                entity_to_append = None
-
-
+            res_code, entity_to_append = sourceFragmentIsEntity(dict_entity,
+                                                                id, storages)
         case ConfigKeywords.dates : 
-            # дата (может быть интервалом)
-
-            if date : 
-                temp_time = datetime.datetime.fromisoformat(date).time()
-                if not (temp_time.hour == temp_time.minute == temp_time.second == temp_time.microsecond == 0) : 
-                    time = str(temp_time)
-                date = str(datetime.datetime.fromisoformat(date).date())
-
-            if start :
-                temp_time = datetime.datetime.fromisoformat(start).time()
-                if not (temp_time.hour == temp_time.minute == temp_time.second == temp_time.microsecond == 0) : 
-                    start_time = str(temp_time)
-                start_date = str(datetime.datetime.fromisoformat(start).date())
-
-            if end :
-                temp_time = datetime.datetime.fromisoformat(end).time()
-                if not (temp_time.hour == temp_time.minute == temp_time.second == temp_time.microsecond == 0) : 
-                    end_time = str(temp_time)
-                end_date = str(datetime.datetime.fromisoformat(end).date())
-
-            entity_to_append = Date( name=name, 
-                                     id=id, 
-                                     description=description, 
-                                     date=date, 
-                                     time=time, 
-                                     start_date=start_date, 
-                                     start_time=start_time,
-                                     end_date=end_date, 
-                                     end_time=end_time, 
-                                     start=start, 
-                                     end=end )
-
-
+            res_code, entity_to_append = dateIsEntity(dict_entity, id)
         case ConfigKeywords.places :
-            # место
-
-            entity_to_append = Place( name=name, 
-                                      id=id, 
-                                      description=description, 
-                                      geo=geo )
-
-
+            res_code, entity_to_append = placeIsEntity(dict_entity, id)
         case ConfigKeywords.persons :
-            # историческая личность
-
-            # Для персоналии должна быть зарегистрирована дата в dates.yaml,
-            # т.к. date поле есть ссылка FK
-            if storages.date_storage.get(int(date)) :
-                entity_to_append = Person( name=name, 
-                                           id=id, 
-                                           description=description,
-                                           date=date )
-            else :
-                res_code = 2
-                logger.warning(f"Такой даты для персоналии={id} - date={date} - не существует")
-                entity_to_append = None 
-
-
+            res_code, entity_to_append = personIsEntity(dict_entity, 
+                                                        id, storages)
         case ConfigKeywords.others :
-            # "Другое"
-            entity_to_append = Other( name=name, 
-                                      id=id, 
-                                      description=description, 
-                                      meta=meta )
-
-
+            res_code, entity_to_append = otherIsEntity(dict_entity, id)
         case ConfigKeywords.events :
-            # "Ивент"
-
-            # Для ивента должна быть зарегистрирована дата в dates.yaml,
-            # т.к. date поле есть ссылка FK
-            if storages.date_storage.get(int(date)) :
-                entity_to_append = Event( name=name, 
-                                          id=id, 
-                                          min=min, 
-                                          max=max, 
-                                          level=level, 
-                                          date=int(date) )
-            else :
-                res_code = 2
-                logger.warning(f"Такой даты для события={id} - date={date} - не существует")
-                entity_to_append = None 
-
-
+            res_code, entity_to_append = eventIsEntity(dict_entity, 
+                                                       id, storages)
         case ConfigKeywords.biblios :
-            entity_to_append = Biblio( name=name, 
-                                       id=id, 
-                                       description=description, 
-                                       author=author,
-                                       link=link,
-                                       state=state,
-                                       period=period,
-                                       date=date )
-
+            res_code, entity_to_append = biblioIsEntity(dict_entity, id)
         case ConfigKeywords.biblio_fragments :
-            if storages.biblio_storage.get(int(biblio)) :
-                entity_to_append = BiblioFragment( name=name, 
-                                                   id=id, 
-                                                   description=description,
-                                                   biblio=biblio )
-            else :
-                res_code = 2
-                logger.warning(f"Такого источника для фрагмента библиографического источника={id} - source={source} - не существует")
-                entity_to_append = None
-
-
+            res_code, entity_to_append = biblioFragmentIsEntity(dict_entity,
+                                                                id, storages)
 
     return res_code, entity_to_append
-
 
 
 ############ РАБОТА С ХРАНИЛИЩАМИ
@@ -330,6 +375,9 @@ def parse(paths : Paths,
             из которых впоследствии будет собран SQL запрос
     """
     try : 
+
+        #########
+
         codes = {
             ConfigKeywords.sources : 2,
             ConfigKeywords.source_fragments : 2,
@@ -342,6 +390,7 @@ def parse(paths : Paths,
             ConfigKeywords.biblio_fragments : 2
         }
 
+        #########
 
         def checkCodesOn2(code : int) -> bool :
             """
@@ -368,14 +417,13 @@ def parse(paths : Paths,
                 parseF(paths.pathByKeyword(keyword), keyword)
             return None
 
+        #########
 
         for _ in range(max_reparse) :
             for keyword in list(codes.keys()) :
                 checkAndParse(keyword)
-
             if 1 in list(codes.values()) :
                 raise Exception("Непредвиденная ошибка - статус код одной из операций = 1 (см. лог)")
-
             if 2 not in list(codes.values()) :
                 break
 
@@ -383,6 +431,7 @@ def parse(paths : Paths,
             raise Exception(f"Программа отработала неправильно codes={codes}")
 
         ######## ТЕПЕРЬ СВЯЗИ ОТДЕЛЬНО
+
         parseBonds(paths, storages, bond_storage, ftp)
         
         return storages, bond_storage

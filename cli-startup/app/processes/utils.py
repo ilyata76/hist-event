@@ -29,10 +29,6 @@ def dictFromYaml(path : Path,
             ftp.login(ftp_username, ftp_password)
             return dictFromYaml(path, ftp)
 
-        # OLD
-        # with open(path, "rb") as file : # encoding="utf-8"
-        #     buffer = file.read()
-
         return yaml.load(file_bytes, Loader=yaml.FullLoader)
     
     except ConnectionRefusedError as exc:

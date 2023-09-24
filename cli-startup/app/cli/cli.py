@@ -8,9 +8,7 @@ from ftplib import FTP
 from io import BytesIO
 
 from processes import parse, generateSQL, validate
-from schemas import Storages, SourceStorage, DateStorage, PlaceStorage, PersonStorage,\
-                    PersonStorage, OtherStorage, EventStorage, SourceFragmentStorage,\
-                    BiblioStorage, BiblioFragmentStorage, BondStorage, Paths
+from schemas import Storages, BondStorage, Paths
 from config import ConfigKeywords, max_reparse_count as config_max_reparse_count,\
                         ftp_host, ftp_port, ftp_password, ftp_username
 

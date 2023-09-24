@@ -72,7 +72,7 @@ class Paths() :
             case _ :
                 return object.__getattribute__(self, __name)
     
-    def __pathByKeywordDict(self) -> dict:
+    def __pathByKeywordDict(self) -> dict[str, Path]:
         return {
             ConfigKeywords.sources : self.sources_path,
             ConfigKeywords.source_fragments : self.sources_path,
@@ -82,8 +82,9 @@ class Paths() :
             ConfigKeywords.others : self.others_path,
             ConfigKeywords.events : self.events_path,
             ConfigKeywords.biblios : self.biblios_path,
-            ConfigKeywords.biblio_fragments : self.biblios_path
+            ConfigKeywords.biblio_fragments : self.biblios_path,
+            ConfigKeywords.bonds : self.bonds_path
         }
     
-    def pathByKeyword(self, keyword : str) -> str :
+    def pathByKeyword(self, keyword : str) -> Path :
         return self.__pathByKeywordDict().get(keyword, None)
