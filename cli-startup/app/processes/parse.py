@@ -290,8 +290,7 @@ def parse(paths : Paths,
 
         source_code, source_fragment_code, date_code, place_code, person_code,\
               other_code, event_code, biblio_code, biblio_fragment_code = 0, 1, 2, 3, 4, 5, 6, 7, 8
-
-        codes = [2, 2, 2, 2, 2, 2, 2, 2, 2]
+        codes = [2]*9
 
         for i in range(max_reparse) :
             logger.info(f"\n\n\n ПАРСИНГ ФАЙЛОВ - ЦИКЛ ИТЕРАЦИИ {i} codes={codes} \n\n\n")

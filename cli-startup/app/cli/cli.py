@@ -27,24 +27,10 @@ class StartupCLI(cli.Application):
     
     ##
 
-    storages = Storages(
-        source_storage=SourceStorage(name=ConfigKeywords.sources), 
-        source_fragment_storage=SourceFragmentStorage(name=ConfigKeywords.source_fragments),
-        date_storage=DateStorage(ConfigKeywords.dates),
-        place_storage=PlaceStorage(ConfigKeywords.places), 
-        person_storage=PersonStorage(ConfigKeywords.persons),
-        other_storage=OtherStorage(ConfigKeywords.others),
-        event_storage=EventStorage(ConfigKeywords.events),
-        biblio_storage=BiblioStorage(ConfigKeywords.biblios),
-        biblio_fragment_storage=BiblioFragmentStorage(ConfigKeywords.biblio_fragments)
-    )
-
+    storages = Storages()
     bond_storage = BondStorage(ConfigKeywords.bonds)
-
     reparse_count = config_max_reparse_count
-
     paths = Paths()
-
 
     ## Для внутреннего пользования
 
