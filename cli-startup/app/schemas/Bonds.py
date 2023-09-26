@@ -6,6 +6,7 @@ from loguru import logger
 from config import ConfigKeywords
 from processes.utils import NOV
 
+
 class Bond(BaseModel) :
     """
         Определяет связь как абстракцию (отличается от остальных сущностей)
@@ -14,7 +15,6 @@ class Bond(BaseModel) :
     parents : set[int] | None = None
     childs : set[int] | None = None
     prerequisites : set[int] | None = None
-
 
 
 class BondStorage() :

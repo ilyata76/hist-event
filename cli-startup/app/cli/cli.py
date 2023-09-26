@@ -97,7 +97,7 @@ class StartupCLI(cli.Application):
 
         except Exception as exc: 
             self.log("Работа программы завершена некорректно exc={exc}", exc=exc)
-            logger.error("Программа завершила свою работу некорректно exc={exc}", exc=exc)
+            logger.exception("Программа завершила свою работу некорректно exc={exc}", exc=exc)
         finally :
             ftp.close()
 

@@ -23,14 +23,14 @@ def configure_logger() :
         if config.use_console_debug : 
             logger.add(sys.stdout, level="DEBUG")
             
-        logger.add(config.logs_folder + "./cli-startup-debug.log", 
+        logger.add(config.logs_folder + "/cli-startup-debug.log", 
                    format="{time} {level} {message}", level="DEBUG", rotation="4 MB", compression="zip")
 
     else : 
         if config.use_console_debug : 
             logger.add(sys.stdout, level="INFO")
 
-        logger.add(config.logs_folder + "./cli-startup.log", 
+        logger.add(config.logs_folder + "/cli-startup.log", 
                    format="{time} {level} {message}", level="INFO", rotation="4 MB", compression="zip")
     
     logger_configured = True

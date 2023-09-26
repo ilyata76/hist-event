@@ -3,11 +3,12 @@ import yaml
 import pyparsing
 from ftplib import FTP
 from loguru import logger
-from config import ftp_host, ftp_port, ftp_password, ftp_username
+from config import ftp_host, ftp_port, ftp_password, ftp_username,\
+                    parse_keyword_special_symbols, parse_name_special_symbols
 
 
 def dictFromYaml(path : Path, 
-                 ftp : FTP) -> dict | list[dict] | None:
+                 ftp : FTP = FTP()) -> dict | list[dict] | None:
     """
         Открыть файл .yaml по пути path внутри FTP-сервера, 
             вернуть результат в виде словаря
@@ -42,9 +43,9 @@ def patternTextInclusion() -> pyparsing.ParserElement :
         Для поиска { таких : 1 } [ ИМЯ ] вставок шаблон
     """
 
-    keyword = pyparsing.alphas + "_"
+    keyword = pyparsing.alphas + parse_keyword_special_symbols
     number = pyparsing.nums
-    name = pyparsing.alphanums + " _-/\\:()?!" + pyparsing.ppu.Cyrillic.alphanums # TODO to config
+    name = pyparsing.alphanums + parse_name_special_symbols + pyparsing.ppu.Cyrillic.alphanums
 
     return pyparsing.Combine( pyparsing.Suppress("{") + pyparsing.ZeroOrMore(" ") + pyparsing.Word(keyword) #' { abo'
                                  + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + ":" + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) #' : '

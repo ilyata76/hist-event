@@ -31,6 +31,9 @@ max_reparse_count = int(os.environ.get("MAX_REPARSE_COUNT", 10))
 
 logs_folder = str(os.environ.get("LOGS_FOLDER", "./logs"))
 
+parse_keyword_special_symbols = str(os.environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_"))
+parse_name_special_symbols = str(os.environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!"))
+
 
 class ParseResult :
     """
