@@ -29,6 +29,8 @@ else :
 
 max_reparse_count = int(os.environ.get("MAX_REPARSE_COUNT", 10))
 
+logs_folder = str(os.environ.get("LOGS_FOLDER", "./logs"))
+
 
 class ParseResult :
     """
