@@ -47,13 +47,21 @@ def patternTextInclusion() -> pyparsing.ParserElement :
     number = pyparsing.nums
     name = pyparsing.alphanums + parse_name_special_symbols + pyparsing.ppu.Cyrillic.alphanums
 
-    return pyparsing.Combine( pyparsing.Suppress("{") + pyparsing.ZeroOrMore(" ") + pyparsing.Word(keyword) #' { abo'
-                                 + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + ":" + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) #' : '
-                                 + pyparsing.Word(number) + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + pyparsing.Suppress("}") #'1 }'
-                                 + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) # и имя 
-                                 + "[" + pyparsing.ZeroOrMore(" ") + pyparsing.Word(name) #'[ NAME'
-                                 + pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + pyparsing.Suppress("]") #' ]'
-                            )
+    return pyparsing.Combine( pyparsing.Suppress("{") + 
+                              pyparsing.ZeroOrMore(" ") + 
+                              pyparsing.Word(keyword) + #' { abo'
+                              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + 
+                              ":" + 
+                              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + #' : '
+                              pyparsing.Word(number) + 
+                              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + 
+                              pyparsing.Suppress("}") + #'1 }'
+                              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + # и имя 
+                              "[" + 
+                              pyparsing.ZeroOrMore(" ") + 
+                              pyparsing.Word(name) + #'[ NAME'
+                              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + 
+                              pyparsing.Suppress("]") ) #' ]'
 
 
 def nullOrValue(value) -> str:
