@@ -1,8 +1,9 @@
 """
     Конфигурирующиеся и постоянные переменные
 """
-import os
+import os, sys
 from pathlib import Path
+from loguru import logger
 
 yaml_folder = Path(str(os.environ.get("YAML_FOLDER", "./files/yamls")))
 sql_folder = Path(str(os.environ.get("SQL_FOLDER", "./files/sqls")))
@@ -34,6 +35,31 @@ logs_folder = Path(str(os.environ.get("LOGS_FOLDER", "./logs")))
 
 parse_keyword_special_symbols = str(os.environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_"))
 parse_name_special_symbols = str(os.environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!"))
+
+
+logger_configured : bool = False
+
+def configure_logger() : 
+    """
+    """
+    global logger_configured
+    if logger_configured :
+        return
+    logger.remove(0)
+    logger.add(sys.stderr, level="WARNING")
+    if debug : 
+        if use_console_debug : 
+            logger.add(sys.stdout, level="DEBUG")
+            
+        logger.add(logs_folder.joinpath("sql-generator-debug.log"), 
+                   format="{time} {level} {message}", level="DEBUG", rotation="4 MB", compression="zip")
+    else : 
+        if use_console_debug : 
+            logger.add(sys.stdout, level="INFO")
+
+        logger.add(logs_folder.joinpath("/sql-generator.log"), 
+                   format="{time} {level} {message}", level="INFO", rotation="4 MB", compression="zip")
+    logger_configured = True
 
 
 class ParseResult :

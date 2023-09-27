@@ -2,6 +2,7 @@
 *.log.zip
 files/hist-event/sqls/*.sql
 files/hist-event/yamls/*.yaml
+files/hist-event/stdout-logs/*.stdout
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
