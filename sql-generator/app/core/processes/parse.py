@@ -6,10 +6,19 @@ from loguru import logger
 from pathlib import Path
 from ftplib import FTP
 
-from schemas import Date, Person, Place, Event, Other,\
-                    Source, SourceFragment, Biblio, BiblioFragment,\
-                    Storages, Bond, BondStorage, Paths
-from processes.utils import patternTextInclusion, dictFromYaml
+from core.schemas.Biblio import Biblio
+from core.schemas.BiblioFragment import BiblioFragment
+from core.schemas.Date import Date
+from core.schemas.Event import Event
+from core.schemas.Other import Other
+from core.schemas.Person import Person
+from core.schemas.Place import Place
+from core.schemas.Source import Source
+from core.schemas.SourceFragment import SourceFragment
+from core.schemas.Storages import Storages
+from core.schemas.Bonds import Bond, BondStorage
+from core.schemas.Paths import Paths
+from core.processes.utils import patternTextInclusion, dictFromYaml
 from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
 #####################
 

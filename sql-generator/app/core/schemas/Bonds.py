@@ -4,7 +4,7 @@
 from pydantic import BaseModel
 from loguru import logger
 from config import ConfigKeywords
-from processes.utils import NOV
+from core.processes.utils import NOV
 
 
 class Bond(BaseModel) :

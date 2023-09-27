@@ -5,8 +5,8 @@ from pathlib import Path
 from ftplib import FTP
 from loguru import logger
 from config import ConfigKeywords
-from processes.utils import dictFromYaml
-from schemas import Paths
+from core.processes.utils import dictFromYaml
+from core.schemas.Paths import Paths
 
 
 errors = []

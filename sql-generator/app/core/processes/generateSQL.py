@@ -4,7 +4,8 @@
 """
 from inspect import cleandoc
 from loguru import logger
-from schemas import Storages, BondStorage
+from core.schemas.Storages import Storages
+from core.schemas.Bonds import BondStorage
 from config import ConfigKeywords
 
 

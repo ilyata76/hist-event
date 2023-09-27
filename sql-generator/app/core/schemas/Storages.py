@@ -3,9 +3,18 @@
 """
 from pyparsing import ParserElement 
 from loguru import logger
-from schemas import BaseEntity, BaseStorage,\
-                    SourceStorage, DateStorage, PlaceStorage, PersonStorage, OtherStorage,\
-                    EventStorage, SourceFragmentStorage, BiblioStorage, BiblioFragmentStorage
+
+from core.schemas.Entity import BaseEntity, BaseStorage
+from core.schemas.Biblio import BiblioStorage
+from core.schemas.BiblioFragment import BiblioFragmentStorage
+from core.schemas.Date import DateStorage
+from core.schemas.Event import EventStorage
+from core.schemas.Other import OtherStorage
+from core.schemas.Person import PersonStorage
+from core.schemas.Place import PlaceStorage
+from core.schemas.Source import SourceStorage
+from core.schemas.SourceFragment import SourceFragmentStorage
+
 from config import ConfigKeywords, ParseResult, ParseKeywords
 
 

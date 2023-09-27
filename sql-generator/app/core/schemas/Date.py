@@ -2,9 +2,9 @@
     Схемы, определяющие дату как сущность
 """
 from loguru import logger
-from schemas import BaseEntity, BaseStorage
+from core.schemas.Entity import BaseEntity, BaseStorage
 from config import ConfigKeywords
-from processes.utils import NOV
+from core.processes.utils import NOV
 
 
 class Date(BaseEntity) :

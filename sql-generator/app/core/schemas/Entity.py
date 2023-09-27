@@ -4,7 +4,7 @@
 from pydantic import BaseModel
 from loguru import logger
 from config import ConfigKeywords
-from processes.utils import NOV
+from core.processes.utils import NOV
 
 
 class BaseEntity(BaseModel) :
@@ -45,7 +45,7 @@ class BaseStorage() :
     """
 
     def __init__(self, name = None) :
-        logger.debug("Создание класса Storage")
+        logger.debug(f"Создание класса Storage.{name}")
         self.storage = {}
         self.name = name if name else "BaseStorage"
 

@@ -7,9 +7,13 @@ from loguru import logger
 from ftplib import FTP, error_perm
 from io import BytesIO
 
-from processes import parse, generateSQL, validate
-from processes.utils import lprint
-from schemas import Storages, BondStorage, Paths
+from core.processes.parse import parse
+from core.processes.generateSQL import generateSQL 
+from core.processes.validate import validate
+from core.processes.utils import lprint
+from core.schemas.Storages import Storages
+from core.schemas.Bonds import BondStorage
+from core.schemas.Paths import Paths
 from config import ConfigKeywords, max_reparse_count as config_max_reparse_count,\
                         ftp_host, ftp_port, ftp_password, ftp_username
 
