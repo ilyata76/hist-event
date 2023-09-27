@@ -23,15 +23,16 @@ if debug.lower() == "false" or debug.lower() == "no" :
 else :
     debug = True
 
-use_console_debug = os.environ.get("DEBUG_CONSOLE", "false")
-if use_console_debug.lower() == "false" or use_console_debug.lower() == "no" :
-    use_console_debug = False
+use_log_console= os.environ.get("LOG_CONSOLE", "false")
+if use_log_console.lower() == "false" or use_log_console.lower() == "no" :
+    use_log_console = False
 else :
-    use_console_debug = True
+    use_log_console = True
 
 max_reparse_count = int(os.environ.get("MAX_REPARSE_COUNT", 10))
 
 logs_folder = Path(str(os.environ.get("LOGS_FOLDER", "./logs")))
+logs_filename = str(os.environ.get("LOGS_FILENAME", "sql-generator.log"))
 
 parse_keyword_special_symbols = str(os.environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_"))
 parse_name_special_symbols = str(os.environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!"))
@@ -45,20 +46,18 @@ def configure_logger() :
     global logger_configured
     if logger_configured :
         return
+    
     logger.remove(0)
     logger.add(sys.stderr, level="WARNING")
-    if debug : 
-        if use_console_debug : 
-            logger.add(sys.stdout, level="DEBUG")
-            
-        logger.add(logs_folder.joinpath("sql-generator-debug.log"), 
-                   format="{time} {level} {message}", level="DEBUG", rotation="4 MB", compression="zip")
-    else : 
-        if use_console_debug : 
-            logger.add(sys.stdout, level="INFO")
 
-        logger.add(logs_folder.joinpath("/sql-generator.log"), 
-                   format="{time} {level} {message}", level="INFO", rotation="4 MB", compression="zip")
+    level = "DEBUG" if debug else "INFO"
+
+    logger.add(logs_folder.joinpath(logs_filename), 
+                   format="{time} {level} {message}", level=level, rotation="4 MB", compression="zip")
+    
+    if use_log_console :
+        logger.add(sys.stdout, level=level)
+    
     logger_configured = True
 
 

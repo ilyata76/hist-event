@@ -1,6 +1,0 @@
-# обязательные id(уник), name
-others : 
-  - id: 1
-    name : "ABOBA NMAE"
-    meta : "КАКАЯ_ТО_МЕТА_ИНФОРМАЦИЯ"
-    description : "DESCRIPTION {source:1}[источник] ааа {person:1}[Абоба Максим]"

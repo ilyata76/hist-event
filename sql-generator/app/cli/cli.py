@@ -4,7 +4,7 @@
 from pathlib import Path
 from plumbum import cli
 from loguru import logger
-from ftplib import FTP
+from ftplib import FTP, error_perm
 from io import BytesIO
 
 from processes import parse, generateSQL, validate
@@ -88,7 +88,9 @@ class StartupCLI(cli.Application):
 
             try :
                 self.ftp.storbinary(f"STOR {self.paths.main_sql_path}", byts)
-            except Exception :
+            except error_perm as exc :
+                if exc.args[0] == "550 No such file or directory." :
+                    self.ftp.mkd(self.paths.path_sql_folder.__str__())
                 self.ftp.connect(ftp_host, ftp_port)
                 self.ftp.login(ftp_username, ftp_password)
                 self.ftp.storbinary(f"STOR {self.paths.main_sql_path}", byts)
@@ -99,7 +101,7 @@ class StartupCLI(cli.Application):
             return 0
 
         except Exception as exc: 
-            self.log("Работа программы завершена некорректно exc={exc}", exc=exc)
+            self.log("Работа программы завершена некорректно exc={exc}", self.ftp, exc=exc)
             logger.exception("Программа завершила свою работу некорректно exc={exc}", exc=exc)
             return 1
         finally :

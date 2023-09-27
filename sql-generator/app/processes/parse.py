@@ -11,9 +11,8 @@ from schemas import Date, Person, Place, Event, Other,\
                     Storages, Bond, BondStorage, Paths
 from processes.utils import patternTextInclusion, dictFromYaml
 from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
+#####################
 
-
-############
 
 def sourceIsEntity(dict_entity : dict, id : int,
                    storages : Storages):

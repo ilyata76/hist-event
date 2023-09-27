@@ -8,13 +8,18 @@ from config import ftp_host, ftp_port, ftp_password, ftp_username,\
                     parse_keyword_special_symbols, parse_name_special_symbols,\
                     stdout_log_folder
 from datetime import datetime
+############################
 
 def dictFromYaml(path : Path, 
-                 ftp : FTP = FTP()) -> dict | list[dict] | None:
+                 ftp : FTP = FTP(), 
+                 repeated : int = 0) -> dict | list[dict] | None:
     """
         Открыть файл .yaml по пути path внутри FTP-сервера, 
             вернуть результат в виде словаря
     """
+    if repeated > 3 :
+        raise Exception("Не удалось подключиться к FTP-серверу и прочитать yaml-файлы!")
+
     try : 
         logger.info("Чтение {yaml} файла в {ftp}", yaml=path, ftp=f"{ftp_host}:{ftp_port}")
         
@@ -30,7 +35,7 @@ def dictFromYaml(path : Path,
         except Exception as exc:
             ftp.connect(ftp_host, ftp_port)
             ftp.login(ftp_username, ftp_password)
-            return dictFromYaml(path, ftp)
+            return dictFromYaml(path, ftp, repeated + 1)
 
         return yaml.load(file_bytes, Loader=yaml.FullLoader)
     
@@ -92,11 +97,13 @@ def save_bytes(byts : bytes) :
     return stdout_file_bytes
 
 
-def lprint(string : str, ftp : FTP = FTP()) -> None :
+def lprint(string : str, ftp : FTP = FTP(), repeated : int = 0) -> None :
     """
         Переопределённая функция print сохраняет вывод в консоль.
             А также сохраняет вывод в файл generate-sql.stdout
     """
+    if repeated > 3 :
+        raise Exception("Не удалось подключиться к FTP-серверу и выполнить запись в stdout-лог!")
     global stdout_path
     string = "[" + datetime.now().__str__() + "][generate-sql] " + string + "\n"
     print(string, end="")
@@ -107,7 +114,9 @@ def lprint(string : str, ftp : FTP = FTP()) -> None :
         except Exception :
             pass
         ftp.storbinary(f"STOR {stdout_path}", BytesIO(stdout_file_bytes + byts))
-    except Exception :
+    except Exception as exc:
+        if exc.args[0] == "550 No such file or directory." :
+            ftp.mkd(stdout_log_folder.__str__())
         ftp.connect(ftp_host, ftp_port)
         ftp.login(ftp_username, ftp_password)
-        return lprint(string, ftp)
+        return lprint(string, ftp, repeated + 1)
