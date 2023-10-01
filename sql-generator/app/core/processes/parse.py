@@ -235,38 +235,42 @@ def getEntity(dict_entity : dict, keyword : str,
         Вернёт 0, entity, если всё ОК.
         В противном случае - 2, None.
     """
-    logger.debug("Взятие сущности из словаря после парсинга, {e}", e=dict_entity)
-    res_code, entity_to_append = 0, None
+    try : 
+        logger.debug("Взятие сущности из словаря после парсинга, {e}", e=dict_entity)
+        res_code, entity_to_append = 0, None
 
-    match keyword : # добавим в Storage в зависимости от типа читаемого файла
-        case ConfigKeywords.sources :
-            res_code, entity_to_append = sourceIsEntity(dict_entity, 
+        match keyword : # добавим в Storage в зависимости от типа читаемого файла
+            case ConfigKeywords.sources :
+                res_code, entity_to_append = sourceIsEntity(dict_entity, 
+                                                            id, storages)
+            case ConfigKeywords.source_fragments :
+                res_code, entity_to_append = sourceFragmentIsEntity(dict_entity,
+                                                                    id, storages)
+            case ConfigKeywords.dates : 
+                res_code, entity_to_append = dateIsEntity(dict_entity, id)
+            case ConfigKeywords.places :
+                res_code, entity_to_append = placeIsEntity(dict_entity, id)
+            case ConfigKeywords.persons :
+                res_code, entity_to_append = personIsEntity(dict_entity, 
+                                                            id, storages)
+            case ConfigKeywords.others :
+                res_code, entity_to_append = otherIsEntity(dict_entity, id)
+            case ConfigKeywords.events :
+                res_code, entity_to_append = eventIsEntity(dict_entity, 
                                                         id, storages)
-        case ConfigKeywords.source_fragments :
-            res_code, entity_to_append = sourceFragmentIsEntity(dict_entity,
-                                                                id, storages)
-        case ConfigKeywords.dates : 
-            res_code, entity_to_append = dateIsEntity(dict_entity, id)
-        case ConfigKeywords.places :
-            res_code, entity_to_append = placeIsEntity(dict_entity, id)
-        case ConfigKeywords.persons :
-            res_code, entity_to_append = personIsEntity(dict_entity, 
-                                                        id, storages)
-        case ConfigKeywords.others :
-            res_code, entity_to_append = otherIsEntity(dict_entity, id)
-        case ConfigKeywords.events :
-            res_code, entity_to_append = eventIsEntity(dict_entity, 
-                                                       id, storages)
-        case ConfigKeywords.biblios :
-            res_code, entity_to_append = biblioIsEntity(dict_entity, id)
-        case ConfigKeywords.biblio_fragments :
-            res_code, entity_to_append = biblioFragmentIsEntity(dict_entity,
-                                                                id, storages)
-        case _ :
-            raise Exception(f"Нет такой сущности, {keyword}!")
+            case ConfigKeywords.biblios :
+                res_code, entity_to_append = biblioIsEntity(dict_entity, id)
+            case ConfigKeywords.biblio_fragments :
+                res_code, entity_to_append = biblioFragmentIsEntity(dict_entity,
+                                                                    id, storages)
+            case _ :
+                raise Exception(f"Нет такой сущности, {keyword}!")
 
-    return res_code, entity_to_append
-
+        return res_code, entity_to_append
+    
+    except Exception as exc :
+        logger.error(f"Ошибка при чтении сущности [{type(exc)}:{exc}]")
+        raise Exception(f"Ошибка при чтении сущности [{type(exc)}:{exc}]")
 
 ############ РАБОТА С ХРАНИЛИЩАМИ
 
@@ -326,8 +330,8 @@ def parseFile(path : Path, keyword : str,
 
     except Exception as exc :
         res_code = 1
-        logger.error(f"Ошибка во время парсинга файла {keyword} по пути {path} [{exc}]")
-        raise Exception(f"Ошибка во время парсинга файла {keyword} по пути {path} [{exc}]")
+        logger.error(f"Ошибка во время парсинга файла {keyword} по пути {path} [{type(exc)}:{exc}]")
+        raise Exception(f"Ошибка во время парсинга файла {keyword} по пути {path} [{type(exc)}:{exc}]")
 
     logger.info(f"Конец операции полного парсинга файла keyword={keyword} path={path} res_code={res_code}")
     return res_code
@@ -456,5 +460,5 @@ def parse(paths : Paths,
         return storages, bond_storage
 
     except Exception as exc :
-        logger.error(f"Ошибка во время операции общего парсинга [{exc}]")
-        raise Exception(f"Ошибка во время операции общего парсинга [{exc}]")
+        logger.error(f"Ошибка во время операции общего парсинга [{type(exc)}:{exc}]")
+        raise Exception(f"Ошибка во время операции общего парсинга [{type(exc)}:{exc}]")

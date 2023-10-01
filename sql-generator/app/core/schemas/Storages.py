@@ -126,18 +126,22 @@ class Storages() :
         """
             Добавить ENTITY по KEYWORD в подходящее хранилище
         """
-        logger.debug(f"Добавление {entity} по {keyword}")
-        result = False
-        if current_storage := self.__specifyCurrentSaveStorage(keyword) :
-            if current_storage.get(id) is None and\
-                not (result := current_storage.append(entity)) :
-                logger.error(f"Ошибка с добавлением новой сущности для {keyword}")
-                raise Exception(f"Непредвиденная ошибка с добавлением новой сущности для {keyword}!!!")
+        try : 
+            logger.debug(f"Добавление {entity} по {keyword}")
+            result = False
+            if current_storage := self.__specifyCurrentSaveStorage(keyword) :
+                if current_storage.get(id) is None and\
+                    not (result := current_storage.append(entity)) :
+                    logger.error(f"Ошибка с добавлением новой сущности для {keyword}")
+                    raise Exception(f"Непредвиденная ошибка с добавлением новой сущности для {keyword}!!!")
+                else :
+                    result = True
             else :
-                result = True
-        else :
-            logger.error(f"Такого keyword={keyword} не существует!")
-        return result
+                logger.error(f"Такого keyword={keyword} не существует!")
+            return result
+        except Exception as exc:
+            logger.error(f"Ошибка при добавлении {entity} по {keyword} [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка при добавлении {entity} по {keyword} [{type(exc)}:{exc}]")
 
 
     def __parseText(self, string : str, 
@@ -146,18 +150,21 @@ class Storages() :
             Возвращает список словарей - результата парсинга по паттерну
             Используется для парсинга текста события и регистрации их ID в моделях
         """
-        logger.debug("Начало парсинга текста")
-        parse_list : list = pattern.searchString(string).as_list()
-        result : list = []
+        try : 
+            logger.debug("Начало парсинга текста")
+            parse_list : list = pattern.searchString(string).as_list()
+            result : list = []
 
-        for x in parse_list :
-            stroke : str = x[0]
-            result.append( { ParseResult.keyword : stroke.split(':')[0].strip(),
-                            ParseResult.number : stroke.split(':')[1].strip().split('[')[0].strip(),
-                            ParseResult.name : stroke.split('[')[1].strip() } )
-        logger.info("Парсинг строки res={res}", res=result.__len__())
-        return result
-
+            for x in parse_list :
+                stroke : str = x[0]
+                result.append( { ParseResult.keyword : stroke.split(':')[0].strip(),
+                                ParseResult.number : stroke.split(':')[1].strip().split('[')[0].strip(),
+                                ParseResult.name : stroke.split('[')[1].strip() } )
+            logger.info("Парсинг строки res={res}", res=result.__len__())
+            return result
+        except Exception as exc:
+            logger.error(f"Ошибка при парсинге текста __parseText [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка при парсинге текста __parseText [{type(exc)}:{exc}]")
 
     def saveAndRegisterEntitites(self, text : str, 
                                  pattern : ParserElement, keyword : str, id: int) -> int :
@@ -221,9 +228,10 @@ class Storages() :
                     raise Exception(f"Ошибка с регистрацией сущности {id}[{keyword}][{register_keyword}] \
                                      для сущности {entity_id}[{entity_keyword}]!")
     
-        except Exception as exc :
-            res_code = 1
-            raise exc
+        except Exception as exc:
+            res_code = -1
+            logger.error(f"Ошибка при обходе текста на вставки [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка при обходе текста на вставки [{type(exc)}:{exc}]")
     
         return res_code
 

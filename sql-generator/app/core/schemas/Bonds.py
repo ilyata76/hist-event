@@ -37,8 +37,8 @@ class BondStorage() :
             self.storage.update({bond.event : bond})
             res = True
         except Exception as exc:
-            logger.error("Ошибка во время добавления в BondStorage exc={exc}", exc=exc)
-            raise exc
+            logger.error(f"Ошибка во время добавления в BondStorage [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка во время добавления в BondStorage [{type(exc)}:{exc}]")
         logger.info("Добавление сущности в BondStorage res={res}", res=res)
         return res
     
@@ -51,8 +51,8 @@ class BondStorage() :
         try : 
             res = self.storage.get(event_id, None)
         except Exception as exc:
-            logger.error("Ошибка во взятия по индексу в BondStorage exc={exc}", exc=exc)
-            raise exc
+            logger.error(f"Ошибка во взятия по индексу в BondStorage [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка во взятия по индексу в BondStorage [{type(exc)}:{exc}]")
         logger.info("Получение сущности из BondStorage res={res}", res=res)
         return res
     
@@ -67,8 +67,8 @@ class BondStorage() :
                 result += str(key) + "  :  " + str(self.storage[key]) + "\n"
             return result
         except Exception as exc:
-            logger.error("Ошибка во время вывода _str_ exc={exc}", exc=exc)
-            return "Error"
+            logger.error(f"Ошибка во время вывода _str_ [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка во время вывода _str_ [{type(exc)}:{exc}]")
         
 
     def dropTableSQL(self) -> str : 

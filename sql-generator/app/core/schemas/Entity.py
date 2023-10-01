@@ -59,8 +59,8 @@ class BaseStorage() :
             self.storage.update({entity.id : entity})
             res = True
         except Exception as exc:
-            logger.error("Ошибка во время добавления в Storage exc={exc}", exc=exc)
-            raise exc
+            logger.error(f"Ошибка во время добавления в Storage [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка во время добавления в Storage [{type(exc)}:{exc}]")
         logger.debug("Добавление сущности в Storage res={res}", res=res)
         return res
 
@@ -73,8 +73,8 @@ class BaseStorage() :
         try : 
             res = self.storage.get(id, None)
         except Exception as exc:
-            logger.error("Ошибка во взятия по индексу в Storage exc={exc}", exc=exc)
-            raise exc
+            logger.error(f"Ошибка во взятия по индексу в Storage [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка во взятия по индексу в Storage [{type(exc)}:{exc}]")
         logger.debug("Получение сущности из Storage res={res}", res=res)
         return res
 
@@ -97,11 +97,10 @@ class BaseStorage() :
                 res = True
 
         except Exception as exc:
-            logger.error("Сохранение/регтстрация сущности {entity_id} по полю {field} для сущности {id} в хранилище {name}. exc={exc}", 
-                         field=field, entity_id=entity_id, exc=exc, id=id, name=self.name)
-            raise exc
+            logger.error(f"Сохранение/регтстрация сущности {entity_id} по полю {field} для сущности {id} в хранилище {self.name} [{type(exc)}:{exc}]")
+            raise Exception(f"Сохранение/регтстрация сущности {entity_id} по полю {field} для сущности {id} в хранилище {self.name} [{type(exc)}:{exc}]")
         
-        logger.debug(f"Сохранение/регтстрация сущности {entity_id} по полю {field} для сущности {id} в хранилище {self.name}. res={res}")
+        logger.debug(f"Сохранение/регистрация сущности {entity_id} по полю {field} для сущности {id} в хранилище {self.name}. res={res}")
         return res
 
 
@@ -179,5 +178,5 @@ class BaseStorage() :
                 result += str(key) + "  :  " + str(self.storage[key]) + "\n"
             return result
         except Exception as exc:
-            logger.error("Ошибка во время вывода _str_ exc={exc}", exc=exc)
-            return "Error"
+            logger.error(f"Ошибка во время вывода _str_ [{type(exc)}:{exc}]")
+            raise Exception(f"Ошибка во время вывода _str_ [{type(exc)}:{exc}]")

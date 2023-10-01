@@ -52,11 +52,11 @@ class StartupCLI(cli.Application):
                 также сохраняет в stdout на FTP
         """
         try : 
-            print(message.format(*args, **kwargs))
+            print(msgFormat(message.format(*args, **kwargs)))
             getattr(logger, level)(message, *args, **kwargs)
         except Exception as exc :
-            logger.exception(f"Выполнение команды логирования завершилось с ошибкой! Последнее сообщение=[{message}] Ошибка=[{exc}]")
-            print(msgFormat(f"Работа программы завершена некорректно! Последнее сообщение=[{message}] Ошибка=[{exc}]"))
+            logger.exception(f"Выполнение команды логирования завершилось с ошибкой! Последнее сообщение=[{message}] Ошибка=[{type(exc)}:{exc}]")
+            print(msgFormat(f"Работа программы завершена некорректно! Последнее сообщение=[{message}] Ошибка=[{type(exc)}:{exc}]"))
 
 
     def validate(self) :
@@ -69,7 +69,7 @@ class StartupCLI(cli.Application):
             if self.errors and len(self.errors) > 0 :
                 raise Exception(f"Некоторые файлы не прошли валидацию! [{self.errors}]")
         except Exception as exc :
-            raise Exception(f"Процесс валидации завершился с ошибкой! [{exc}]")
+            raise Exception(f"Процесс валидации завершился с ошибкой! [{type(exc)}:{exc}]")
         # finally :
         #     return self.errors
 
@@ -88,7 +88,7 @@ class StartupCLI(cli.Application):
             if not self.bond_storage :
                 raise Exception("Файлы связей, bonds, не прошли проверку при парсинге!")
         except Exception as exc :
-            raise Exception(f"Процесс парсинга завершился с ошибкой! [{exc}]")
+            raise Exception(f"Процесс парсинга завершился с ошибкой! [{type(exc)}:{exc}]")
         # finally :
         #     return self.storages, self.bond_storage
 
@@ -114,9 +114,9 @@ class StartupCLI(cli.Application):
                     self.ftp.login(ftp_username, ftp_password)
                     self.ftp.storbinary(f"STOR {self.paths.main_sql_path}", byts)
             except Exception as exc :
-                raise Exception(f"Ошибка с отправкой sql-файла на FTP-сервер! [{exc}]")
+                raise Exception(f"Ошибка с отправкой sql-файла на FTP-сервер! [{type(exc)}:{exc}]")
         except Exception as exc :
-            raise Exception(f"Процесс генерации завершился с ошибкой! [{exc}]")
+            raise Exception(f"Процесс генерации завершился с ошибкой! [{type(exc)}:{exc}]")
         # finally :
         #     return self.sql_string
 
@@ -139,7 +139,7 @@ class StartupCLI(cli.Application):
                 self.ftp.login(ftp_username, ftp_password)
                 self.log("Успешное подключение к FTP-серверу!")
             except Exception as exc:
-                raise Exception(f"Не удалось подключиться к FTP-серверу [{exc}]")
+                raise Exception(f"Не удалось подключиться к FTP-серверу [{type(exc)}:{exc}]")
 
             if proccess in [ConfigCLICommands.full, ConfigCLICommands.validate]\
              and not self.no_validate :
@@ -157,7 +157,7 @@ class StartupCLI(cli.Application):
             return 0
 
         except Exception as exc: 
-            self.log(f"Работа программы завершена некорректно! [{exc}]", "exception")
+            self.log(f"Работа программы завершена некорректно! [{type(exc)}:{exc}]", "exception")
             return 1
 
         finally :
