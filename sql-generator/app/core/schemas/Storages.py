@@ -43,6 +43,7 @@ class Storages() :
                     = BiblioStorage(ConfigKeywords.biblios),
                  biblio_fragment_storage : BiblioFragmentStorage | None 
                     = BiblioFragmentStorage(ConfigKeywords.biblio_fragments)) :
+        logger.debug("Создание хранилища хранилищей Storages")
         self.source_storage = source_storage
         self.date_storage = date_storage
         self.place_storage = place_storage
@@ -125,6 +126,7 @@ class Storages() :
         """
             Добавить ENTITY по KEYWORD в подходящее хранилище
         """
+        logger.debug(f"Добавление {entity} по {keyword}")
         result = False
         if current_storage := self.__specifyCurrentSaveStorage(keyword) :
             if current_storage.get(id) is None and\
@@ -172,6 +174,7 @@ class Storages() :
                 - 2 если нарушение цепочки
         """
         try :
+            logger.info(f"Обход текста файла по {keyword} для {id}-сущности")
 
             if not (current_save_storage := self.__specifyCurrentSaveStorage(keyword)) :
                 logger.error(f"Такого keyword={keyword} не существует!")

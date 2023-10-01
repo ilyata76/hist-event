@@ -7,7 +7,7 @@ from loguru import logger
 
 yaml_folder = Path(str(os.environ.get("YAML_FOLDER", "./files/yamls")))
 sql_folder = Path(str(os.environ.get("SQL_FOLDER", "./files/sqls")))
-stdout_log_folder = Path(str(os.environ.get("STDOUT_LOG_FOLDER", "./files/stdout-logs")))
+#stdout_log_folder = Path(str(os.environ.get("STDOUT_LOG_FOLDER", "./files/stdout-logs")))
 
 files_folder = Path(str(os.environ.get("FILES_FOLDER", "./files")))
 
@@ -183,3 +183,9 @@ class ConfigPathKeywords:
     
     # от path-sql-folder
     main_sql_default_path = "main.sql"
+
+
+class ConfigCLICommands :
+    full = "full"
+    validate = "validate"
+    parse = "parse"

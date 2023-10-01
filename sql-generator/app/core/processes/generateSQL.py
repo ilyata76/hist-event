@@ -14,6 +14,7 @@ def eventsAndBonds() :
     """
         Создать представление, в котором будут события с их связями
     """
+    logger.info("Создание представления eventsAndBonds")
     return cleandoc(f"""
     DROP VIEW IF EXISTS {ConfigKeywords.eventsbonds} CASCADE;
     DROP VIEW IF EXISTS {ConfigKeywords.bondswithoutid} CASCADE;
@@ -41,6 +42,7 @@ def generateSQL(storages : Storages, bond_storage : BondStorage) -> str | None:
         Главная функция процесса создания SQL-запроса
     """
     try : 
+        logger.info("Процесс генерации SQL-файла")
 
         result = "BEGIN;\n\n"
 
@@ -60,9 +62,10 @@ def generateSQL(storages : Storages, bond_storage : BondStorage) -> str | None:
         result += eventsAndBonds() + "\n\n"
 
         result += "COMMIT;\n\n"
-        
+        logger.info("Процесс генерации SQL-файла: успешное завершение")
+
         return result
     
     except Exception as exc:
-        logger.error("При генерации SQL произошла ошибка {t} exc={exc}", t=type(exc), exc=exc)
-        return None
+        logger.error(f"При генерации SQL произошла ошибка [{exc}]")
+        raise Exception(f"При генерации SQL произошла ошибка [{exc}]")

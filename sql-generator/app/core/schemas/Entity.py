@@ -114,14 +114,14 @@ class BaseStorage() :
     
 
     def dropTableSQL(self) -> str : 
-        logger.debug(f"Удаление таблиц SQL для {self.name}")
+        logger.info(f"Удаление таблиц SQL для {self.name}")
         return f"""DROP TABLE IF EXISTS {self.name} CASCADE;"""
     
 
 
     
     def generateTableSQL(self, str_include : str = "") -> str :
-        logger.debug(f"Создание таблиц SQL для {self.name}")
+        logger.info(f"Создание таблиц SQL для {self.name}")
 
         str_result  = f"CREATE TABLE {self.name} (\n"
         str_result += f"\t{ConfigKeywords.id} INTEGER PRIMARY KEY,\n"
@@ -152,7 +152,7 @@ class BaseStorage() :
     
 
     def fillTableSQL(self, element : BaseEntity, str_include : str = "") -> str :
-        logger.debug(f"Заполнение таблиц SQL для {self.name}")
+        logger.info(f"Заполнение таблиц SQL для {self.name}")
 
         str_result  = f"\t( {NOV(element.id)}, {NOV(element.name)}, {NOV(element.description)},\n"
         if str_include : str_result += f"{str_include},\n"

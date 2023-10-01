@@ -18,7 +18,9 @@ from core.schemas.SourceFragment import SourceFragment
 from core.schemas.Storages import Storages
 from core.schemas.Bonds import Bond, BondStorage
 from core.schemas.Paths import Paths
+
 from core.processes.utils import patternTextInclusion, dictFromYaml
+
 from config import ConfigKeywords, max_reparse_count as config_max_reparse_count
 #####################
 
@@ -28,6 +30,7 @@ def sourceIsEntity(dict_entity : dict, id : int,
     """
         Источник. Зависит от даты и автора-персоналии.
     """
+    logger.debug("Сущность для добавления определена - Source")
     res_code, entity = 1, None
     date = dict_entity.get(ConfigKeywords.date, None)
     author = dict_entity.get(ConfigKeywords.author, None)
@@ -57,6 +60,7 @@ def sourceFragmentIsEntity(dict_entity : dict, id : int,
     """
         Фрагмент от источника. Зависит от самого источника
     """
+    logger.debug("Сущность для добавления определена - SourceFragment")
     res_code, entity = 1, None
     source = dict_entity.get(ConfigKeywords.source, None)
     if storages.source_storage.get(int(source)) :
@@ -75,6 +79,7 @@ def dateIsEntity(dict_entity : dict, id : int):
     """
         Дата. Есть вариации заполнения полей.
     """
+    logger.debug("Сущность для добавления определена - Date")
     res_code, entity = 1, None
     start_date, start_time, end_date, end_time, time = None, None, None, None, None
 
@@ -120,6 +125,7 @@ def placeIsEntity(dict_entity : dict, id : int) :
     """
         Место
     """
+    logger.debug("Сущность для добавления определена - Place")
     res_code, entity = 0, Place( name=dict_entity.get(ConfigKeywords.name, None), 
                                  id=id, 
                                  description=dict_entity.get(ConfigKeywords.description, None), 
@@ -133,6 +139,7 @@ def personIsEntity(dict_entity : dict, id : int,
     """
         Зависит от date
     """
+    logger.debug("Сущность для добавления определена - Person")
     res_code, entity = 1, None
     date = dict_entity.get(ConfigKeywords.date, None)
 
@@ -152,6 +159,7 @@ def otherIsEntity(dict_entity : dict, id : int) :
     """
         "Другое"
     """
+    logger.debug("Сущность для добавления определена - Other")
     res_code, entity = 0, Other( name=dict_entity.get(ConfigKeywords.name, None), 
                                  id=id, 
                                  description=dict_entity.get(ConfigKeywords.description, None), 
@@ -164,6 +172,7 @@ def eventIsEntity(dict_entity : dict, id : int,
     """
         Событие
     """
+    logger.debug("Сущность для добавления определена - Event")
     res_code, entity = 1, None
     date = dict_entity.get(ConfigKeywords.date, None)
 
@@ -185,6 +194,7 @@ def biblioIsEntity(dict_entity : dict, id : int) :
     """
         Книги. Дата здесь - просто строка
     """
+    logger.debug("Сущность для добавления определена - Biblio")
     res_code, entity = 0, Biblio( name=dict_entity.get(ConfigKeywords.name, None), 
                                   id=id, 
                                   description=dict_entity.get(ConfigKeywords.description, None), 
@@ -201,6 +211,7 @@ def biblioFragmentIsEntity(dict_entity : dict, id : int,
     """
         Зависит от библиографического источника
     """
+    logger.debug("Сущность для добавления определена - BiblioFragment")
     res_code, entity = 1, None
     biblio = dict_entity.get(ConfigKeywords.biblio, None)
 
@@ -224,6 +235,7 @@ def getEntity(dict_entity : dict, keyword : str,
         Вернёт 0, entity, если всё ОК.
         В противном случае - 2, None.
     """
+    logger.debug("Взятие сущности из словаря после парсинга, {e}", e=dict_entity)
     res_code, entity_to_append = 0, None
 
     match keyword : # добавим в Storage в зависимости от типа читаемого файла
@@ -250,6 +262,8 @@ def getEntity(dict_entity : dict, keyword : str,
         case ConfigKeywords.biblio_fragments :
             res_code, entity_to_append = biblioFragmentIsEntity(dict_entity,
                                                                 id, storages)
+        case _ :
+            raise Exception(f"Нет такой сущности, {keyword}!")
 
     return res_code, entity_to_append
 
@@ -270,8 +284,7 @@ def parseFile(path : Path, keyword : str,
     """
     try :
         res_code = 0
-        logger.info("Начало операции полного парсинга файла keyword={keyword} path={path}", 
-                    path=path, keyword=keyword)
+        logger.info(f"Начало операции полного парсинга файла keyword={keyword} path={path}")
         
         # прочитаем YAML файл, возьмём часть от keyword
         dict_entities = dictFromYaml(path, ftp)[keyword]
@@ -313,14 +326,11 @@ def parseFile(path : Path, keyword : str,
 
     except Exception as exc :
         res_code = 1
-        logger.error("ОШИБКА ВО ВРЕМЯ ПАРСИНГА ФАЙЛА файла keyword={keyword} path={path} exc={exc}", 
-                     path=path, keyword=keyword, exc=exc)
+        logger.error(f"Ошибка во время парсинга файла {keyword} по пути {path} [{exc}]")
+        raise Exception(f"Ошибка во время парсинга файла {keyword} по пути {path} [{exc}]")
 
-    finally: 
-        logger.info("Конец операции полного парсинга файла keyword={keyword} path={path} res_code={res_code}", 
-                        path=path, keyword=keyword, res_code=res_code)
-
-        return res_code
+    logger.info(f"Конец операции полного парсинга файла keyword={keyword} path={path} res_code={res_code}")
+    return res_code
 
 ###########
 
@@ -330,6 +340,7 @@ def parseBonds(paths : Paths, storages : Storages,
         Связи отдельно парсим, 
             т.к. на них накладываются дополнительные условия
     """
+    logger.info(f"Парсинг связей из {paths.bonds_path}")
     bonds = dictFromYaml(paths.bonds_path, ftp)[ConfigKeywords.bonds]
 
     if type(bonds) == dict or type(bonds) is dict:
@@ -383,7 +394,7 @@ def parse(paths : Paths,
             из которых впоследствии будет собран SQL запрос
     """
     try : 
-
+        logger.info("Операция общего парсинга: начало")
         #########
 
         codes = {
@@ -431,19 +442,19 @@ def parse(paths : Paths,
             for keyword in list(codes.keys()) :
                 checkAndParse(keyword)
             if 1 in list(codes.values()) :
-                raise Exception("Непредвиденная ошибка - статус код одной из операций = 1 (см. лог)")
+                raise Exception("Непредвиденная ошибка - статус код одной из операций = 1")
             if 2 not in list(codes.values()) :
                 break
 
         if 2 in list(codes.values()) or 1 in list(codes.values()) :
-            raise Exception(f"Программа отработала неправильно codes={codes}")
+            raise Exception(f"Программа отработала неправильно коды возврата - {codes}")
 
         ######## ТЕПЕРЬ СВЯЗИ ОТДЕЛЬНО
-
         parseBonds(paths, storages, bond_storage, ftp)
-        
+
+        logger.info("Операция общего парсинга: успешное завершение")
         return storages, bond_storage
 
     except Exception as exc :
-        logger.error("ОШИБКА ВО ВРЕМЯ ОБЩЕГО ПАРСИНГА {t}: exc={exc}", t=type(exc), exc=exc)
-        return None, None
+        logger.error(f"Ошибка во время операции общего парсинга [{exc}]")
+        raise Exception(f"Ошибка во время операции общего парсинга [{exc}]")

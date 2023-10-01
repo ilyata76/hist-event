@@ -11,6 +11,9 @@ def onStartup() :
     configure_logger()
 
 
+# TODO: пути до файлов, конфигурации (репарса например) и пр. в query
+# TODO: ручки для проверки доступности других серверов
+
 @api.get("/ping",
          tags=["common"],
          name="ping?",
@@ -22,7 +25,7 @@ async def getRoot() -> Ping:
     return Ping(result="pong!")
 
 
-@api.post("/validator/yaml",
+@api.post("process/yaml/validate",
           tags=["TODO"],
           name="validate-yaml",
           response_model=Ping)
@@ -34,7 +37,7 @@ async def postValidatorYaml() -> Ping:
     return Ping(result="pong!") # TODO
 
 
-@api.post("/parser/yaml",
+@api.post("process/yaml/parse",
           tags=["TODO"],
           name="parse-yaml",
           response_model=Ping)
@@ -47,8 +50,8 @@ async def postParserYaml() -> Ping:
 
 
 
-@api.post("/generator/sql",
-          tags=["process"],
+@api.post("process/sql/generate",
+          tags=["TODO"],
           name="generate-sql",
           response_model=PostSQL)
 async def postGeneratorSQL() -> PostSQL:

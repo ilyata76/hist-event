@@ -39,7 +39,7 @@ class BondStorage() :
         except Exception as exc:
             logger.error("Ошибка во время добавления в BondStorage exc={exc}", exc=exc)
             raise exc
-        logger.debug("Добавление сущности в BondStorage res={res}", res=res)
+        logger.info("Добавление сущности в BondStorage res={res}", res=res)
         return res
     
 
@@ -53,7 +53,7 @@ class BondStorage() :
         except Exception as exc:
             logger.error("Ошибка во взятия по индексу в BondStorage exc={exc}", exc=exc)
             raise exc
-        logger.debug("Получение сущности из BondStorage res={res}", res=res)
+        logger.info("Получение сущности из BondStorage res={res}", res=res)
         return res
     
 
@@ -72,12 +72,12 @@ class BondStorage() :
         
 
     def dropTableSQL(self) -> str : 
-        logger.debug(f"Удаление таблицы SQL для {self.name}")
+        logger.info(f"Удаление таблицы SQL для {self.name}")
         return f"""DROP TABLE IF EXISTS {self.name} CASCADE;"""
     
     
     def generateTableSQL(self) -> str :
-        logger.debug(f"Создание таблиц SQL для {self.name}")
+        logger.info(f"Создание таблиц SQL для {self.name}")
 
         str_result  = f"CREATE TABLE {self.name} (\n"
         str_result += f"\t{ConfigKeywords.id} SERIAL PRIMARY KEY,\n"
@@ -95,6 +95,7 @@ class BondStorage() :
         """
             Заполнение таблицы
         """
+        logger.info(f"Заполнение SQL таблиц для {self.name}")
         result = f"INSERT INTO {self.name} ({ConfigKeywords.event}, {ConfigKeywords.parents}, {ConfigKeywords.childs}, {ConfigKeywords.prerequisites}) VALUES \n"
         ary = []
 
