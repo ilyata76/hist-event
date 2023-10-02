@@ -1,11 +1,10 @@
 """
     Конфигурирующиеся и постоянные переменные
 """
-import os
+import os, sys
+from pathlib import Path
+from loguru import logger
 
-yaml_folder = str(os.environ.get("YAML_FOLDER", "./files/yamls"))
-
-sql_folder = str(os.environ.get("SQL_FOLDER", "./files/sqls"))
 
 files_folder = str(os.environ.get("FILES_FOLDER", "./files"))
 
@@ -21,8 +20,35 @@ if debug.lower() == "false" or debug.lower() == "no" :
 else :
     debug = True
 
-use_console_debug = os.environ.get("DEBUG_CONSOLE", "false")
-if use_console_debug.lower() == "false" or use_console_debug.lower() == "no" :
-    use_console_debug = False
+use_log_console= os.environ.get("LOG_CONSOLE", "false")
+if use_log_console.lower() == "false" or use_log_console.lower() == "no" :
+    use_log_console = False
 else :
-    use_console_debug = True
+    use_log_console = True
+
+logs_folder = Path(str(os.environ.get("LOGS_FOLDER", "./logs")))
+logs_filename = str(os.environ.get("LOGS_FILENAME", "ftp-io.log"))
+logger_configured : bool = False
+
+
+def configure_logger() : 
+    """
+    """
+    global logger_configured
+    if logger_configured :
+        return
+    
+    logger.remove(0)
+    logger.add(sys.stderr, level="WARNING")
+
+    level = "DEBUG" if debug else "INFO"
+
+    logger.add(logs_folder.joinpath(logs_filename), 
+                   format="{time} {level} {message}", level=level, rotation="4 MB", compression="zip")
+    
+    if use_log_console :
+        logger.add(sys.stdout, level=level)
+    
+    logger_configured = True
+
+    logger.debug("Логгер был сконфигурирован")

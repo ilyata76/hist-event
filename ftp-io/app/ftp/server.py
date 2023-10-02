@@ -1,9 +1,14 @@
+"""
+    Файл с классом управления сервером
+"""
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
+from loguru import logger
 
 from config import ftp_admin_username, ftp_admin_password,\
                     files_folder
+
 
 class MyFTPServer() :
     """
@@ -23,17 +28,21 @@ class MyFTPServer() :
             "T" = change file modification time (SITE MFMT command) New in 1.5.3
     """
 
-    def __init__(self, host, port) :
+    def __init__(self, host : str, port : int, 
+                 handler : FTPHandler) :
+        logger.debug(f"Создание экземпляра класса MyFTPServer с {host}:{port}")
         self.host = host
         self.port = port
         self._authorizer = DummyAuthorizer()
         self._authorizer.add_user(ftp_admin_username, ftp_admin_password, 
                                   files_folder, perm="elradfmwMT")
         self._authorizer.add_anonymous(files_folder)
-        self._handler = FTPHandler # TODO свой хендлер с логированием
+        self._handler = handler
         self._handler.authorizer = self._authorizer
 
 
     def start(self) :
+        logger.info("Старт сервера")
         server = FTPServer((self.host, self.port), self._handler)
         server.serve_forever(handle_exit=True, timeout=10)
+        logger.info("Остановка сервера")
