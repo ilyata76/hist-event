@@ -33,6 +33,7 @@ max_reparse_count = int(os.environ.get("MAX_REPARSE_COUNT", 10))
 
 logs_folder = Path(str(os.environ.get("LOGS_FOLDER", "./logs")))
 logs_filename = str(os.environ.get("LOGS_FILENAME", "sql-generator.log"))
+latest_stdout_cli_filename = str(os.environ.get("LATEST_STDOUT_CLI_FILENAME", "cli-latest.stdout"))
 
 parse_keyword_special_symbols = str(os.environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_"))
 parse_name_special_symbols = str(os.environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!"))

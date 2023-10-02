@@ -294,7 +294,8 @@ def parseFile(path : Path, keyword : str,
         dict_entities = dictFromYaml(path, ftp)[keyword]
 
         if not dict_entities :
-            raise Exception(f"{keyword} : {path} : возникла ошибка во время обхода файла (результат None)")
+            return 0 # файл пустой
+            #raise Exception(f"{keyword} : {path} : возникла ошибка во время обхода файла (результат None)")
         if type(dict_entities) is dict or type(dict_entities) == dict: 
             # если результат - один словарь, а не много
             dict_entities = [dict_entities]

@@ -16,7 +16,7 @@ def dictFromYaml(path : Path,
         Открыть файл .yaml по пути path внутри FTP-сервера, 
             вернуть результат в виде словаря
     """
-    if repeated > 3 :
+    if repeated > 1 :
         raise Exception("Не удалось подключиться к FTP-серверу и прочитать yaml-файлы!")
 
     try : 

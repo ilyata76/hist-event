@@ -1,10 +1,14 @@
 from pydantic import BaseModel
 
+
 class Ping(BaseModel) :
     result : str
 
-class PostSQL(BaseModel) :
+
+class PostProcess(BaseModel) :
     result : int
+    stdout : bytes
+
 
 class PostYAML(BaseModel) :
     errors : list[str]

@@ -13,4 +13,4 @@ def main() :
 
 if __name__ == "__main__":
     from os import system
-    print(system("sql-generate -v"))
+    print(system("sql-generate"))

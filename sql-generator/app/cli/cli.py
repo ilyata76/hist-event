@@ -15,7 +15,14 @@ from core.schemas.Storages import Storages
 from core.schemas.Bonds import BondStorage
 from core.schemas.Paths import Paths
 from config import ConfigKeywords, max_reparse_count as config_max_reparse_count,\
-                        ftp_host, ftp_port, ftp_password, ftp_username, ConfigCLICommands
+                        ftp_host, ftp_port, ftp_password, ftp_username, ConfigCLICommands,\
+                        logs_folder as config_logs_folder, latest_stdout_cli_filename as config_latest_stdout_cli_filename
+
+
+def get_latest() :
+    f = open(config_logs_folder.joinpath(config_latest_stdout_cli_filename), "ab")
+    f.truncate(0)
+    return f
 
 
 class StartupCLI(cli.Application):
@@ -40,11 +47,17 @@ class StartupCLI(cli.Application):
     ftp : FTP | None = None
     errors : list | None = None
     sql_string : str | None = None
+    latest_log = get_latest()
 
     reparse_count = config_max_reparse_count
     paths = Paths()
 
     ## Для внутреннего пользования
+
+    def latest(self, msg : str) -> None :
+        if self.latest_log:
+            self.latest_log.write(bytes(msg + "\n", encoding="utf-8"))
+
 
     def log(self, message : str, level = "info", *args, **kwargs) -> None:
         """
@@ -54,6 +67,7 @@ class StartupCLI(cli.Application):
         try : 
             print(msgFormat(message.format(*args, **kwargs)))
             getattr(logger, level)(message, *args, **kwargs)
+            self.latest(msgFormat(message.format(*args, **kwargs)))
         except Exception as exc :
             logger.exception(f"Выполнение команды логирования завершилось с ошибкой! Последнее сообщение=[{message}] Ошибка=[{type(exc)}:{exc}]")
             print(msgFormat(f"Работа программы завершена некорректно! Последнее сообщение=[{message}] Ошибка=[{type(exc)}:{exc}]"))
@@ -67,7 +81,7 @@ class StartupCLI(cli.Application):
         try : 
             self.errors = validate(self.paths, self.ftp)
             if self.errors and len(self.errors) > 0 :
-                raise Exception(f"Некоторые файлы не прошли валидацию! [{self.errors}]")
+                raise Exception(f"Некоторые файлы не прошли валидацию! [VALIDATION{self.errors}VALIDATION]")
         except Exception as exc :
             raise Exception(f"Процесс валидации завершился с ошибкой! [{type(exc)}:{exc}]")
         # finally :
@@ -128,6 +142,8 @@ class StartupCLI(cli.Application):
                 если нет флагов
         """
         try : 
+            #self.latest_log = open(config_logs_folder.joinpath(config_latest_stdout_cli_filename), "wb")
+
             if not (proccess in [ConfigCLICommands.full, 
                                  ConfigCLICommands.validate, 
                                  ConfigCLICommands.parse]) :
@@ -137,6 +153,7 @@ class StartupCLI(cli.Application):
                 self.ftp = FTP()
                 self.ftp.connect(ftp_host, ftp_port)
                 self.ftp.login(ftp_username, ftp_password)
+                #self.latest_log = open(config_logs_folder.joinpath(config_latest_stdout_cli_filename), "ab")
                 self.log("Успешное подключение к FTP-серверу!")
             except Exception as exc:
                 raise Exception(f"Не удалось подключиться к FTP-серверу [{type(exc)}:{exc}]")
@@ -247,7 +264,7 @@ class StartupCLI(cli.Application):
             Установить путь до YAML файла со связями событий
         """
         self.paths.bonds_path = bonds_path
-        self.log("Установлена папка для YAML файла со связями событий  {path}", path=self.paths.bonds_path)
+        self.log("Установлена папка для YAML файла со связями событий {path}", path=self.paths.bonds_path)
 
 
     @cli.switch("--sql-folder", str)

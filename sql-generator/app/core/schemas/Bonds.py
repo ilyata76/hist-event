@@ -95,6 +95,9 @@ class BondStorage() :
         """
             Заполнение таблицы
         """
+        if not self.storage :
+            return ""
+        
         logger.info(f"Заполнение SQL таблиц для {self.name}")
         result = f"INSERT INTO {self.name} ({ConfigKeywords.event}, {ConfigKeywords.parents}, {ConfigKeywords.childs}, {ConfigKeywords.prerequisites}) VALUES \n"
         ary = []

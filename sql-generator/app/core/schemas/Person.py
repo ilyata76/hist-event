@@ -53,6 +53,9 @@ class PersonStorage(BaseStorage) :
         """
             Заполнение таблицы
         """
+        if not self.storage :
+            return ""
+
         result = f"INSERT INTO {self.name} VALUES \n"
         ary = []
 

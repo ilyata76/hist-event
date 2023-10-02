@@ -128,4 +128,4 @@ def validate(paths : Paths,
         memorizeError(f"Непредвиденная ошибка во время исполнения валидации {type(exc)} [{exc}]")
 
     finally:    
-        return errors
+        return tuple(errors)
