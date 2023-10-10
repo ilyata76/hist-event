@@ -1,0 +1,74 @@
+syntax = "proto3";
+
+package nosql_database_api;
+
+// сервис работы NoSQL базы данных, используемой различными сервисами, например,
+// для запоминания сохранённых файлов на FTP-сервере
+service NoSQLDatabaseAPI {
+  // проверить работоспособность
+  rpc Ping (PingRequest) returns (PingResponse) {} 
+
+  // сохранить файл в базе
+  rpc AddFile (AddFileRequest) returns (AddFileResponse) {}
+
+  // сохранить/заменить (запомнить) файл в базе
+  rpc PutFile (PutFileRequest) returns (PutFileResponse) {}
+
+  // удалить (забыть) файл в базе
+  rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse) {}
+
+  // получить файл из базы
+  rpc GetFile (GetFileRequest) returns (GetFileResponse) {}
+
+  // получить несколько файлов из базы
+  rpc GetManyFiles (GetManyFilesRequest) returns (GetManyFilesResponse) {}
+}
+
+message PingRequest {
+  //
+}
+message PingResponse {
+  string pong = 1;
+}
+
+message PutFileRequest {
+  string filename = 1;
+  string path = 2;
+}
+message PutFileResponse {
+  string filename = 1;
+  string path = 2;
+}
+
+message DeleteFileRequest {
+  string filename = 1;
+} 
+message DeleteFileResponse {
+  string filename = 1;
+  string path = 2;
+}
+
+message AddFileRequest {
+  string filename = 1;
+  string path = 2;
+}
+message AddFileResponse {
+  string filename = 1;
+  string path = 2;
+}
+
+message GetFileRequest {
+  string filename = 1;
+}
+message GetFileResponse {
+  string filename = 1;
+  string path = 2;
+}
+
+message GetManyFilesRequest {
+  int32 start_pos = 1;
+  int32 limit = 2;
+}
+message GetManyFilesResponse {
+  string TODO = 1;
+}

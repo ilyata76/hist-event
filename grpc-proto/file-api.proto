@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package file_api;
+
+service FileAPI {
+  // проверить работоспособность
+  rpc Ping (PingRequest) returns (PingResponse) {} 
+}
+
+message PingRequest {
+    //
+}
+message PingResponse {
+    string pong = 1;
+}
+  
