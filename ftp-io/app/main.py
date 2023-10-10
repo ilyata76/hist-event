@@ -1,3 +1,7 @@
+"""
+    Точка входа
+"""
+
 from utils.logger import logger
 from utils.config import config
 from ftp.server import MyFTPServer
