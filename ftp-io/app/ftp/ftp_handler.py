@@ -3,7 +3,8 @@
     MyFTPHandlerLoguru делает логирование запросов
 """
 from pyftpdlib.handlers import FTPHandler
-from loguru import logger
+
+from utils.logger import logger
 
 
 class MyFTPHandler(FTPHandler) :

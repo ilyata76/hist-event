@@ -4,10 +4,9 @@
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
-from loguru import logger
 
-from config import ftp_admin_username, ftp_admin_password,\
-                    files_folder
+from utils.logger import logger
+from utils.config import config
 
 
 class MyFTPServer() :
@@ -34,9 +33,9 @@ class MyFTPServer() :
         self.host = host
         self.port = port
         self._authorizer = DummyAuthorizer()
-        self._authorizer.add_user(ftp_admin_username, ftp_admin_password, 
-                                  files_folder, perm="elradfmwMT")
-        self._authorizer.add_anonymous(files_folder)
+        self._authorizer.add_user(config.FTP_USERNAME, config.FTP_PASSWORD, 
+                                  str(config.FILES_FOLDER), perm="elradfmwMT")
+        self._authorizer.add_anonymous(str(config.FILES_FOLDER))
         self._handler = handler
         self._handler.authorizer = self._authorizer
 
@@ -44,5 +43,5 @@ class MyFTPServer() :
     def start(self) :
         logger.info("Старт сервера")
         server = FTPServer((self.host, self.port), self._handler)
-        server.serve_forever(handle_exit=True, timeout=10)
+        server.serve_forever(handle_exit=True, worker_processes=2, timeout=10)
         logger.info("Остановка сервера")
