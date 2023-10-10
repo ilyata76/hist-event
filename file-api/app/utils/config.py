@@ -46,49 +46,35 @@ class Config :
             Определяет название файла, в котором будет храниться лог приложения
         """
         if not hasattr(self, "_Config__LOG_FILENAME") :
-            self.__LOG_FILENAME = environ.get("LOG_FILENAME", "nosql-database-api.log")
+            self.__LOG_FILENAME = environ.get("LOG_FILENAME", "file-api.log")
         return self.__LOG_FILENAME
 
     @property
-    def DATABASE_URI(self) -> str :
-        """
-            Определяет путь(ссылку, URI) до базы данных
-        """
-        if not hasattr(self, "_Config__DATABASE_URI") :
-            self.__DATABASE_URI = environ.get("DATABASE_URI", "localhost:27017")
-        return self.__DATABASE_URI
+    def FTP_USERNAME(self) -> str :
+        if not hasattr(self, "_Config__FTP_USERNAME") :
+            self.__FTP_USERNAME = environ.get("FTP_USERNAME", "admin")
+        return self.__FTP_USERNAME
 
     @property
-    def DATABASE_TIMEOUT_MS(self) -> str :
-        """
-            Определяет время ожидания клиента ответа от сервера в мс
-        """
+    def FTP_PASSWORD(self) -> str :
+        if not hasattr(self, "_Config__FTP_PASSWORD") :
+            self.__FTP_PASSWORD = environ.get("FTP_PASSWORD", "admin")
+        return self.__FTP_PASSWORD
+
+    @property
+    def FTP_PORT(self) -> str :
         try : 
-            if not hasattr(self, "_Config__DATABASE_TIMEOUT_MS") :
-                self.__DATABASE_TIMEOUT_MS = int(environ.get("DATABASE_TIMEOUT_MS", 1000))
+            if not hasattr(self, "_Config__FTP_PORT") :
+                self.__FTP_PORT = int(environ.get("FTP_PORT", 21))
         except BaseException :
-            self.__DATABASE_TIMEOUT_MS = 1000
-        return self.__DATABASE_TIMEOUT_MS
+            self.__FTP_PORT = 21
+        return self.__FTP_PORT
 
     @property
-    def DATABASE_RECONNECTION_S(self) -> str :
-        """
-            Определяет время ожидания клиента ответа от сервера в мс
-        """
-        try : 
-            if not hasattr(self, "_Config__DATABASE_RECONNECTION_S") :
-                self.__DATABASE_RECONNECTION_S = int(environ.get("DATABASE_RECONNECTION_S", 600))
-        except BaseException :
-            self.__DATABASE_RECONNECTION_S = 100000
-        return self.__DATABASE_RECONNECTION_S
-
-    @property
-    def DATABASE_FILES_DB(self) -> str :
-        return "files"
-    
-    @property
-    def DATABASE_FTP_FILES_COLLECTION(self) -> str :
-        return "ftp_files"
+    def FTP_HOST(self) -> str :
+        if not hasattr(self, "_Config__FTP_HOST") :
+            self.__FTP_HOST = environ.get("FTP_HOST", "localhost")
+        return self.__FTP_HOST
 
     @property
     def GRPC_HOST(self) -> str :
@@ -99,7 +85,7 @@ class Config :
     @property
     def GRPC_PORT(self) -> str :
         if not hasattr(self, "_Config__GRPC_PORT") :
-            self.__GRPC_PORT = environ.get("GRPC_PORT", "50051")
+            self.__GRPC_PORT = environ.get("GRPC_PORT", "50052")
         return self.__GRPC_PORT
 
     @property
@@ -113,6 +99,18 @@ class Config :
         except BaseException :
             self.__GRPC_MAX_WORKERS = 10
         return self.__GRPC_MAX_WORKERS
+    
+    @property 
+    def NOSQL_DATABASE_GRPC_HOST(self) -> str :
+        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_HOST") :
+            self.__NOSQL_DATABASE_GRPC_HOST = environ.get("NOSQL_DATABASE_GRPC_HOST", "localhost")
+        return self.__NOSQL_DATABASE_GRPC_HOST
+    
+    @property 
+    def NOSQL_DATABASE_GRPC_PORT(self) -> str :
+        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_PORT") :
+            self.__NOSQL_DATABASE_GRPC_PORT = environ.get("NOSQL_DATABASE_GRPC_PORT", "50051")
+        return self.__NOSQL_DATABASE_GRPC_PORT
 
     def __str__(self, indent : str = "") -> str :
         """
@@ -123,16 +121,15 @@ class Config :
                + indent + f"LOG_CONSOLE : {self.LOG_CONSOLE}" + "\n"\
                + indent + f"LOG_FOLDER : {self.LOG_FOLDER}" + "\n"\
                + indent + f"LOG_FILENAME : {self.LOG_FILENAME}" + "\n"\
-               + indent + f"DATABASE_URI : {self.DATABASE_URI}" + "\n"\
-               + indent + f"DATABASE_TIMEOUT_MS : {self.DATABASE_TIMEOUT_MS}" + "\n"\
-               + indent + f"DATABASE_RECONNECTION_S : {self.DATABASE_RECONNECTION_S}" + "\n"\
                + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "\n"\
                + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "\n"\
-               + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}"
-
-
-FILE_KEY = "file"
-DATABASE_FILENAME_PATH = f"{FILE_KEY}.filename"
+               + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}" + "\n"\
+               + indent + f"FTP_USERNAME : {self.FTP_USERNAME}" + "\n"\
+               + indent + f"FTP_PASSWORD : {'specified' if self.FTP_PASSWORD is not None else 'not specified'}" + "\n"\
+               + indent + f"FTP_HOST : {self.FTP_HOST}" + "\n"\
+               + indent + f"FTP_PORT : {self.FTP_PORT}" + "\n"\
+               + indent + f"NOSQL_DATABASE_GRPC_HOST : {self.NOSQL_DATABASE_GRPC_HOST}" + "\n"\
+               + indent + f"NOSQL_DATABASE_GRPC_PORT : {self.NOSQL_DATABASE_GRPC_PORT}"
 
 
 class LogCode :

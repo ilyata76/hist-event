@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  nosql-database:
+    container_name: nosql-database
+    image: mongo:4.4
+    restart: always
+    volumes:
+      - ./nosql-database/mongodb-data:/data/db
+    ports: # TODO не забыть убрать!
+      - 27017:27017

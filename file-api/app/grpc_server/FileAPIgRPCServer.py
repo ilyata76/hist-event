@@ -5,13 +5,13 @@ from concurrent import futures
 import grpc
 from asyncio import CancelledError
 
-import proto.nosql_database_api_pb2_grpc as pb2_grpc
-from grpc_server.NoSQLDatabaseAPIServicer import NoSQLDatabaseAPIServicer
+import proto.file_api_pb2_grpc as pb2_grpc
+from grpc_server.FileAPIServicer import FileAPIServicer
 from utils.logger import logger
 from utils.config import config
 
 
-class NoSQLDatabaseAPIgRPCServer :
+class FileAPIgRPCServer :
     """
         Управление сервером
     """
@@ -20,7 +20,7 @@ class NoSQLDatabaseAPIgRPCServer :
         logger.debug("Создание экземпляра класса управления gRPC сервером")
         self._server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=config.GRPC_MAX_WORKERS))
         logger.info("Привязка к gRPC серверу сервиса NoSQLDatabaseAPIservicer")
-        pb2_grpc.add_NoSQLDatabaseAPIServicer_to_server(NoSQLDatabaseAPIServicer(), self._server)
+        pb2_grpc.add_FileAPIServicer_to_server(FileAPIServicer(), self._server)
         self._port = port
         self._ip = ip
         self._server.add_insecure_port(self._ip + ":" + self._port)
@@ -33,7 +33,7 @@ class NoSQLDatabaseAPIgRPCServer :
             await self._server.start()
             logger.info(f"Сервер был запущен на {self._ip}:{self._port}")
             await self._server.wait_for_termination()
-        except (KeyboardInterrupt, CancelledError) :
+        except (KeyboardInterrupt, CancelledError)  :
             logger.info("Сервер был принудительно остановлен")
         except BaseException as exc :
             logger.exception(f"Произошла непредвиденная ошибка с сервером : {type(exc)}:{exc}")
