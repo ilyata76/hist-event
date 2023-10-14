@@ -17,16 +17,19 @@ class AbstractDB :
         logger.debug("Создание экземпляра AbstractDB")
         self.client = client
 
-    def DBMethodDecorator(function) : 
+    async def testConnect(self) :
+        logger.debug("Клиент DB: тестовое подключение")
+        if not self.client.connected and not await self.client.testConnection(): 
+            raise DBException(code=DBExceptionCode.SERVICE_UNAVAIABLE, 
+                              detail="КлиентDB не смог подключиться к базам данных!")
+
+    def method(function) : 
         """
-            Декоратор для методов работы с файлами.
+            Декоратор для методов работы с базой данных.
         """
         async def wrap(self, *args, **kwargs) :
             try : 
-                if not self.client.connected : 
-                    if not await self.client.testConnection() :
-                        raise DBException(code=DBExceptionCode.SERVICE_UNAVAIABLE, 
-                                          detail="FileDB не смог подключиться к базам данных!")
+                await self.testConnect()
                 return await function(self, *args, **kwargs)
             except DBException as exc :
                 logger.error(f"Произошла ошибка, связанная с работой базы данных : {type(exc)}:{exc}")
@@ -37,7 +40,7 @@ class AbstractDB :
         return wrap
     
 
-class AbstartMongoDB(AbstractDB) :
+class AbstractMongoDB(AbstractDB) :
     """
         Для работы с классами от MongoDB
     """
@@ -46,16 +49,14 @@ class AbstartMongoDB(AbstractDB) :
         super().__init__(client)
 
     
-    def MongoDBMethodDecorator(function) : 
+    def method(function) : 
         """
             Декоратор для методов работы с файлами.
+                Поднимает DBException и другие исключения
         """
         async def wrap(self, *args, **kwargs) :
             try : 
-                if not self.client.connected : 
-                    if not await self.client.testConnection() :
-                        raise DBException(code=DBExceptionCode.SERVICE_UNAVAIABLE, 
-                                          detail="FileDB не смог подключиться к базам данных!")
+                await self.testConnect()
                 return await function(self, *args, **kwargs)
             except (pyerros.ConnectionFailure, 
                     pyerros.ExecutionTimeout, 
@@ -63,17 +64,17 @@ class AbstartMongoDB(AbstractDB) :
                     pyerros.NetworkTimeout, 
                     pyerros.ServerSelectionTimeoutError,
                     pyerros.WaitQueueTimeoutError) as exc:
-                logger.error(f"FileDB не смог подключиться к базам данных! : {type(exc)}:{exc}")
+                logger.error(f"Клиент не смог подключиться к базам данных! : {type(exc)}:{exc}")
                 raise DBException(code=DBExceptionCode.SERVICE_UNAVAIABLE, 
-                                  detail=f"FileDB не смог подключиться к базам данных! : {type(exc)}:{exc}")
+                                  detail=f"Клиент не смог подключиться к базам данных! : {type(exc)}:{exc}")
             except (pyerros.CursorNotFound, 
                     pyerros.CollectionInvalid, 
                     pyerros.ConfigurationError, 
                     pyerros.InvalidURI, 
                     pyerros.InvalidName) :
-                logger.error(f"База данных стала недоступна для FileDB : {type(exc)}:{exc}")
+                logger.error(f"База данных стала недоступна для Клиент : {type(exc)}:{exc}")
                 raise DBException(code=DBExceptionCode.INVALIDATED, 
-                                  detail=f"База данных стала недоступна для FileDB : {type(exc)}:{exc}")
+                                  detail=f"База данных стала недоступна для Клиент : {type(exc)}:{exc}")
             except pyerros.DocumentTooLarge :
                 logger.error(f"Документ слишком много весит! : {type(exc)}:{exc}")
                 raise DBException(code=DBExceptionCode.TOO_LARGE, 

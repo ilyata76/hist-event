@@ -63,6 +63,7 @@ class MongoDBClient(DBClient) :
             Проверить, что MongoDB функционирует
         """
         try :
+            logger.debug("Проведение тестового подключения к MongoDB")
             await self.client.server_info()
             self._connected = True
         except BaseException :

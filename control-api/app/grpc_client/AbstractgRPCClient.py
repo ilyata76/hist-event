@@ -4,8 +4,8 @@
 from functools import partial
 from grpc import RpcError
 
-from utils.logger import logger
-from utils.config import LogCode
+from app.utils.logger import logger
+from app.utils.config import LogCode
 
 
 class AbstractgRPCClient :

@@ -31,10 +31,10 @@ class AbstractServicer :
                     logger.info(f"{prefix(code=LogCode.SUCCESS)} Запрос от удаленного gRPC был обработан")
                     return res
                 except grpc.RpcError as exc :
-                    logger.info(f"{prefix(code=LogCode.ERROR)} Ошибка gRPC-сервера : {exc.code()}:{exc.details()}")
+                    logger.error(f"{prefix(code=LogCode.ERROR)} Ошибка gRPC-сервера : {exc.code()}:{exc.details()}")
                     await context.abort(exc.code(), exc.details())
                 except BaseException as exc:
-                    logger.error(f"{prefix(code=LogCode.ERROR)} Во время обработки запроса произошла ошибка : {type(exc)}:{exc}")
+                    logger.exception(f"{prefix(code=LogCode.ERROR)} Во время обработки запроса произошла ошибка : {type(exc)}:{exc}")
                     await context.abort(grpc.StatusCode.INTERNAL, f"internal server error : {type(exc)}:{exc}")
             return wrap
         return servicerMethod

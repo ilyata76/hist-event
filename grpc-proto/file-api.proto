@@ -2,15 +2,30 @@ syntax = "proto3";
 
 package file_api;
 
+// сервис по управлению файлами:
+//   получать, отдавать, сохранять и пр. 
 service FileAPI {
+
   // проверить работоспособность
-  rpc Ping (PingRequest) returns (PingResponse) {} 
+  rpc Ping (PingRequest) returns (PingResponse) {}
+
+  // загрузить файл
+
+  // получить файл
+
+  // получить мета-информацию о файле
+
+  // удалить файл
+
+  // сохранить/заменить файл
+
+  // получить список мета-информацю всех (или отрезком) файлов
+
 }
 
 message PingRequest {
-    //
+  //
 }
 message PingResponse {
-    string pong = 1;
+  string pong = 1;
 }
-  

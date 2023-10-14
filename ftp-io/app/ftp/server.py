@@ -41,7 +41,7 @@ class MyFTPServer() :
 
 
     def start(self) :
-        logger.info("Старт сервера")
+        logger.info(f"Старт сервера на {self.host}:{self.port}")
         server = FTPServer((self.host, self.port), self._handler)
         server.serve_forever(handle_exit=True, worker_processes=2, timeout=10)
         logger.info("Остановка сервера")

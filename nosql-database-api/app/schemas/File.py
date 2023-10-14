@@ -4,12 +4,19 @@
 from pydantic import BaseModel
 
 
-class File(BaseModel) :
+class FileBase(BaseModel) :
     """
-        Главная схема файла
+        Базовая схема файла
     """
-    filename : str
-    path : str
+    path : str  # PATHLIKE /a/b/file.txt
+    storage : str # s3, ftp, etc.
+
+
+class File(FileBase) :
+    """
+        Главная схема файла, дополненная именем
+    """
+    filename : str #
 
 
 class FileBinary(File) :

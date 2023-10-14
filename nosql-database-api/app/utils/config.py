@@ -4,6 +4,8 @@
 from os import environ
 from pathlib import Path
 
+from utils.exception import ConfigException, ConfigExceptionCode
+
 
 class Config :
     """
@@ -91,6 +93,10 @@ class Config :
         return "ftp_files"
 
     @property
+    def DATABASE_S3_FILES_COLLECTION(self) -> str :
+        return "s3_files"
+
+    @property
     def GRPC_HOST(self) -> str :
         if not hasattr(self, "_Config__GRPC_HOST") :
             self.__GRPC_HOST = environ.get("GRPC_HOST", "0.0.0.0")
@@ -131,8 +137,26 @@ class Config :
                + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}"
 
 
+class StorageIdentifier :
+    FTP = "ftp"
+    S3 = "s3"
+
+
+class StorageCollection :
+    @staticmethod
+    def get(identifier : str = StorageIdentifier.FTP) :
+        match identifier :
+            case StorageIdentifier.FTP :
+                return config.DATABASE_FTP_FILES_COLLECTION
+            case StorageIdentifier.FTP :
+                return config.DATABASE_S3_FILES_COLLECTION
+            case _ :
+                raise ConfigException(code=ConfigExceptionCode.INVALID_STORAGE_IDENTIFIER,
+                                      detail=f"Нет такого идентификатора коллекции, {identifier}!")
+
+
 FILE_KEY = "file"
-DATABASE_FILENAME_PATH = f"{FILE_KEY}.filename"
+DATABASE_PATH_PATH = f"{FILE_KEY}.path"
 
 
 class LogCode :

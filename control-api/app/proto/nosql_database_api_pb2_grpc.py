@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import proto.nosql_database_api_pb2 as nosql__database__api__pb2
+import app.proto.nosql_database_api_pb2 as nosql__database__api__pb2
 
 
 class NoSQLDatabaseAPIStub(object):

@@ -2,11 +2,11 @@
     Файл клиента для gRPC NoSQLDatabase сервера и доступа к нему
 """
 import grpc
-import proto.nosql_database_api_pb2 as pb2
-import proto.nosql_database_api_pb2_grpc as pb2_grpc
+import app.proto.nosql_database_api_pb2 as pb2
+import app.proto.nosql_database_api_pb2_grpc as pb2_grpc
 
-from utils.config import config
-from grpc_client.AbstractgRPCClient import AbstractgRPCClient
+from app.utils.config import config
+from app.grpc_client.AbstractgRPCClient import AbstractgRPCClient
 
 
 class NoSQLDatabaseAPIgRPCClient :

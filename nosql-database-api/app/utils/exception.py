@@ -4,6 +4,15 @@
 from enum import Enum
 
 
+class MyException(Exception) :
+    def __init__(self, *, code : int, detail : str) :
+        self.code = code
+        self.detail = detail
+    
+    def __str__(self) -> str :
+        return self.detail
+
+
 class DBExceptionCode(Enum) :
     """
         Коды для DBException.code
@@ -17,14 +26,17 @@ class DBExceptionCode(Enum) :
     ENTITY_DONT_EXISTS = 7
 
 
-class DBException(Exception) :
+class DBException(MyException) :
     """
         Класс для ошибок, связанных с работой баз данных
     """
 
-    def __init__(self, *, code : int, detail : str) :
-        self.code = code
-        self.detail = detail
-    
-    def __str__(self) -> str :
-        return self.detail
+
+class ConfigExceptionCode(Enum) :
+    INVALID_STORAGE_IDENTIFIER = 1
+
+
+class ConfigException(MyException) :
+    """
+        Класс для ошибок, связанных с какими-либо конфигурирующими переменными
+    """
