@@ -14,7 +14,7 @@ async def serve() -> None :
 
 
 if __name__ == "__main__":
-    logger.info(f"Параметры запускаемого приложения: \n{config}")
+    logger.info(f"ЗАПУСК С {config}")
 
     try : 
         asyncio.run(serve())

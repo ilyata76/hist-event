@@ -125,15 +125,15 @@ class Config :
             Строковое представление.
                 Также обновляет ENV-взятие переменных, т.к. обращается к ним напрямую
         """
-        return   indent + f"LOG_DEBUG : {self.LOG_DEBUG}" + "\n"\
-               + indent + f"LOG_CONSOLE : {self.LOG_CONSOLE}" + "\n"\
-               + indent + f"LOG_FOLDER : {self.LOG_FOLDER}" + "\n"\
-               + indent + f"LOG_FILENAME : {self.LOG_FILENAME}" + "\n"\
-               + indent + f"DATABASE_URI : {self.DATABASE_URI}" + "\n"\
-               + indent + f"DATABASE_TIMEOUT_MS : {self.DATABASE_TIMEOUT_MS}" + "\n"\
-               + indent + f"DATABASE_RECONNECTION_S : {self.DATABASE_RECONNECTION_S}" + "\n"\
-               + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "\n"\
-               + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "\n"\
+        return   indent + f"LOG_DEBUG : {self.LOG_DEBUG}" + "; "\
+               + indent + f"LOG_CONSOLE : {self.LOG_CONSOLE}" + "; "\
+               + indent + f"LOG_FOLDER : {self.LOG_FOLDER}" + "; "\
+               + indent + f"LOG_FILENAME : {self.LOG_FILENAME}" + "; "\
+               + indent + f"DATABASE_URI : {self.DATABASE_URI}" + "; "\
+               + indent + f"DATABASE_TIMEOUT_MS : {self.DATABASE_TIMEOUT_MS}" + "; "\
+               + indent + f"DATABASE_RECONNECTION_S : {self.DATABASE_RECONNECTION_S}" + "; "\
+               + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "; "\
+               + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "; "\
                + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}"
 
 

@@ -117,18 +117,18 @@ class Config :
             Строковое представление.
                 Также обновляет ENV-взятие переменных, т.к. обращается к ним напрямую
         """
-        return   indent + f"LOG_DEBUG : {self.LOG_DEBUG}" + "\n"\
-               + indent + f"LOG_CONSOLE : {self.LOG_CONSOLE}" + "\n"\
-               + indent + f"LOG_FOLDER : {self.LOG_FOLDER}" + "\n"\
-               + indent + f"LOG_FILENAME : {self.LOG_FILENAME}" + "\n"\
-               + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "\n"\
-               + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "\n"\
-               + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}" + "\n"\
-               + indent + f"FTP_USERNAME : {self.FTP_USERNAME}" + "\n"\
-               + indent + f"FTP_PASSWORD : {'specified' if self.FTP_PASSWORD is not None else 'not specified'}" + "\n"\
-               + indent + f"FTP_HOST : {self.FTP_HOST}" + "\n"\
-               + indent + f"FTP_PORT : {self.FTP_PORT}" + "\n"\
-               + indent + f"NOSQL_DATABASE_GRPC_HOST : {self.NOSQL_DATABASE_GRPC_HOST}" + "\n"\
+        return   indent + f"LOG_DEBUG : {self.LOG_DEBUG}" + "; "\
+               + indent + f"LOG_CONSOLE : {self.LOG_CONSOLE}" + "; "\
+               + indent + f"LOG_FOLDER : {self.LOG_FOLDER}" + "; "\
+               + indent + f"LOG_FILENAME : {self.LOG_FILENAME}" + "; "\
+               + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "; "\
+               + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "; "\
+               + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}" + "; "\
+               + indent + f"FTP_USERNAME : {self.FTP_USERNAME}" + "; "\
+               + indent + f"FTP_PASSWORD : {'specified' if self.FTP_PASSWORD is not None else 'not specified'}" + "; "\
+               + indent + f"FTP_HOST : {self.FTP_HOST}" + "; "\
+               + indent + f"FTP_PORT : {self.FTP_PORT}" + "; "\
+               + indent + f"NOSQL_DATABASE_GRPC_HOST : {self.NOSQL_DATABASE_GRPC_HOST}" + "; "\
                + indent + f"NOSQL_DATABASE_GRPC_PORT : {self.NOSQL_DATABASE_GRPC_PORT}"
 
 
