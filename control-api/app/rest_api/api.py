@@ -9,11 +9,9 @@ from app.utils.config import config
 
 api = FastAPI()
 
-
 @api.on_event("startup")
 def onStartup() :
-    logger.info(f"Параметры запускаемого приложения: \n{config}")
-
+    logger.info(f"ЗАПУСК ПРИ {config}")
 
 from app.rest_api.ping import ping
 api.include_router(router=ping)

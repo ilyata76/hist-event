@@ -15,7 +15,7 @@ class AbstractServicer :
 
     @staticmethod
     def logPrefix(path : str, peer : str, code : str) :
-        return f"[SERVER][{path}][{code}][{peer}]"
+        return f"[SERVER][{peer}] : {path} : {code}"
 
     def method(path : str) :
         """
@@ -26,15 +26,15 @@ class AbstractServicer :
             async def wrap(self, request, context : grpc.ServicerContext, *args, **kwargs) :
                 prefix = partial(AbstractServicer.logPrefix, path=path, peer=context.peer())
                 try : 
-                    logger.debug(f"{prefix(code=LogCode.PENDING)} Получен запрос от удаленного gRPC-сервера")
+                    logger.debug(f"{prefix(code=LogCode.PENDING)}")
                     res = await function(self, request=request, context=context, *args, **kwargs)
-                    logger.info(f"{prefix(code=LogCode.SUCCESS)} Запрос от удаленного gRPC был обработан")
+                    logger.info(f"{prefix(code=LogCode.SUCCESS)}")
                     return res
                 except grpc.RpcError as exc :
-                    logger.error(f"{prefix(code=LogCode.ERROR)} Ошибка gRPC-сервера : {exc.code()}:{exc.details()}")
+                    logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code()}:{exc.details()}")
                     await context.abort(exc.code(), exc.details())
                 except BaseException as exc:
-                    logger.exception(f"{prefix(code=LogCode.ERROR)} Во время обработки запроса произошла ошибка : {type(exc)}:{exc}")
+                    logger.exception(f"{prefix(code=LogCode.ERROR)} : {type(exc)}:{exc}")
                     await context.abort(grpc.StatusCode.INTERNAL, f"internal server error : {type(exc)}:{exc}")
             return wrap
         return servicerMethod

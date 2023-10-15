@@ -15,7 +15,7 @@ class AbstractgRPCClient :
 
     @staticmethod
     def logPrefix(path : str, code : str) :
-        return f"[CLIENT][{path}][{code}]"
+        return f"[CLIENT] : {path} : {code}"
 
     def method(path : str) :
         """
@@ -26,15 +26,15 @@ class AbstractgRPCClient :
             async def wrap(*args, **kwargs) :
                 prefix = partial(AbstractgRPCClient.logPrefix, path=path)
                 try : 
-                    logger.debug(f"{prefix(code=LogCode.PENDING)} Отправлен запрос к удаленному gRPC-серверу")
+                    logger.debug(f"{prefix(code=LogCode.PENDING)}")
                     result = await function(*args, **kwargs)
-                    logger.info(f"{prefix(code=LogCode.SUCCESS)} Получен ответ от удаленного gRPC-сервера")
+                    logger.info(f"{prefix(code=LogCode.SUCCESS)}")
                     return result
                 except RpcError as exc:
-                    logger.error(f"{prefix(code=LogCode.ERROR)} Удаленный сервер вернул ошибку : {exc.code()}:{exc.details()}")
+                    logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code()}:{exc.details()}")
                     raise exc
                 except BaseException as exc:
-                    logger.exception(f"{prefix(code=LogCode.ERROR)} При обработке запроса произошла непредвиденная ошибка : {type(exc)}:{exc}")
+                    logger.exception(f"{prefix(code=LogCode.ERROR)} : {type(exc)}:{exc}")
                     raise RuntimeError(f"При обработке запроса произошла непредвиденная ошибка : {type(exc)}:{exc}")
             return wrap
         return gRPCMethod
