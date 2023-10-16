@@ -10,21 +10,23 @@ from app.utils.logger import logger
 from app.utils.config import LogCode
 
 
-def log_and_except(path : str = "not specified") :
-    """
-        Декоратор ловит gRPC исключения, поднимает fastapi.httpexception,
-            которые впоследствии будут обработаны FastAPI в коробке
-    """
-    def LAE(function) :
+def log_and_except(#path : str = "not specified"
+                   function) :
+        """
+            Декоратор ловит gRPC исключения, поднимает fastapi.httpexception,
+                которые впоследствии будут обработаны FastAPI в коробке
+        """
+    #def LAE(function) :
         @wraps(function)
         async def wrap(request : Request, *args, **kwargs) :
+            log_prefix = f"[SERVER][{request.client.host}:{request.client.port}] : {request.method} {request.url}"
             try : 
-                logger.debug(f"[SERVER][{request.client.host}:{request.client.port}] : {path} : {LogCode.PENDING}")
+                logger.debug(f"{log_prefix} : {LogCode.PENDING}")
                 res = await function(request, *args, **kwargs)
-                logger.info(f"[SERVER][{request.client.host}:{request.client.port}] : {path} : {LogCode.SUCCESS}")
+                logger.info(f"{log_prefix} : {LogCode.SUCCESS}")
                 return res
             except RpcError as exc :
-                logger.error(f"[SERVER][{request.client.host}:{request.client.port}] : {path} : {LogCode.ERROR} {exc.code()}:{exc.details()}")
+                logger.error(f"{log_prefix} : {LogCode.ERROR} {exc.code()}:{exc.details()}")
                 match exc.code() :
                     case StatusCode.NOT_FOUND | StatusCode.UNIMPLEMENTED  :
                         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -49,11 +51,11 @@ def log_and_except(path : str = "not specified") :
                         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                             detail=exc.details())
             except HTTPException as exc :
-                logger.error(f"[SERVER][{request.client.host}:{request.client.port}] : {path} : {LogCode.ERROR} {type(exc)}:{exc}")
+                logger.error(f"{log_prefix} : {LogCode.ERROR} {type(exc)}:{exc}")
                 raise exc
             except BaseException as exc :
-                logger.exception(f"[SERVER][{request.client.host}:{request.client.port}] : {path} : {LogCode.ERROR} : {type(exc)}:{exc}")
+                logger.exception(f"{log_prefix} : {LogCode.ERROR} : {type(exc)}:{exc}")
                 raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                                     detail=f"Во время обработки REST запроса произошла непредвиденная ошибка : {type(exc)}:{exc}")
         return wrap
-    return LAE
+    #return LAE

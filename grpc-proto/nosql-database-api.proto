@@ -1,3 +1,8 @@
+// с этим proto-файлом связаны сервисы:
+//    file-api (как клиент)
+//    control-api (как клиент)
+//    nosql-database-api
+
 syntax = "proto3";
 
 package nosql_database_api;
@@ -23,7 +28,7 @@ service NoSQLDatabaseAPI {
 
 message PingRequest {
   //
-}
+};
 message PingResponse {
   string pong = 1;
-}
+};

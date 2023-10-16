@@ -1,3 +1,7 @@
+// с этим proto-файлом связаны сервисы:
+//    file-api
+//    control-api (как клиент)
+
 syntax = "proto3";
 
 package file_api;
@@ -10,22 +14,97 @@ service FileAPI {
   rpc Ping (PingRequest) returns (PingResponse) {}
 
   // загрузить файл
+  rpc AddFile (AddFileRequest) returns (AddFileResponse) {}
 
   // получить файл
+  rpc GetFile (GetFileRequest) returns (GetFileResponse) {}
 
-  // получить мета-информацию о файле
+  // получить мета-информацию о файле (сгодится для проверки существования файла)
+  rpc GetFileMetaInfo (GetFileMetaInfoRequest) returns (GetFileMetaInfoResponse) {}
 
   // удалить файл
+  rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse) {}
 
   // сохранить/заменить файл
+  rpc PutFile (PutFileRequest) returns (PutFileResponse) {}
 
   // получить список мета-информацю всех (или отрезком) файлов
-
-}
+  rpc GetManyFilesMetaInfo (GetManyFilesMetaInfoRequest) returns (GetManyFilesMetaInfoResponse) {}
+};
 
 message PingRequest {
   //
-}
+};
 message PingResponse {
   string pong = 1;
-}
+};
+
+// методы работы с файлами
+
+message AddFileRequest {
+  // идентификатор хранилища: s3, ftp
+  string storage = 1;
+  // уникальный путь /a/b/file.txt
+  string path = 2;
+  // имя файла file.txt
+  string filename = 3;
+  // сам файл
+  bytes file = 4;
+};
+message AddFileResponse {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+};
+
+message GetFileRequest {
+  string storage = 1;
+  string path = 2;
+};
+message GetFileResponse {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+  bytes file = 4;
+};
+
+message GetFileMetaInfoRequest {
+  string storage = 1;
+  string path = 2;
+};
+message GetFileMetaInfoResponse {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+};
+
+message DeleteFileRequest {
+  string storage = 1;
+  string path = 2;
+};
+message DeleteFileResponse {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+};
+
+message PutFileRequest {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+  bytes file = 4;
+};
+message PutFileResponse {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+};
+
+message GetManyFilesMetaInfoRequest {
+  string storage = 1;
+  uint32 start = 2; // например, 1
+  uint32 end = 3;   //        -> 10
+};
+message GetManyFilesMetaInfoResponse {
+  string TODO = 1;
+};

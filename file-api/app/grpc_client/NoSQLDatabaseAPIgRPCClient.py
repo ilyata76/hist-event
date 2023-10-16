@@ -15,7 +15,7 @@ class NoSQLDatabaseAPIgRPCClient :
     """
 
     @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:/ping")
+    @AbstractgRPCClient.method("nosql-database-api:Ping")
     async def Ping() :
         with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
             stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)

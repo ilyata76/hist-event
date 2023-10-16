@@ -40,7 +40,7 @@ class FileDB(AbstractDB) :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="FileDB не реализует метод get!")
 
     @AbstractDB.method
-    async def getMany(self, start_pos : int, length : int, storage_identifier : str) -> list[File] | None :
+    async def getMany(self, range : Range, storage_identifier : str) -> list[File] | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="FileDB не реализует метод getAll!")
 
 
@@ -66,7 +66,7 @@ class FileMongoDB(FileDB) :
         res = None
 
         async with await self.client.client.start_session() as s :
-            exist = await self.db[file.storage].find_one({DATABASE_PATH_PATH: file.path}, session=s)
+            exist = await self.db[file.storage].find_one({DATABASE_PATH_PATH: str(file.path)}, session=s)
             if exist :
                 raise DBException(code=DBExceptionCode.ENTITY_EXISTS, detail="Такой уже существует!")
             
@@ -85,7 +85,7 @@ class FileMongoDB(FileDB) :
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[file.storage].find_one_and_replace({DATABASE_PATH_PATH : file.path}, 
+            res = await self.db[file.storage].find_one_and_replace({DATABASE_PATH_PATH : str(file.path)}, 
                                                                    {FILE_KEY: file.model_dump()}, 
                                                                    session=s)
             if not res : 
@@ -105,7 +105,7 @@ class FileMongoDB(FileDB) :
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[file.storage].find_one({DATABASE_PATH_PATH : file.path}, session=s)
+            res = await self.db[file.storage].find_one({DATABASE_PATH_PATH : str(file.path)}, session=s)
             if not res :
                 raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS, detail="Сущности для удаления не существует!")
             await self.db[file.storage].delete_one({"_id": res["_id"]}, session=s)
@@ -124,7 +124,7 @@ class FileMongoDB(FileDB) :
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[file.storage].find_one({DATABASE_PATH_PATH : file.path}, session=s)
+            res = await self.db[file.storage].find_one({DATABASE_PATH_PATH : str(file.path)}, session=s)
             if not res :
                 raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS, detail="Сущности не существует!")
 

@@ -1,4 +1,5 @@
 #
+files/*
 *.log.zip
 files/hist-event/sqls/*.sql
 files/hist-event/yamls/*.yaml

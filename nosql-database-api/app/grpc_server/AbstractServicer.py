@@ -19,6 +19,7 @@ class AbstractServicer :
     def logPrefix(path : str, peer : str, code : str) :
         return f"[SERVER][{peer}] : {path} : {code}"
 
+    @staticmethod
     def method(path : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование

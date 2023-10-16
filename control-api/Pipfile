@@ -9,6 +9,7 @@ grpcio-tools = "*"
 fastapi = "*"
 uvicorn = "*"
 loguru = "*"
+python-multipart = "*"
 
 [dev-packages]
 

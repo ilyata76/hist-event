@@ -94,4 +94,9 @@ class LogCode :
     ERROR = "ERROR"
 
 
+class StorageIdentifier :
+    FTP = "ftp"
+    S3 = "s3"
+
+
 config = Config()

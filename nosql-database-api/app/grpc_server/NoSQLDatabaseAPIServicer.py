@@ -15,6 +15,6 @@ class NoSQLDatabaseAPIServicer(pb2_grpc.NoSQLDatabaseAPIServicer) :
         Логика сервера (сервисер))
     """
   
-    @AbstractServicer.method("nosql-database-api:/ping")
+    @AbstractServicer.method("nosql-database-api:Ping")
     async def Ping(self, request : pb2.PingRequest, context : grpc.ServicerContext):
         return pb2.PingResponse(pong="Pong!")

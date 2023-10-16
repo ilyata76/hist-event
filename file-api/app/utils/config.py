@@ -62,7 +62,7 @@ class Config :
         return self.__FTP_PASSWORD
 
     @property
-    def FTP_PORT(self) -> str :
+    def FTP_PORT(self) -> int :
         try : 
             if not hasattr(self, "_Config__FTP_PORT") :
                 self.__FTP_PORT = int(environ.get("FTP_PORT", 21))
@@ -136,6 +136,11 @@ class LogCode :
     PENDING = "PENDING"
     SUCCESS = "SUCCESS"
     ERROR = "ERROR"
+
+
+class StorageIdentifier :
+    FTP = "ftp"
+    S3 = "s3"
 
 
 config = Config()

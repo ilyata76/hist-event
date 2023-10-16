@@ -17,27 +17,29 @@ ping = APIRouter(prefix="/ping")
          name="ping?",
          response_model=PongReponse,
          description="Проверить работоспособность REST")
-@log_and_except("/ping")
+@log_and_except
 async def getPingRoot(request : Request) -> PongReponse:
     return PongReponse(pong="pong", 
                        service="control-api-REST")
+
 
 @ping.get("/nosql-database-api",
          tags=["ping"],
          name="ping?",
          response_model=PongReponse,
          description="Проверить работоспособность gRPC-сервера с NoSQL базой данных")
-@log_and_except("/ping/nosql-database-api")
+@log_and_except
 async def getPingNoSQLDatabaseAPI(request : Request) -> PongReponse:
     return PongReponse(pong=(await NoSQLDatabaseAPIgRPCClient.Ping()).pong, 
                        service="nosql-database-api-GRPC")
+
 
 @ping.get("/file-api",
          tags=["ping"],
          name="ping?",
          response_model=PongReponse,
          description="Проверить работоспособность gRPC-сервера с FileAPI")
-@log_and_except("/ping/file-api")
+@log_and_except
 async def getPingFileAPI(request : Request) -> PongReponse:
     return PongReponse(pong=(await FileAPIgRPCCLient.Ping()).pong, 
                        service="file-api-GRPC")

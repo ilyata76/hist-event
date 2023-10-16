@@ -6,7 +6,9 @@ import proto.file_api_pb2 as file__api__pb2
 
 
 class FileAPIStub(object):
-    """Missing associated documentation comment in .proto file."""
+    """сервис по управлению файлами:
+    получать, отдавать, сохранять и пр. 
+    """
 
     def __init__(self, channel):
         """Constructor.
@@ -19,13 +21,87 @@ class FileAPIStub(object):
                 request_serializer=file__api__pb2.PingRequest.SerializeToString,
                 response_deserializer=file__api__pb2.PingResponse.FromString,
                 )
+        self.AddFile = channel.unary_unary(
+                '/file_api.FileAPI/AddFile',
+                request_serializer=file__api__pb2.AddFileRequest.SerializeToString,
+                response_deserializer=file__api__pb2.AddFileResponse.FromString,
+                )
+        self.GetFile = channel.unary_unary(
+                '/file_api.FileAPI/GetFile',
+                request_serializer=file__api__pb2.GetFileRequest.SerializeToString,
+                response_deserializer=file__api__pb2.GetFileResponse.FromString,
+                )
+        self.GetFileMetaInfo = channel.unary_unary(
+                '/file_api.FileAPI/GetFileMetaInfo',
+                request_serializer=file__api__pb2.GetFileMetaInfoRequest.SerializeToString,
+                response_deserializer=file__api__pb2.GetFileMetaInfoResponse.FromString,
+                )
+        self.DeleteFile = channel.unary_unary(
+                '/file_api.FileAPI/DeleteFile',
+                request_serializer=file__api__pb2.DeleteFileRequest.SerializeToString,
+                response_deserializer=file__api__pb2.DeleteFileResponse.FromString,
+                )
+        self.PutFile = channel.unary_unary(
+                '/file_api.FileAPI/PutFile',
+                request_serializer=file__api__pb2.PutFileRequest.SerializeToString,
+                response_deserializer=file__api__pb2.PutFileResponse.FromString,
+                )
+        self.GetManyFilesMetaInfo = channel.unary_unary(
+                '/file_api.FileAPI/GetManyFilesMetaInfo',
+                request_serializer=file__api__pb2.GetManyFilesMetaInfoRequest.SerializeToString,
+                response_deserializer=file__api__pb2.GetManyFilesMetaInfoResponse.FromString,
+                )
 
 
 class FileAPIServicer(object):
-    """Missing associated documentation comment in .proto file."""
+    """сервис по управлению файлами:
+    получать, отдавать, сохранять и пр. 
+    """
 
     def Ping(self, request, context):
         """проверить работоспособность
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def AddFile(self, request, context):
+        """загрузить файл
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetFile(self, request, context):
+        """получить файл
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetFileMetaInfo(self, request, context):
+        """получить мета-информацию о файле (сгодится для проверки существования файла)
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteFile(self, request, context):
+        """удалить файл
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PutFile(self, request, context):
+        """сохранить/заменить файл
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetManyFilesMetaInfo(self, request, context):
+        """получить список мета-информацю всех (или отрезком) файлов
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -39,6 +115,36 @@ def add_FileAPIServicer_to_server(servicer, server):
                     request_deserializer=file__api__pb2.PingRequest.FromString,
                     response_serializer=file__api__pb2.PingResponse.SerializeToString,
             ),
+            'AddFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddFile,
+                    request_deserializer=file__api__pb2.AddFileRequest.FromString,
+                    response_serializer=file__api__pb2.AddFileResponse.SerializeToString,
+            ),
+            'GetFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFile,
+                    request_deserializer=file__api__pb2.GetFileRequest.FromString,
+                    response_serializer=file__api__pb2.GetFileResponse.SerializeToString,
+            ),
+            'GetFileMetaInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFileMetaInfo,
+                    request_deserializer=file__api__pb2.GetFileMetaInfoRequest.FromString,
+                    response_serializer=file__api__pb2.GetFileMetaInfoResponse.SerializeToString,
+            ),
+            'DeleteFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteFile,
+                    request_deserializer=file__api__pb2.DeleteFileRequest.FromString,
+                    response_serializer=file__api__pb2.DeleteFileResponse.SerializeToString,
+            ),
+            'PutFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.PutFile,
+                    request_deserializer=file__api__pb2.PutFileRequest.FromString,
+                    response_serializer=file__api__pb2.PutFileResponse.SerializeToString,
+            ),
+            'GetManyFilesMetaInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetManyFilesMetaInfo,
+                    request_deserializer=file__api__pb2.GetManyFilesMetaInfoRequest.FromString,
+                    response_serializer=file__api__pb2.GetManyFilesMetaInfoResponse.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'file_api.FileAPI', rpc_method_handlers)
@@ -47,7 +153,9 @@ def add_FileAPIServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class FileAPI(object):
-    """Missing associated documentation comment in .proto file."""
+    """сервис по управлению файлами:
+    получать, отдавать, сохранять и пр. 
+    """
 
     @staticmethod
     def Ping(request,
@@ -63,5 +171,107 @@ class FileAPI(object):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/Ping',
             file__api__pb2.PingRequest.SerializeToString,
             file__api__pb2.PingResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def AddFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/AddFile',
+            file__api__pb2.AddFileRequest.SerializeToString,
+            file__api__pb2.AddFileResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/GetFile',
+            file__api__pb2.GetFileRequest.SerializeToString,
+            file__api__pb2.GetFileResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetFileMetaInfo(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/GetFileMetaInfo',
+            file__api__pb2.GetFileMetaInfoRequest.SerializeToString,
+            file__api__pb2.GetFileMetaInfoResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/DeleteFile',
+            file__api__pb2.DeleteFileRequest.SerializeToString,
+            file__api__pb2.DeleteFileResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def PutFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/PutFile',
+            file__api__pb2.PutFileRequest.SerializeToString,
+            file__api__pb2.PutFileResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetManyFilesMetaInfo(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/GetManyFilesMetaInfo',
+            file__api__pb2.GetManyFilesMetaInfoRequest.SerializeToString,
+            file__api__pb2.GetManyFilesMetaInfoResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
