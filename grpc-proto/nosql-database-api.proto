@@ -12,23 +12,59 @@ package nosql_database_api;
 service NoSQLDatabaseAPI {
 
   // проверить работоспособность
-  rpc Ping (PingRequest) returns (PingResponse) {}
+  rpc Ping (PingR) returns (PongR) {}
 
   // сохранить мета-информацию о файле в базе
+  rpc AddFileMetaInfo (FileR) returns (FileR) {}
 
   // сохранить/заменить (запомнить) мета-информацию о файле в базе
+  rpc PutFileMetaInfo (FileR) returns (FileR) {}
 
   // удалить (забыть) мета-информацию о файле в базе
+  rpc DeleteFileMetaInfo (FileBaseR) returns (FileR) {}
 
   // получить мета-информацию файла
+  rpc GetFileMetaInfo (FileBaseR) returns (FileR) {}
 
-  // получить несколько (отрезком) файлов из базы (мета-информацию о них)
-
+  // получить список мета-информацю всех (или отрезком) файлов
+  rpc GetManyFilesMetaInfo (StorageSegmentR) returns (FileSegmentR) {}
 }
 
-message PingRequest {
+message PingR {
   //
 };
-message PingResponse {
+message PongR {
   string pong = 1;
+};
+
+// методы работы с файлами
+
+message FileR {
+  File file = 1;
+};
+message FileBaseR {
+  FileBase file = 1;
+};
+
+//
+
+message StorageSegmentR {
+  string storage = 1;
+  uint32 start = 2; // например, 1
+  uint32 end = 3;   //        -> 10
+};
+message FileSegmentR {
+  repeated File files = 1;
+};
+
+// классы
+
+message FileBase {
+  string storage = 1;
+  string path = 2;
+};
+message File {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
 };

@@ -13,37 +13,29 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18nosql-database-api.proto\x12\x12nosql_database_api\"\r\n\x0bPingRequest\"\x1c\n\x0cPingResponse\x12\x0c\n\x04pong\x18\x01 \x01(\t\"0\n\x0ePutFileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"1\n\x0fPutFileResponse\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"%\n\x11\x44\x65leteFileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"4\n\x12\x44\x65leteFileResponse\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"0\n\x0e\x41\x64\x64\x46ileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"1\n\x0f\x41\x64\x64\x46ileResponse\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"\"\n\x0eGetFileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\"1\n\x0fGetFileResponse\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"7\n\x13GetManyFilesRequest\x12\x11\n\tstart_pos\x18\x01 \x01(\x05\x12\r\n\x05limit\x18\x02 \x01(\x05\"$\n\x14GetManyFilesResponse\x12\x0c\n\x04TODO\x18\x01 \x01(\t2\xa5\x04\n\x10NoSQLDatabaseAPI\x12K\n\x04Ping\x12\x1f.nosql_database_api.PingRequest\x1a .nosql_database_api.PingResponse\"\x00\x12T\n\x07\x41\x64\x64\x46ile\x12\".nosql_database_api.AddFileRequest\x1a#.nosql_database_api.AddFileResponse\"\x00\x12T\n\x07PutFile\x12\".nosql_database_api.PutFileRequest\x1a#.nosql_database_api.PutFileResponse\"\x00\x12]\n\nDeleteFile\x12%.nosql_database_api.DeleteFileRequest\x1a&.nosql_database_api.DeleteFileResponse\"\x00\x12T\n\x07GetFile\x12\".nosql_database_api.GetFileRequest\x1a#.nosql_database_api.GetFileResponse\"\x00\x12\x63\n\x0cGetManyFiles\x12\'.nosql_database_api.GetManyFilesRequest\x1a(.nosql_database_api.GetManyFilesResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18nosql-database-api.proto\x12\x12nosql_database_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"/\n\x05\x46ileR\x12&\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x18.nosql_database_api.File\"7\n\tFileBaseR\x12*\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x1c.nosql_database_api.FileBase\">\n\x0fStorageSegmentR\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\r\n\x05start\x18\x02 \x01(\r\x12\x0b\n\x03\x65nd\x18\x03 \x01(\r\"7\n\x0c\x46ileSegmentR\x12\'\n\x05\x66iles\x18\x01 \x03(\x0b\x32\x18.nosql_database_api.File\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"7\n\x04\x46ile\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t2\xea\x03\n\x10NoSQLDatabaseAPI\x12>\n\x04Ping\x12\x19.nosql_database_api.PingR\x1a\x19.nosql_database_api.PongR\"\x00\x12I\n\x0f\x41\x64\x64\x46ileMetaInfo\x12\x19.nosql_database_api.FileR\x1a\x19.nosql_database_api.FileR\"\x00\x12I\n\x0fPutFileMetaInfo\x12\x19.nosql_database_api.FileR\x1a\x19.nosql_database_api.FileR\"\x00\x12P\n\x12\x44\x65leteFileMetaInfo\x12\x1d.nosql_database_api.FileBaseR\x1a\x19.nosql_database_api.FileR\"\x00\x12M\n\x0fGetFileMetaInfo\x12\x1d.nosql_database_api.FileBaseR\x1a\x19.nosql_database_api.FileR\"\x00\x12_\n\x14GetManyFilesMetaInfo\x12#.nosql_database_api.StorageSegmentR\x1a .nosql_database_api.FileSegmentR\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'nosql_database_api_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_PINGREQUEST']._serialized_start=48
-  _globals['_PINGREQUEST']._serialized_end=61
-  _globals['_PINGRESPONSE']._serialized_start=63
-  _globals['_PINGRESPONSE']._serialized_end=91
-  _globals['_PUTFILEREQUEST']._serialized_start=93
-  _globals['_PUTFILEREQUEST']._serialized_end=141
-  _globals['_PUTFILERESPONSE']._serialized_start=143
-  _globals['_PUTFILERESPONSE']._serialized_end=192
-  _globals['_DELETEFILEREQUEST']._serialized_start=194
-  _globals['_DELETEFILEREQUEST']._serialized_end=231
-  _globals['_DELETEFILERESPONSE']._serialized_start=233
-  _globals['_DELETEFILERESPONSE']._serialized_end=285
-  _globals['_ADDFILEREQUEST']._serialized_start=287
-  _globals['_ADDFILEREQUEST']._serialized_end=335
-  _globals['_ADDFILERESPONSE']._serialized_start=337
-  _globals['_ADDFILERESPONSE']._serialized_end=386
-  _globals['_GETFILEREQUEST']._serialized_start=388
-  _globals['_GETFILEREQUEST']._serialized_end=422
-  _globals['_GETFILERESPONSE']._serialized_start=424
-  _globals['_GETFILERESPONSE']._serialized_end=473
-  _globals['_GETMANYFILESREQUEST']._serialized_start=475
-  _globals['_GETMANYFILESREQUEST']._serialized_end=530
-  _globals['_GETMANYFILESRESPONSE']._serialized_start=532
-  _globals['_GETMANYFILESRESPONSE']._serialized_end=568
-  _globals['_NOSQLDATABASEAPI']._serialized_start=571
-  _globals['_NOSQLDATABASEAPI']._serialized_end=1120
+  _globals['_PINGR']._serialized_start=48
+  _globals['_PINGR']._serialized_end=55
+  _globals['_PONGR']._serialized_start=57
+  _globals['_PONGR']._serialized_end=78
+  _globals['_FILER']._serialized_start=80
+  _globals['_FILER']._serialized_end=127
+  _globals['_FILEBASER']._serialized_start=129
+  _globals['_FILEBASER']._serialized_end=184
+  _globals['_STORAGESEGMENTR']._serialized_start=186
+  _globals['_STORAGESEGMENTR']._serialized_end=248
+  _globals['_FILESEGMENTR']._serialized_start=250
+  _globals['_FILESEGMENTR']._serialized_end=305
+  _globals['_FILEBASE']._serialized_start=307
+  _globals['_FILEBASE']._serialized_end=348
+  _globals['_FILE']._serialized_start=350
+  _globals['_FILE']._serialized_end=405
+  _globals['_NOSQLDATABASEAPI']._serialized_start=408
+  _globals['_NOSQLDATABASEAPI']._serialized_end=898
 # @@protoc_insertion_point(module_scope)

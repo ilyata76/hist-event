@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66ile-api.proto\x12\x08\x66ile_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"1\n\x0b\x46ileBinaryR\x12\"\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x14.file_api.FileBinary\"%\n\x05\x46ileR\x12\x1c\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x0e.file_api.File\"-\n\tFileBaseR\x12 \n\x04\x66ile\x18\x01 \x01(\x0b\x32\x12.file_api.FileBase\"J\n\x1bGetManyFilesMetaInfoRequest\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\r\n\x05start\x18\x02 \x01(\r\x12\x0b\n\x03\x65nd\x18\x03 \x01(\r\",\n\x1cGetManyFilesMetaInfoResponse\x12\x0c\n\x04TODO\x18\x01 \x03(\t\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"7\n\x04\x46ile\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\"K\n\nFileBinary\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\x12\x0c\n\x04\x66ile\x18\x04 \x01(\x0c\x32\xb2\x03\n\x07\x46ileAPI\x12*\n\x04Ping\x12\x0f.file_api.PingR\x1a\x0f.file_api.PongR\"\x00\x12\x33\n\x07\x41\x64\x64\x46ile\x12\x15.file_api.FileBinaryR\x1a\x0f.file_api.FileR\"\x00\x12\x37\n\x07GetFile\x12\x13.file_api.FileBaseR\x1a\x15.file_api.FileBinaryR\"\x00\x12\x39\n\x0fGetFileMetaInfo\x12\x13.file_api.FileBaseR\x1a\x0f.file_api.FileR\"\x00\x12\x34\n\nDeleteFile\x12\x13.file_api.FileBaseR\x1a\x0f.file_api.FileR\"\x00\x12\x33\n\x07PutFile\x12\x15.file_api.FileBinaryR\x1a\x0f.file_api.FileR\"\x00\x12g\n\x14GetManyFilesMetaInfo\x12%.file_api.GetManyFilesMetaInfoRequest\x1a&.file_api.GetManyFilesMetaInfoResponse\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0e\x66ile-api.proto\x12\x08\x66ile_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"1\n\x0b\x46ileBinaryR\x12\"\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x14.file_api.FileBinary\"%\n\x05\x46ileR\x12\x1c\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x0e.file_api.File\"-\n\tFileBaseR\x12 \n\x04\x66ile\x18\x01 \x01(\x0b\x32\x12.file_api.FileBase\">\n\x0fStorageSegmentR\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\r\n\x05start\x18\x02 \x01(\r\x12\x0b\n\x03\x65nd\x18\x03 \x01(\r\"-\n\x0c\x46ileSegmentR\x12\x1d\n\x05\x66iles\x18\x01 \x03(\x0b\x32\x0e.file_api.File\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"7\n\x04\x46ile\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\"K\n\nFileBinary\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\x12\x0c\n\x04\x66ile\x18\x04 \x01(\x0c\x32\x96\x03\n\x07\x46ileAPI\x12*\n\x04Ping\x12\x0f.file_api.PingR\x1a\x0f.file_api.PongR\"\x00\x12\x33\n\x07\x41\x64\x64\x46ile\x12\x15.file_api.FileBinaryR\x1a\x0f.file_api.FileR\"\x00\x12\x37\n\x07GetFile\x12\x13.file_api.FileBaseR\x1a\x15.file_api.FileBinaryR\"\x00\x12\x39\n\x0fGetFileMetaInfo\x12\x13.file_api.FileBaseR\x1a\x0f.file_api.FileR\"\x00\x12\x34\n\nDeleteFile\x12\x13.file_api.FileBaseR\x1a\x0f.file_api.FileR\"\x00\x12\x33\n\x07PutFile\x12\x15.file_api.FileBinaryR\x1a\x0f.file_api.FileR\"\x00\x12K\n\x14GetManyFilesMetaInfo\x12\x19.file_api.StorageSegmentR\x1a\x16.file_api.FileSegmentR\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -30,16 +30,16 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_FILER']._serialized_end=148
   _globals['_FILEBASER']._serialized_start=150
   _globals['_FILEBASER']._serialized_end=195
-  _globals['_GETMANYFILESMETAINFOREQUEST']._serialized_start=197
-  _globals['_GETMANYFILESMETAINFOREQUEST']._serialized_end=271
-  _globals['_GETMANYFILESMETAINFORESPONSE']._serialized_start=273
-  _globals['_GETMANYFILESMETAINFORESPONSE']._serialized_end=317
-  _globals['_FILEBASE']._serialized_start=319
-  _globals['_FILEBASE']._serialized_end=360
-  _globals['_FILE']._serialized_start=362
-  _globals['_FILE']._serialized_end=417
-  _globals['_FILEBINARY']._serialized_start=419
-  _globals['_FILEBINARY']._serialized_end=494
-  _globals['_FILEAPI']._serialized_start=497
-  _globals['_FILEAPI']._serialized_end=931
+  _globals['_STORAGESEGMENTR']._serialized_start=197
+  _globals['_STORAGESEGMENTR']._serialized_end=259
+  _globals['_FILESEGMENTR']._serialized_start=261
+  _globals['_FILESEGMENTR']._serialized_end=306
+  _globals['_FILEBASE']._serialized_start=308
+  _globals['_FILEBASE']._serialized_end=349
+  _globals['_FILE']._serialized_start=351
+  _globals['_FILE']._serialized_end=406
+  _globals['_FILEBINARY']._serialized_start=408
+  _globals['_FILEBINARY']._serialized_end=483
+  _globals['_FILEAPI']._serialized_start=486
+  _globals['_FILEAPI']._serialized_end=892
 # @@protoc_insertion_point(module_scope)

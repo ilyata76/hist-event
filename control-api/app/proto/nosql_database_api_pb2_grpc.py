@@ -18,33 +18,33 @@ class NoSQLDatabaseAPIStub(object):
         """
         self.Ping = channel.unary_unary(
                 '/nosql_database_api.NoSQLDatabaseAPI/Ping',
-                request_serializer=nosql__database__api__pb2.PingRequest.SerializeToString,
-                response_deserializer=nosql__database__api__pb2.PingResponse.FromString,
+                request_serializer=nosql__database__api__pb2.PingR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.PongR.FromString,
                 )
-        self.AddFile = channel.unary_unary(
-                '/nosql_database_api.NoSQLDatabaseAPI/AddFile',
-                request_serializer=nosql__database__api__pb2.AddFileRequest.SerializeToString,
-                response_deserializer=nosql__database__api__pb2.AddFileResponse.FromString,
+        self.AddFileMetaInfo = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/AddFileMetaInfo',
+                request_serializer=nosql__database__api__pb2.FileR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.FileR.FromString,
                 )
-        self.PutFile = channel.unary_unary(
-                '/nosql_database_api.NoSQLDatabaseAPI/PutFile',
-                request_serializer=nosql__database__api__pb2.PutFileRequest.SerializeToString,
-                response_deserializer=nosql__database__api__pb2.PutFileResponse.FromString,
+        self.PutFileMetaInfo = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/PutFileMetaInfo',
+                request_serializer=nosql__database__api__pb2.FileR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.FileR.FromString,
                 )
-        self.DeleteFile = channel.unary_unary(
-                '/nosql_database_api.NoSQLDatabaseAPI/DeleteFile',
-                request_serializer=nosql__database__api__pb2.DeleteFileRequest.SerializeToString,
-                response_deserializer=nosql__database__api__pb2.DeleteFileResponse.FromString,
+        self.DeleteFileMetaInfo = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/DeleteFileMetaInfo',
+                request_serializer=nosql__database__api__pb2.FileBaseR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.FileR.FromString,
                 )
-        self.GetFile = channel.unary_unary(
-                '/nosql_database_api.NoSQLDatabaseAPI/GetFile',
-                request_serializer=nosql__database__api__pb2.GetFileRequest.SerializeToString,
-                response_deserializer=nosql__database__api__pb2.GetFileResponse.FromString,
+        self.GetFileMetaInfo = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/GetFileMetaInfo',
+                request_serializer=nosql__database__api__pb2.FileBaseR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.FileR.FromString,
                 )
-        self.GetManyFiles = channel.unary_unary(
-                '/nosql_database_api.NoSQLDatabaseAPI/GetManyFiles',
-                request_serializer=nosql__database__api__pb2.GetManyFilesRequest.SerializeToString,
-                response_deserializer=nosql__database__api__pb2.GetManyFilesResponse.FromString,
+        self.GetManyFilesMetaInfo = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/GetManyFilesMetaInfo',
+                request_serializer=nosql__database__api__pb2.StorageSegmentR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.FileSegmentR.FromString,
                 )
 
 
@@ -60,36 +60,36 @@ class NoSQLDatabaseAPIServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def AddFile(self, request, context):
-        """сохранить файл в базе
+    def AddFileMetaInfo(self, request, context):
+        """сохранить мета-информацию о файле в базе
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def PutFile(self, request, context):
-        """сохранить/заменить (запомнить) файл в базе
+    def PutFileMetaInfo(self, request, context):
+        """сохранить/заменить (запомнить) мета-информацию о файле в базе
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def DeleteFile(self, request, context):
-        """удалить (забыть) файл в базе
+    def DeleteFileMetaInfo(self, request, context):
+        """удалить (забыть) мета-информацию о файле в базе
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetFile(self, request, context):
-        """получить файл из базы
+    def GetFileMetaInfo(self, request, context):
+        """получить мета-информацию файла
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetManyFiles(self, request, context):
-        """получить несколько файлов из базы
+    def GetManyFilesMetaInfo(self, request, context):
+        """получить список мета-информацю всех (или отрезком) файлов
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -100,33 +100,33 @@ def add_NoSQLDatabaseAPIServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Ping': grpc.unary_unary_rpc_method_handler(
                     servicer.Ping,
-                    request_deserializer=nosql__database__api__pb2.PingRequest.FromString,
-                    response_serializer=nosql__database__api__pb2.PingResponse.SerializeToString,
+                    request_deserializer=nosql__database__api__pb2.PingR.FromString,
+                    response_serializer=nosql__database__api__pb2.PongR.SerializeToString,
             ),
-            'AddFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.AddFile,
-                    request_deserializer=nosql__database__api__pb2.AddFileRequest.FromString,
-                    response_serializer=nosql__database__api__pb2.AddFileResponse.SerializeToString,
+            'AddFileMetaInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.AddFileMetaInfo,
+                    request_deserializer=nosql__database__api__pb2.FileR.FromString,
+                    response_serializer=nosql__database__api__pb2.FileR.SerializeToString,
             ),
-            'PutFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.PutFile,
-                    request_deserializer=nosql__database__api__pb2.PutFileRequest.FromString,
-                    response_serializer=nosql__database__api__pb2.PutFileResponse.SerializeToString,
+            'PutFileMetaInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.PutFileMetaInfo,
+                    request_deserializer=nosql__database__api__pb2.FileR.FromString,
+                    response_serializer=nosql__database__api__pb2.FileR.SerializeToString,
             ),
-            'DeleteFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteFile,
-                    request_deserializer=nosql__database__api__pb2.DeleteFileRequest.FromString,
-                    response_serializer=nosql__database__api__pb2.DeleteFileResponse.SerializeToString,
+            'DeleteFileMetaInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteFileMetaInfo,
+                    request_deserializer=nosql__database__api__pb2.FileBaseR.FromString,
+                    response_serializer=nosql__database__api__pb2.FileR.SerializeToString,
             ),
-            'GetFile': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetFile,
-                    request_deserializer=nosql__database__api__pb2.GetFileRequest.FromString,
-                    response_serializer=nosql__database__api__pb2.GetFileResponse.SerializeToString,
+            'GetFileMetaInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFileMetaInfo,
+                    request_deserializer=nosql__database__api__pb2.FileBaseR.FromString,
+                    response_serializer=nosql__database__api__pb2.FileR.SerializeToString,
             ),
-            'GetManyFiles': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetManyFiles,
-                    request_deserializer=nosql__database__api__pb2.GetManyFilesRequest.FromString,
-                    response_serializer=nosql__database__api__pb2.GetManyFilesResponse.SerializeToString,
+            'GetManyFilesMetaInfo': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetManyFilesMetaInfo,
+                    request_deserializer=nosql__database__api__pb2.StorageSegmentR.FromString,
+                    response_serializer=nosql__database__api__pb2.FileSegmentR.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -152,13 +152,13 @@ class NoSQLDatabaseAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/Ping',
-            nosql__database__api__pb2.PingRequest.SerializeToString,
-            nosql__database__api__pb2.PingResponse.FromString,
+            nosql__database__api__pb2.PingR.SerializeToString,
+            nosql__database__api__pb2.PongR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def AddFile(request,
+    def AddFileMetaInfo(request,
             target,
             options=(),
             channel_credentials=None,
@@ -168,14 +168,14 @@ class NoSQLDatabaseAPI(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/AddFile',
-            nosql__database__api__pb2.AddFileRequest.SerializeToString,
-            nosql__database__api__pb2.AddFileResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/AddFileMetaInfo',
+            nosql__database__api__pb2.FileR.SerializeToString,
+            nosql__database__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def PutFile(request,
+    def PutFileMetaInfo(request,
             target,
             options=(),
             channel_credentials=None,
@@ -185,14 +185,14 @@ class NoSQLDatabaseAPI(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/PutFile',
-            nosql__database__api__pb2.PutFileRequest.SerializeToString,
-            nosql__database__api__pb2.PutFileResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/PutFileMetaInfo',
+            nosql__database__api__pb2.FileR.SerializeToString,
+            nosql__database__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def DeleteFile(request,
+    def DeleteFileMetaInfo(request,
             target,
             options=(),
             channel_credentials=None,
@@ -202,14 +202,14 @@ class NoSQLDatabaseAPI(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/DeleteFile',
-            nosql__database__api__pb2.DeleteFileRequest.SerializeToString,
-            nosql__database__api__pb2.DeleteFileResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/DeleteFileMetaInfo',
+            nosql__database__api__pb2.FileBaseR.SerializeToString,
+            nosql__database__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetFile(request,
+    def GetFileMetaInfo(request,
             target,
             options=(),
             channel_credentials=None,
@@ -219,14 +219,14 @@ class NoSQLDatabaseAPI(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetFile',
-            nosql__database__api__pb2.GetFileRequest.SerializeToString,
-            nosql__database__api__pb2.GetFileResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetFileMetaInfo',
+            nosql__database__api__pb2.FileBaseR.SerializeToString,
+            nosql__database__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetManyFiles(request,
+    def GetManyFilesMetaInfo(request,
             target,
             options=(),
             channel_credentials=None,
@@ -236,8 +236,8 @@ class NoSQLDatabaseAPI(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetManyFiles',
-            nosql__database__api__pb2.GetManyFilesRequest.SerializeToString,
-            nosql__database__api__pb2.GetManyFilesResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetManyFilesMetaInfo',
+            nosql__database__api__pb2.StorageSegmentR.SerializeToString,
+            nosql__database__api__pb2.FileSegmentR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -48,8 +48,8 @@ class FileAPIStub(object):
                 )
         self.GetManyFilesMetaInfo = channel.unary_unary(
                 '/file_api.FileAPI/GetManyFilesMetaInfo',
-                request_serializer=file__api__pb2.GetManyFilesMetaInfoRequest.SerializeToString,
-                response_deserializer=file__api__pb2.GetManyFilesMetaInfoResponse.FromString,
+                request_serializer=file__api__pb2.StorageSegmentR.SerializeToString,
+                response_deserializer=file__api__pb2.FileSegmentR.FromString,
                 )
 
 
@@ -142,8 +142,8 @@ def add_FileAPIServicer_to_server(servicer, server):
             ),
             'GetManyFilesMetaInfo': grpc.unary_unary_rpc_method_handler(
                     servicer.GetManyFilesMetaInfo,
-                    request_deserializer=file__api__pb2.GetManyFilesMetaInfoRequest.FromString,
-                    response_serializer=file__api__pb2.GetManyFilesMetaInfoResponse.SerializeToString,
+                    request_deserializer=file__api__pb2.StorageSegmentR.FromString,
+                    response_serializer=file__api__pb2.FileSegmentR.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -271,7 +271,7 @@ class FileAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/GetManyFilesMetaInfo',
-            file__api__pb2.GetManyFilesMetaInfoRequest.SerializeToString,
-            file__api__pb2.GetManyFilesMetaInfoResponse.FromString,
+            file__api__pb2.StorageSegmentR.SerializeToString,
+            file__api__pb2.FileSegmentR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -33,7 +33,7 @@ class FileBaseR(_message.Message):
     file: FileBase
     def __init__(self, file: _Optional[_Union[FileBase, _Mapping]] = ...) -> None: ...
 
-class GetManyFilesMetaInfoRequest(_message.Message):
+class StorageSegmentR(_message.Message):
     __slots__ = ["storage", "start", "end"]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
     START_FIELD_NUMBER: _ClassVar[int]
@@ -43,11 +43,11 @@ class GetManyFilesMetaInfoRequest(_message.Message):
     end: int
     def __init__(self, storage: _Optional[str] = ..., start: _Optional[int] = ..., end: _Optional[int] = ...) -> None: ...
 
-class GetManyFilesMetaInfoResponse(_message.Message):
-    __slots__ = ["TODO"]
-    TODO_FIELD_NUMBER: _ClassVar[int]
-    TODO: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, TODO: _Optional[_Iterable[str]] = ...) -> None: ...
+class FileSegmentR(_message.Message):
+    __slots__ = ["files"]
+    FILES_FIELD_NUMBER: _ClassVar[int]
+    files: _containers.RepeatedCompositeFieldContainer[File]
+    def __init__(self, files: _Optional[_Iterable[_Union[File, _Mapping]]] = ...) -> None: ...
 
 class FileBase(_message.Message):
     __slots__ = ["storage", "path"]

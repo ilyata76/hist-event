@@ -39,5 +39,5 @@ from app.rest_api.ping import ping
 api.include_router(router=ping)
 
 
-from app.rest_api.file_ftp import file_ftp
-api.include_router(router=file_ftp)
+from app.rest_api.file import file
+api.include_router(router=file)

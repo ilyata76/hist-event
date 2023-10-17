@@ -29,7 +29,7 @@ service FileAPI {
   rpc PutFile (FileBinaryR) returns (FileR) {}
 
   // получить список мета-информацю всех (или отрезком) файлов
-  rpc GetManyFilesMetaInfo (GetManyFilesMetaInfoRequest) returns (GetManyFilesMetaInfoResponse) {}
+  rpc GetManyFilesMetaInfo (StorageSegmentR) returns (FileSegmentR) {}
 };
 
 message PingR {
@@ -53,13 +53,13 @@ message FileBaseR {
 
 //
 
-message GetManyFilesMetaInfoRequest {
+message StorageSegmentR {
   string storage = 1;
   uint32 start = 2; // например, 1
   uint32 end = 3;   //        -> 10
 };
-message GetManyFilesMetaInfoResponse {
-  repeated string TODO = 1;
+message FileSegmentR {
+  repeated File files = 1;
 };
 
 
