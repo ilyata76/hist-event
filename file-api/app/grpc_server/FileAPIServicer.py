@@ -10,6 +10,7 @@ import proto.file_api_pb2_grpc as pb2_grpc
 from grpc_server.AbstractServicer import AbstractServicer
 from storage import FileStorage
 from schemas.File import FileBinary, File, FileBase
+from utils.dict_from_message import dict_from_message
 
 
 class FileAPIServicer(pb2_grpc.FileAPIServicer) :
@@ -18,49 +19,32 @@ class FileAPIServicer(pb2_grpc.FileAPIServicer) :
     """
     
     @AbstractServicer.method("file-api:Ping")
-    async def Ping(self, request : pb2.PingRequest, context : grpc.ServicerContext) :
-        return pb2.PingResponse(pong="pong")
+    async def Ping(self, request : pb2.PingR, context : grpc.ServicerContext) :
+        return pb2.PongR(pong="pong")
 
     @AbstractServicer.method("file-api:AddFile")
-    async def AddFile(self, request : pb2.AddFileRequest, context : grpc.ServicerContext) :
-        storage = FileStorage.get(storage_identifier=request.storage)
+    async def AddFile(self, request : pb2.FileBinaryR, context : grpc.ServicerContext) :
+        storage = FileStorage.get(storage_identifier=request.file.storage)
         # TODO проверка существования файла в NoSQL
-        file : File = await storage.appendOne(FileBinary(path=request.path,
-                                                         filename=request.filename,
-                                                         file=request.file,
-                                                         storage=request.storage))
+        file : File = await storage.appendOne(file=FileBinary(**dict_from_message(request.file)))
         # TODO добавление в NoSQL
-        return pb2.AddFileResponse(storage=file.storage, 
-                                   path=str(file.path), 
-                                   filename=file.filename)
+        return pb2.FileR(file=file.model_dump())
 
     @AbstractServicer.method("file-api:GetFile")
-    async def GetFile(self, request : pb2.GetFileRequest, context : grpc.ServicerContext):
-        storage = FileStorage.get(storage_identifier=request.storage)
+    async def GetFile(self, request : pb2.FileBaseR, context : grpc.ServicerContext):
+        storage = FileStorage.get(storage_identifier=request.file.storage)
         # TODO проверка в NoSQL существования файла
-        file : FileBinary = await storage.getOne(FileBase(path=request.path,
-                                                          storage=request.storage))
-        return pb2.GetFileResponse(storage=file.storage,
-                                   path=str(file.path),
-                                   filename=file.filename,
-                                   file=file.file)
+        file : FileBinary = await storage.getOne(FileBase(**dict_from_message(request.file)))
+        return pb2.FileBinaryR(file=file.model_dump())
 
     @AbstractServicer.method("file-api:PutFile")
-    async def PutFile(self, request : pb2.PutFileRequest, context : grpc.ServicerContext):
-        storage = FileStorage.get(storage_identifier=request.storage)
-        file : FileBinary = await storage.putOne(FileBinary(path=request.path,
-                                                            filename=request.filename,
-                                                            file=request.file,
-                                                            storage=request.storage))
-        return pb2.PutFileResponse(storage=file.storage,
-                                   path=str(file.path),
-                                   filename=file.filename)
+    async def PutFile(self, request : pb2.FileBinaryR, context : grpc.ServicerContext):
+        storage = FileStorage.get(storage_identifier=request.file.storage)
+        file : FileBinary = await storage.putOne(FileBinary(**dict_from_message(request.file)))
+        return pb2.FileR(file=file.model_dump())
 
     @AbstractServicer.method("file-api:DeleteFile")
-    async def DeleteFile(self, request : pb2.DeleteFileRequest, context : grpc.ServicerContext):
-        storage = FileStorage.get(storage_identifier=request.storage)
-        file : File = await storage.deleteOne(FileBase(path=request.path,
-                                                       storage=request.storage))
-        return pb2.DeleteFileResponse(storage=file.storage,
-                                      path=str(file.path),
-                                      filename=file.filename)
+    async def DeleteFile(self, request : pb2.FileBaseR, context : grpc.ServicerContext):
+        storage = FileStorage.get(storage_identifier=request.file.storage)
+        file : File = await storage.deleteOne(FileBase(**dict_from_message(request.file)))
+        return pb2.FileR(file=file.model_dump())

@@ -11,94 +11,47 @@ package file_api;
 service FileAPI {
 
   // проверить работоспособность
-  rpc Ping (PingRequest) returns (PingResponse) {}
+  rpc Ping (PingR) returns (PongR) {}
 
   // загрузить файл
-  rpc AddFile (AddFileRequest) returns (AddFileResponse) {}
+  rpc AddFile (FileBinaryR) returns (FileR) {}
 
   // получить файл
-  rpc GetFile (GetFileRequest) returns (GetFileResponse) {}
+  rpc GetFile (FileBaseR) returns (FileBinaryR) {}
 
   // получить мета-информацию о файле (сгодится для проверки существования файла)
-  rpc GetFileMetaInfo (GetFileMetaInfoRequest) returns (GetFileMetaInfoResponse) {}
+  rpc GetFileMetaInfo (FileBaseR) returns (FileR) {}
 
   // удалить файл
-  rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse) {}
+  rpc DeleteFile (FileBaseR) returns (FileR) {}
 
   // сохранить/заменить файл
-  rpc PutFile (PutFileRequest) returns (PutFileResponse) {}
+  rpc PutFile (FileBinaryR) returns (FileR) {}
 
   // получить список мета-информацю всех (или отрезком) файлов
   rpc GetManyFilesMetaInfo (GetManyFilesMetaInfoRequest) returns (GetManyFilesMetaInfoResponse) {}
 };
 
-message PingRequest {
+message PingR {
   //
 };
-message PingResponse {
+message PongR {
   string pong = 1;
 };
 
 // методы работы с файлами
 
-message AddFileRequest {
-  // идентификатор хранилища: s3, ftp
-  string storage = 1;
-  // уникальный путь /a/b/file.txt
-  string path = 2;
-  // имя файла file.txt
-  string filename = 3;
-  // сам файл
-  bytes file = 4;
+message FileBinaryR {
+  FileBinary file = 1;
 };
-message AddFileResponse {
-  string storage = 1;
-  string path = 2;
-  string filename = 3;
+message FileR {
+  File file = 1;
+};
+message FileBaseR {
+  FileBase file = 1;
 };
 
-message GetFileRequest {
-  string storage = 1;
-  string path = 2;
-};
-message GetFileResponse {
-  string storage = 1;
-  string path = 2;
-  string filename = 3;
-  bytes file = 4;
-};
-
-message GetFileMetaInfoRequest {
-  string storage = 1;
-  string path = 2;
-};
-message GetFileMetaInfoResponse {
-  string storage = 1;
-  string path = 2;
-  string filename = 3;
-};
-
-message DeleteFileRequest {
-  string storage = 1;
-  string path = 2;
-};
-message DeleteFileResponse {
-  string storage = 1;
-  string path = 2;
-  string filename = 3;
-};
-
-message PutFileRequest {
-  string storage = 1;
-  string path = 2;
-  string filename = 3;
-  bytes file = 4;
-};
-message PutFileResponse {
-  string storage = 1;
-  string path = 2;
-  string filename = 3;
-};
+//
 
 message GetManyFilesMetaInfoRequest {
   string storage = 1;
@@ -106,5 +59,24 @@ message GetManyFilesMetaInfoRequest {
   uint32 end = 3;   //        -> 10
 };
 message GetManyFilesMetaInfoResponse {
-  string TODO = 1;
+  repeated string TODO = 1;
+};
+
+
+// классы
+
+message FileBase {
+  string storage = 1;
+  string path = 2;
+};
+message File {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+};
+message FileBinary {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+  bytes file = 4;
 };

@@ -128,13 +128,14 @@ class FTPStorage(AbstractStorage) :
 
     @AbstractStorage.method("ftp:putOne")
     async def putOne(self, file : FileBinary) -> File :
+        """Добавляет файл независимо от его существования"""
         self.__createFolerFromFilePath(file.path)
         self.ftp.storbinary(f"STOR {file.path}", BytesIO(file.file))
         return File(**file.model_dump())
 
     @AbstractStorage.method("ftp:deleteOne")
     async def deleteOne(self, file : FileBase) -> File :
-        """Поднимет исключение, если файл существует"""
+        """Поднимет исключение, если файл не существует"""
         if not self.__checkFileExists(file.path) :
             raise StorageException(code=StorageExceptionCode.ENTITY_DOESNT_EXISTS,
                                    detail="FTP: такого файла не существует!")
@@ -146,7 +147,7 @@ class FTPStorage(AbstractStorage) :
 
 class S3Storage(AbstractStorage) :
     """
-        Не реализован
+        Не реализован TODO
     """
     pass
 

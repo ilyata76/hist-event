@@ -30,8 +30,8 @@ async def fileFTPGetByPath(request : Request,
                            path : str) -> UploadFile:
     grpc_response = await FileAPIgRPCCLient.GetFile(FileBase(path=Path(path), 
                                                              storage=StorageIdentifier.FTP))
-    response = Response(content=grpc_response.file)
-    response.headers["Content-Disposition"] = f"attachment; filename={grpc_response.filename}"
+    response = Response(content=grpc_response.file.file)
+    response.headers["Content-Disposition"] = f"attachment; filename={grpc_response.file.filename}"
     return response
 
 
@@ -50,9 +50,7 @@ async def fileFTPPutByPath(request : Request,
                                                           storage=StorageIdentifier.FTP,
                                                           filename=filepath.name,
                                                           file=file_bytes))
-    return File(path=response.path,
-                storage=response.storage,
-                filename=response.filename)
+    return response.file
 
 
 @file_ftp.delete("/{path:path}",
@@ -65,9 +63,7 @@ async def fileFTPDeleteByPath(request : Request,
                               path : str) -> File:
     response = await FileAPIgRPCCLient.DeleteFile(FileBase(path=Path(path), 
                                                            storage=StorageIdentifier.FTP))
-    return File(path=response.path,
-                storage=response.storage,
-                filename=response.filename)
+    return response.file
 
 
 @file_ftp.post("/{path:path}",
@@ -85,6 +81,4 @@ async def fileFTPPostByPath(request : Request,
                                                           storage=StorageIdentifier.FTP,
                                                           filename=filepath.name,
                                                           file=file_bytes))
-    return File(path=response.path,
-                storage=response.storage,
-                filename=response.filename)
+    return response.file

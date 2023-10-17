@@ -1,118 +1,37 @@
+from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Optional as _Optional
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class PingRequest(_message.Message):
+class PingR(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class PingResponse(_message.Message):
+class PongR(_message.Message):
     __slots__ = ["pong"]
     PONG_FIELD_NUMBER: _ClassVar[int]
     pong: str
     def __init__(self, pong: _Optional[str] = ...) -> None: ...
 
-class AddFileRequest(_message.Message):
-    __slots__ = ["storage", "path", "filename", "file"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
+class FileBinaryR(_message.Message):
+    __slots__ = ["file"]
     FILE_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    filename: str
-    file: bytes
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ..., file: _Optional[bytes] = ...) -> None: ...
+    file: FileBinary
+    def __init__(self, file: _Optional[_Union[FileBinary, _Mapping]] = ...) -> None: ...
 
-class AddFileResponse(_message.Message):
-    __slots__ = ["storage", "path", "filename"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    filename: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ...) -> None: ...
-
-class GetFileRequest(_message.Message):
-    __slots__ = ["storage", "path"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ...) -> None: ...
-
-class GetFileResponse(_message.Message):
-    __slots__ = ["storage", "path", "filename", "file"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
+class FileR(_message.Message):
+    __slots__ = ["file"]
     FILE_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    filename: str
-    file: bytes
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ..., file: _Optional[bytes] = ...) -> None: ...
+    file: File
+    def __init__(self, file: _Optional[_Union[File, _Mapping]] = ...) -> None: ...
 
-class GetFileMetaInfoRequest(_message.Message):
-    __slots__ = ["storage", "path"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ...) -> None: ...
-
-class GetFileMetaInfoResponse(_message.Message):
-    __slots__ = ["storage", "path", "filename"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    filename: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ...) -> None: ...
-
-class DeleteFileRequest(_message.Message):
-    __slots__ = ["storage", "path"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ...) -> None: ...
-
-class DeleteFileResponse(_message.Message):
-    __slots__ = ["storage", "path", "filename"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    filename: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ...) -> None: ...
-
-class PutFileRequest(_message.Message):
-    __slots__ = ["storage", "path", "filename", "file"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
+class FileBaseR(_message.Message):
+    __slots__ = ["file"]
     FILE_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    filename: str
-    file: bytes
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ..., file: _Optional[bytes] = ...) -> None: ...
-
-class PutFileResponse(_message.Message):
-    __slots__ = ["storage", "path", "filename"]
-    STORAGE_FIELD_NUMBER: _ClassVar[int]
-    PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
-    storage: str
-    path: str
-    filename: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ...) -> None: ...
+    file: FileBase
+    def __init__(self, file: _Optional[_Union[FileBase, _Mapping]] = ...) -> None: ...
 
 class GetManyFilesMetaInfoRequest(_message.Message):
     __slots__ = ["storage", "start", "end"]
@@ -127,5 +46,35 @@ class GetManyFilesMetaInfoRequest(_message.Message):
 class GetManyFilesMetaInfoResponse(_message.Message):
     __slots__ = ["TODO"]
     TODO_FIELD_NUMBER: _ClassVar[int]
-    TODO: str
-    def __init__(self, TODO: _Optional[str] = ...) -> None: ...
+    TODO: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, TODO: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class FileBase(_message.Message):
+    __slots__ = ["storage", "path"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    PATH_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    path: str
+    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ...) -> None: ...
+
+class File(_message.Message):
+    __slots__ = ["storage", "path", "filename"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    PATH_FIELD_NUMBER: _ClassVar[int]
+    FILENAME_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    path: str
+    filename: str
+    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ...) -> None: ...
+
+class FileBinary(_message.Message):
+    __slots__ = ["storage", "path", "filename", "file"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    PATH_FIELD_NUMBER: _ClassVar[int]
+    FILENAME_FIELD_NUMBER: _ClassVar[int]
+    FILE_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    path: str
+    filename: str
+    file: bytes
+    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ..., file: _Optional[bytes] = ...) -> None: ...

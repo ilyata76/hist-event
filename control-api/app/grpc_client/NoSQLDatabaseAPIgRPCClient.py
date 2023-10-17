@@ -11,7 +11,8 @@ from app.grpc_client.AbstractgRPCClient import AbstractgRPCClient
 
 class NoSQLDatabaseAPIgRPCClient :
     """
-        Класс доступа до gRPC сервера с NoSQLDatabase
+        Класс доступа до gRPC сервера с NoSQLDatabase.
+            Его методы вызываются в коде при обработке запросов.
     """
 
     @staticmethod

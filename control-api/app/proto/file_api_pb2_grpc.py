@@ -18,33 +18,33 @@ class FileAPIStub(object):
         """
         self.Ping = channel.unary_unary(
                 '/file_api.FileAPI/Ping',
-                request_serializer=file__api__pb2.PingRequest.SerializeToString,
-                response_deserializer=file__api__pb2.PingResponse.FromString,
+                request_serializer=file__api__pb2.PingR.SerializeToString,
+                response_deserializer=file__api__pb2.PongR.FromString,
                 )
         self.AddFile = channel.unary_unary(
                 '/file_api.FileAPI/AddFile',
-                request_serializer=file__api__pb2.AddFileRequest.SerializeToString,
-                response_deserializer=file__api__pb2.AddFileResponse.FromString,
+                request_serializer=file__api__pb2.FileBinaryR.SerializeToString,
+                response_deserializer=file__api__pb2.FileR.FromString,
                 )
         self.GetFile = channel.unary_unary(
                 '/file_api.FileAPI/GetFile',
-                request_serializer=file__api__pb2.GetFileRequest.SerializeToString,
-                response_deserializer=file__api__pb2.GetFileResponse.FromString,
+                request_serializer=file__api__pb2.FileBaseR.SerializeToString,
+                response_deserializer=file__api__pb2.FileBinaryR.FromString,
                 )
         self.GetFileMetaInfo = channel.unary_unary(
                 '/file_api.FileAPI/GetFileMetaInfo',
-                request_serializer=file__api__pb2.GetFileMetaInfoRequest.SerializeToString,
-                response_deserializer=file__api__pb2.GetFileMetaInfoResponse.FromString,
+                request_serializer=file__api__pb2.FileBaseR.SerializeToString,
+                response_deserializer=file__api__pb2.FileR.FromString,
                 )
         self.DeleteFile = channel.unary_unary(
                 '/file_api.FileAPI/DeleteFile',
-                request_serializer=file__api__pb2.DeleteFileRequest.SerializeToString,
-                response_deserializer=file__api__pb2.DeleteFileResponse.FromString,
+                request_serializer=file__api__pb2.FileBaseR.SerializeToString,
+                response_deserializer=file__api__pb2.FileR.FromString,
                 )
         self.PutFile = channel.unary_unary(
                 '/file_api.FileAPI/PutFile',
-                request_serializer=file__api__pb2.PutFileRequest.SerializeToString,
-                response_deserializer=file__api__pb2.PutFileResponse.FromString,
+                request_serializer=file__api__pb2.FileBinaryR.SerializeToString,
+                response_deserializer=file__api__pb2.FileR.FromString,
                 )
         self.GetManyFilesMetaInfo = channel.unary_unary(
                 '/file_api.FileAPI/GetManyFilesMetaInfo',
@@ -112,33 +112,33 @@ def add_FileAPIServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Ping': grpc.unary_unary_rpc_method_handler(
                     servicer.Ping,
-                    request_deserializer=file__api__pb2.PingRequest.FromString,
-                    response_serializer=file__api__pb2.PingResponse.SerializeToString,
+                    request_deserializer=file__api__pb2.PingR.FromString,
+                    response_serializer=file__api__pb2.PongR.SerializeToString,
             ),
             'AddFile': grpc.unary_unary_rpc_method_handler(
                     servicer.AddFile,
-                    request_deserializer=file__api__pb2.AddFileRequest.FromString,
-                    response_serializer=file__api__pb2.AddFileResponse.SerializeToString,
+                    request_deserializer=file__api__pb2.FileBinaryR.FromString,
+                    response_serializer=file__api__pb2.FileR.SerializeToString,
             ),
             'GetFile': grpc.unary_unary_rpc_method_handler(
                     servicer.GetFile,
-                    request_deserializer=file__api__pb2.GetFileRequest.FromString,
-                    response_serializer=file__api__pb2.GetFileResponse.SerializeToString,
+                    request_deserializer=file__api__pb2.FileBaseR.FromString,
+                    response_serializer=file__api__pb2.FileBinaryR.SerializeToString,
             ),
             'GetFileMetaInfo': grpc.unary_unary_rpc_method_handler(
                     servicer.GetFileMetaInfo,
-                    request_deserializer=file__api__pb2.GetFileMetaInfoRequest.FromString,
-                    response_serializer=file__api__pb2.GetFileMetaInfoResponse.SerializeToString,
+                    request_deserializer=file__api__pb2.FileBaseR.FromString,
+                    response_serializer=file__api__pb2.FileR.SerializeToString,
             ),
             'DeleteFile': grpc.unary_unary_rpc_method_handler(
                     servicer.DeleteFile,
-                    request_deserializer=file__api__pb2.DeleteFileRequest.FromString,
-                    response_serializer=file__api__pb2.DeleteFileResponse.SerializeToString,
+                    request_deserializer=file__api__pb2.FileBaseR.FromString,
+                    response_serializer=file__api__pb2.FileR.SerializeToString,
             ),
             'PutFile': grpc.unary_unary_rpc_method_handler(
                     servicer.PutFile,
-                    request_deserializer=file__api__pb2.PutFileRequest.FromString,
-                    response_serializer=file__api__pb2.PutFileResponse.SerializeToString,
+                    request_deserializer=file__api__pb2.FileBinaryR.FromString,
+                    response_serializer=file__api__pb2.FileR.SerializeToString,
             ),
             'GetManyFilesMetaInfo': grpc.unary_unary_rpc_method_handler(
                     servicer.GetManyFilesMetaInfo,
@@ -169,8 +169,8 @@ class FileAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/Ping',
-            file__api__pb2.PingRequest.SerializeToString,
-            file__api__pb2.PingResponse.FromString,
+            file__api__pb2.PingR.SerializeToString,
+            file__api__pb2.PongR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -186,8 +186,8 @@ class FileAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/AddFile',
-            file__api__pb2.AddFileRequest.SerializeToString,
-            file__api__pb2.AddFileResponse.FromString,
+            file__api__pb2.FileBinaryR.SerializeToString,
+            file__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -203,8 +203,8 @@ class FileAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/GetFile',
-            file__api__pb2.GetFileRequest.SerializeToString,
-            file__api__pb2.GetFileResponse.FromString,
+            file__api__pb2.FileBaseR.SerializeToString,
+            file__api__pb2.FileBinaryR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -220,8 +220,8 @@ class FileAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/GetFileMetaInfo',
-            file__api__pb2.GetFileMetaInfoRequest.SerializeToString,
-            file__api__pb2.GetFileMetaInfoResponse.FromString,
+            file__api__pb2.FileBaseR.SerializeToString,
+            file__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -237,8 +237,8 @@ class FileAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/DeleteFile',
-            file__api__pb2.DeleteFileRequest.SerializeToString,
-            file__api__pb2.DeleteFileResponse.FromString,
+            file__api__pb2.FileBaseR.SerializeToString,
+            file__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -254,8 +254,8 @@ class FileAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/file_api.FileAPI/PutFile',
-            file__api__pb2.PutFileRequest.SerializeToString,
-            file__api__pb2.PutFileResponse.FromString,
+            file__api__pb2.FileBinaryR.SerializeToString,
+            file__api__pb2.FileR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
