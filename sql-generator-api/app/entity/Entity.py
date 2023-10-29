@@ -2,10 +2,12 @@
     Классы работы с сущностями
 """
 import datetime
+
 from pydantic import BaseModel
 
-from utils.exception import ValidationException as VE, ValidationExceptionCode as VECode
 from utils.config import EntityContentKeyword as ECK
+from entity.validate import validateEntityOnDict, validateFieldOnCasting, validateFieldOnCrossExcluding,\
+                            validateFieldOnExisting, validateFieldOnHTTP, validateFieldOnOneOfExisting
 
 
 class Entity(BaseModel) :
@@ -15,24 +17,15 @@ class Entity(BaseModel) :
     """
     id : int
     name : str
+    description : str | None = None
 
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
         """Базовая функция валидации всех сущностей"""
-        if type(dict_entity) != dict :
-            raise VE(code=VECode.INVALID_FIELD_OR_ENTITY_TYPE,
-                     detail=f"Сущность {entity_identifier} представлена неправильно")
-        if ECK.id not in dict_entity.keys() :
-            raise VE(code=VECode.INVALID_FIELD,
-                     detail=f"У сущности {entity_identifier} поле {ECK.id} является обязательным")
-        if ECK.name not in dict_entity.keys() :
-            raise VE(code=VECode.INVALID_FIELD,
-                     detail=f"У сущности {entity_identifier} поле {ECK.name} является обязательным")
-        try :
-            int(dict_entity[ECK.id])
-        except :
-            raise VE(code=VECode.INVALID_FIELD_CONTENT,
-                     detail=f"У сущности {entity_identifier} поле {ECK.id} должно быть целочисленным типом")
+        validateEntityOnDict(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.id, entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.name, entity_identifier, dict_entity)
+        validateFieldOnCasting(ECK.id, entity_identifier, dict_entity, int)
 
 
 class DateTime(BaseModel) :
@@ -40,25 +33,13 @@ class DateTime(BaseModel) :
     time : datetime.time | None = None
 
     @staticmethod
-    def validate(entity_identifier: str, dict_entity: dict) :
-        if type(dict_entity) != dict :
-            raise VE(code=VECode.INVALID_FIELD_OR_ENTITY_TYPE,
-                     detail=f"Сущность {entity_identifier} в поле -->|{ECK.start} {ECK.end}/{ECK.point}|<-- представлена неправильно")
-        if ECK.date not in dict_entity.keys() :
-            raise VE(code=VECode.INVALID_FIELD,
-                     detail=f"У сущности {entity_identifier} поле {ECK.date} является обязательным")
+    def validate(entity_identifier : str, dict_entity : dict) :
+        validateEntityOnDict(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
         if dict_entity[ECK.date] != "..." : # TODO: разные варианты могут быть: нет данных, настоящее время и пр.
-            try :
-                datetime.date.fromisoformat(dict_entity[ECK.date])
-            except :
-                raise VE(code=VECode.INVALID_FIELD_CONTENT,
-                         detail=f"У сущности {entity_identifier} поле {ECK.date} должно представлять собой строку даты формата ISO или '...'")
+            validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, datetime.date.fromisoformat)
         if ECK.time in dict_entity.keys() and dict_entity[ECK.time] != "...":
-            try :
-                datetime.time.fromisoformat(dict_entity[ECK.time])
-            except :
-                raise VE(code=VECode.INVALID_FIELD_CONTENT,
-                         detail=f"У сущности {entity_identifier} поле {ECK.time} должно представлять собой стоку времени формата ISO или '...'")
+            validateFieldOnCasting(ECK.time, entity_identifier, dict_entity, datetime.time.fromisoformat)
 
 
 class DateProcess(BaseModel) :
@@ -66,55 +47,240 @@ class DateProcess(BaseModel) :
     end : DateTime | None = None
 
     @staticmethod
-    def validate(entity_identifier: str, dict_entity: dict) :
-        if type(dict_entity) != dict :
-            raise VE(code=VECode.INVALID_FIELD_OR_ENTITY_TYPE,
-                    detail=f"Сущность {entity_identifier} в поле -->|{ECK.process}|<-- представлена неправильно")
-        if not (ECK.start in dict_entity.keys() and\
-                ECK.end in dict_entity.keys()) :
-            raise VE(code=VECode.INVALID_FIELD,
-                     detail=f"У сущности {entity_identifier} в поле -->|{ECK.process}|<-- поля {ECK.start} и {ECK.end} является обязательным")
+    def validate(entity_identifier : str, dict_entity : dict) :
+        validateEntityOnDict(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.start, entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.end, entity_identifier, dict_entity)
         DateTime.validate(entity_identifier, dict_entity[ECK.start])
         DateTime.validate(entity_identifier, dict_entity[ECK.end])
 
 
 class Date(Entity) :
     """
-        -   id:
+        -   id: int
             name:
             point:      <---- OR
-                date:
-                time:
+                date: ISO
+                time: ISO
             process:    <---- OR
                 start:
-                    date:
-                    time:
+                    date: ISO
+                    time: ISO
                 end:
-                    date:
-                    time:
+                    date: ISO
+                    time: ISO
             description:
     """
     process : DateProcess | None = None
     point : DateTime | None = None
-    description : str | None = None
 
     @staticmethod
-    def validate(entity_identifier: str, dict_entity: dict) :
+    def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
-        # должны существовать либо process-метки, либо point-метка
-        if ECK.point in dict_entity.keys() and\
-           ECK.process in dict_entity.keys() :
-            raise VE(code=VECode.CROSS_EXCLUDING_FIELDS,
-                     detail=f"У сущности {entity_identifier} поля {ECK.point} и {ECK.process} являются взаимоисключающими")
-        if not (ECK.point in dict_entity.keys() or\
-                ECK.process in dict_entity.keys()) :
-            raise VE(code=VECode.INVALID_FIELD,
-                     detail=f"У сущности {entity_identifier} одно из полей {ECK.point}/ {ECK.process} является обязательным")
+        validateFieldOnOneOfExisting([ECK.point, ECK.process], entity_identifier, dict_entity)
+        validateFieldOnCrossExcluding([ECK.point, ECK.process], entity_identifier, dict_entity)
         if ECK.point in dict_entity.keys() :
             DateTime.validate(entity_identifier, dict_entity[ECK.point])
         if ECK.process in dict_entity.keys() :
             DateProcess.validate(entity_identifier, dict_entity[ECK.process])
 
 
+class Geo(BaseModel) :
+    latitude : float
+    longitude : float
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        validateEntityOnDict(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.latitude, entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.longitude, entity_identifier, dict_entity)
+        validateFieldOnCasting(ECK.latitude, entity_identifier, dict_entity, float)
+        validateFieldOnCasting(ECK.longitude, entity_identifier, dict_entity, float)
+
+
+class Place(Entity) :
+    """
+        -   id: int
+            name:
+            description:
+            geo:
+                latitude: float
+                longitude: float
+    """
+    geo : Geo | None = None
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+        if ECK.geo in dict_entity.keys() :
+            Geo.validate(entity_identifier, dict_entity[ECK.geo])
+
+
+class Person(Entity) :
+    """
+        -   id: int
+            name:
+            description:
+            date:
+    """
+    date : int
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
+        validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+
+
+class Link(BaseModel) :
+    web : str | None = None
+    native : str | None = None
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        validateEntityOnDict(entity_identifier, dict_entity)
+        validateFieldOnOneOfExisting([ECK.web, ECK.native], entity_identifier, dict_entity)
+        validateFieldOnCrossExcluding([ECK.web, ECK.native], entity_identifier, dict_entity)
+        if ECK.web in dict_entity.keys() :
+            validateFieldOnHTTP(ECK.web, entity_identifier, dict_entity)
+
+
+class Biblio(Entity) :
+    """
+        -   id: int
+            name:
+            description:
+            date: int
+            author: int
+            state:
+            period:
+            link:
+                web: http <--- OR
+                native:   <--- OR
+    """
+    period : str | None = None
+    state : str | None = None
+    author : int | None = None
+    date : int | None = None
+    link : Link | None = None
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+        if ECK.author in dict_entity.keys() :
+            validateFieldOnCasting(ECK.author, entity_identifier, dict_entity, int)
+        if ECK.date in dict_entity.keys() :
+            validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+        if ECK.link in dict_entity.keys() :
+            Link.validate(entity_identifier, dict_entity[ECK.link])
+
+
+class BiblioFragment(Entity) :
+    """
+        -   id: int
+            name:
+            description:
+            biblio: int
+    """
+    biblio : int
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.biblio, entity_identifier, dict_entity)
+        validateFieldOnCasting(ECK.biblio, entity_identifier, dict_entity, int)
+
+
+class Source(Entity) :
+    """
+        -   id: int
+            name:
+            description:
+            author: int
+            date: int
+            type:
+            subtype:
+            link: Link
+    
+    """
+    author : int | None = None
+    date : int | None = None
+    type : str | None = None
+    subtype : str | None = None
+    link : Link | None = None
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+        if ECK.author in dict_entity.keys() :
+            validateFieldOnCasting(ECK.author, entity_identifier, dict_entity, int)
+        if ECK.date in dict_entity.keys() :
+            validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+        if ECK.link in dict_entity.keys() :
+            Link.validate(entity_identifier, dict_entity[ECK.link])
+
+
+class SourceFragment(Entity) :
+    """
+        -   id: int
+            name:
+            description:
+            source: int
+    """
+    source : int
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.source, entity_identifier, dict_entity)
+        validateFieldOnCasting(ECK.source, entity_identifier, dict_entity, int)
+
+
 class Event(Entity) :
-    pass
+    """
+        -   id: int
+            name:
+            description:
+            date: int
+            min:
+            max:
+            level: str
+    """
+    date : int
+    min : str
+    max : str
+    level : str | None = None
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.min, entity_identifier, dict_entity)
+        validateFieldOnExisting(ECK.max, entity_identifier, dict_entity)
+        validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+        # TODO level можно ограничить!
+
+
+class Other(Entity) :
+    """
+        -   id: int
+            name:
+            description:
+    """
+    meta : str | None = None
+
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        Entity.validate(entity_identifier, dict_entity)
+
+
+# TODO решить вопрос с Bond!
+# class Bond(Entity) :
+#     """
+#         -   id:
+#             name:
+#             description:
+#             event: int
+#             parents: set[int]
+
+#     """

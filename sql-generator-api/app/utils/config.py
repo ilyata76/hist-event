@@ -115,6 +115,23 @@ class LogCode :
 class EntityKeyword :
     DATE = "date"
     dates = "dates"
+    PLACE = "place"
+    places = "places"
+    PERSON = "person"
+    persons = "persons"
+    BIBLIO = "biblio"
+    biblios = "biblios"
+    BIBLIO_FRAGMENT = "biblio_fragment"
+    biblio_fragments = "biblio_fragments"
+    SOURCE = "source"
+    sources = "sources"
+    SOURCE_FRAGMENT = "source_fragment"
+    source_fragments = "source_fragments"
+    EVENT = "event"
+    events = "events"
+    OTHER = "other"
+    others = "others"
+    
 
 class EntityContentKeyword :
     id = "id"
@@ -126,6 +143,17 @@ class EntityContentKeyword :
     process = "process"
     date = "date"
     time = "time"
+    web = "web"
+    native = "native"
+    author = "author"
+    link = "link"
+    geo = "geo"
+    latitude = "latitude"
+    longitude = "longitude"
+    biblio = "biblio"
+    source = "source"
+    min = "min"
+    max = "max"
 
 
 config = Config()

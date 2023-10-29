@@ -23,6 +23,7 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
 
     @AbstractServicer.method("sql-generator-api:Validate")
     async def Validate(self, request : pb2.ManyFilesR, context : grpc.ServicerContext) :
+        # TODO работа с идентификатором
         v = Validator()
         await v.validateFiles(files=FileKeywordList(files=[FileKeyword(**dictFromMessage(x)) for x in request.files]))
         return pb2.Status(status="aboba validate!")
@@ -30,6 +31,7 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
 
     @AbstractServicer.method("sql-generator-api:Parse")
     async def Parse(self, request : pb2.ManyFilesR, context : grpc.ServicerContext) :
+        # TODO работа с идентификатором
         print(request.files)
         print(request.identifier)
         return pb2.Status(status="aboba parse!")
@@ -37,6 +39,7 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
 
     @AbstractServicer.method("sql-generator-api:Generate")
     async def Generate(self, request : pb2.ManyFilesR, context : grpc.ServicerContext) :
+        # TODO работа с идентификатором
         print(request.files)
         print(request.identifier)
         return pb2.Status(status="aboba generate!")

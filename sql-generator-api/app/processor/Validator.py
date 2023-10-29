@@ -28,7 +28,7 @@ class Validator :
             Валидация конкретной сущности.
             Выбрасывает исключение, если какая-то сущность не может быть провалидирована.
         """
-        self.keyword_to_entity[keyword].validate(f"-->|{keyword}:{entity_index+1}|<--", dict_entity)
+        self.keyword_to_entity[keyword].validate(f"{keyword}:{entity_index+1}", dict_entity)
 
 
     @AbstractProcessor.method("validator:__validateFile")

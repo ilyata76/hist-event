@@ -1,18 +1,38 @@
 """
     Абстрактный процессор
 """
-from entity.Entity import Entity, Date
+from entity.Entity import Entity, Date, Person, Place, Biblio, BiblioFragment,\
+                        Source, SourceFragment, Event, Other
 from utils.logger import logger
 from utils.config import LogCode, EntityKeyword
 
 
 class AbstractProcessor :
 
+    # для добавления новых сущностей - достаточно после их описания
+    # добавить сюда, в словари, связанные с ними соотношения
+
     keyword_to_keyword : dict[str, str] = {
-        EntityKeyword.dates : EntityKeyword.DATE
+        EntityKeyword.dates : EntityKeyword.DATE,
+        EntityKeyword.persons : EntityKeyword.PERSON,
+        EntityKeyword.places : EntityKeyword.PLACE,
+        EntityKeyword.biblios : EntityKeyword.BIBLIO,
+        EntityKeyword.biblio_fragments : EntityKeyword.BIBLIO_FRAGMENT,
+        EntityKeyword.sources : EntityKeyword.SOURCE,
+        EntityKeyword.source_fragments : EntityKeyword.SOURCE_FRAGMENT,
+        EntityKeyword.events : EntityKeyword.EVENT,
+        EntityKeyword.others : EntityKeyword.OTHER
     } # словарь соответствия: какая сущность будет описываться внутри тэга ключа (dates: - ожидается DATE)
     keyword_to_entity : dict[str, Entity] = {
-        EntityKeyword.DATE : Date
+        EntityKeyword.DATE : Date,
+        EntityKeyword.PERSON : Person,
+        EntityKeyword.PLACE : Place,
+        EntityKeyword.BIBLIO : Biblio,
+        EntityKeyword.BIBLIO_FRAGMENT : BiblioFragment,
+        EntityKeyword.SOURCE : Source,
+        EntityKeyword.SOURCE_FRAGMENT : SourceFragment,
+        EntityKeyword.EVENT : Event,
+        EntityKeyword.OTHER : Other
     } # словарь соответствия между keyword и классом сущности.
 
 
