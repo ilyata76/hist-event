@@ -46,20 +46,20 @@ class Config :
             Определяет название файла, в котором будет храниться лог приложения
         """
         if not hasattr(self, "_Config__LOG_FILENAME") :
-            self.__LOG_FILENAME = environ.get("LOG_FILENAME", "control-api.log")
+            self.__LOG_FILENAME = environ.get("LOG_FILENAME", "sql-generator-api.log")
         return self.__LOG_FILENAME
 
-    @property 
-    def NOSQL_DATABASE_GRPC_HOST(self) -> str :
-        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_HOST") :
-            self.__NOSQL_DATABASE_GRPC_HOST = environ.get("NOSQL_DATABASE_GRPC_HOST", "localhost")
-        return self.__NOSQL_DATABASE_GRPC_HOST
-    
-    @property 
-    def NOSQL_DATABASE_GRPC_PORT(self) -> str :
-        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_PORT") :
-            self.__NOSQL_DATABASE_GRPC_PORT = environ.get("NOSQL_DATABASE_GRPC_PORT", "50051")
-        return self.__NOSQL_DATABASE_GRPC_PORT
+    @property
+    def GRPC_HOST(self) -> str :
+        if not hasattr(self, "_Config__GRPC_HOST") :
+            self.__GRPC_HOST = environ.get("GRPC_HOST", "0.0.0.0")
+        return self.__GRPC_HOST
+
+    @property
+    def GRPC_PORT(self) -> str :
+        if not hasattr(self, "_Config__GRPC_PORT") :
+            self.__GRPC_PORT = environ.get("GRPC_PORT", "50053")
+        return self.__GRPC_PORT
 
     @property 
     def FILE_API_GRPC_HOST(self) -> str :
@@ -73,17 +73,17 @@ class Config :
             self.__FILE_API_GRPC_PORT = environ.get("FILE_API_GRPC_PORT", "50052")
         return self.__FILE_API_GRPC_PORT
 
-    @property 
-    def SQL_GENERATOR_API_GRPC_HOST(self) -> str :
-        if not hasattr(self, "_Config__SQL_GENERATOR_API_GRPC_HOST") :
-            self.__SQL_GENERATOR_API_GRPC_HOST = environ.get("SQL_GENERATOR_API_GRPC_HOST", "localhost")
-        return self.__SQL_GENERATOR_API_GRPC_HOST
-    
-    @property 
-    def SQL_GENERATOR_API_GRPC_PORT(self) -> str :
-        if not hasattr(self, "_Config__SQL_GENERATOR_API_GRPC_PORT") :
-            self.__SQL_GENERATOR_API_GRPC_PORT = environ.get("SQL_GENERATOR_API_GRPC_PORT", "50053")
-        return self.__SQL_GENERATOR_API_GRPC_PORT
+    @property
+    def GRPC_MAX_WORKERS(self) -> str :
+        """
+            Количество работающих threads у grpc-сервера
+        """
+        try : 
+            if not hasattr(self, "_Config__GRPC_MAX_WORKERS") :
+                self.__GRPC_MAX_WORKERS = int(environ.get("GRPC_MAX_WORKERS", 10))
+        except BaseException :
+            self.__GRPC_MAX_WORKERS = 10
+        return self.__GRPC_MAX_WORKERS
 
     def __str__(self, indent : str = "") -> str :
         """
@@ -94,12 +94,16 @@ class Config :
                + indent + f"LOG_CONSOLE : {self.LOG_CONSOLE}" + "; "\
                + indent + f"LOG_FOLDER : {self.LOG_FOLDER}" + "; "\
                + indent + f"LOG_FILENAME : {self.LOG_FILENAME}" + "; "\
-               + indent + f"NOSQL_DATABASE_GRPC_HOST : {self.NOSQL_DATABASE_GRPC_HOST}" + "; "\
-               + indent + f"NOSQL_DATABASE_GRPC_PORT : {self.NOSQL_DATABASE_GRPC_PORT}" + "; "\
+               + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "; "\
+               + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "; "\
+               + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}" + "; "\
                + indent + f"FILE_API_GRPC_HOST : {self.FILE_API_GRPC_HOST}" + "; "\
-               + indent + f"FILE_API_GRPC_PORT : {self.FILE_API_GRPC_PORT}" + "; "\
-               + indent + f"SQL_GENERATOR_API_GRPC_HOST : {self.SQL_GENERATOR_API_GRPC_HOST}" + "; "\
-               + indent + f"SQL_GENERATOR_API_GRPC_PORT : {self.SQL_GENERATOR_API_GRPC_PORT}"
+               + indent + f"FILE_API_GRPC_PORT : {self.FILE_API_GRPC_PORT}"
+
+
+class StorageIdentifier :
+    FTP = "ftp"
+    S3 = "s3"
 
 
 class LogCode :
@@ -108,9 +112,20 @@ class LogCode :
     ERROR = "ERROR"
 
 
-class StorageIdentifier :
-    FTP = "ftp"
-    S3 = "s3"
+class EntityKeyword :
+    DATE = "date"
+    dates = "dates"
+
+class EntityContentKeyword :
+    id = "id"
+    name = "name"
+    description = "description"
+    start = "start"
+    end = "end"
+    point = "point"
+    process = "process"
+    date = "date"
+    time = "time"
 
 
 config = Config()

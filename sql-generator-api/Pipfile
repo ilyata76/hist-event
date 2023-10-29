@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 grpcio = "*"
 grpcio-tools = "*"
+loguru = "*"
+pyyaml = "*"
+pydantic = "*"
+pyparsing = "*"
 
 [dev-packages]
 

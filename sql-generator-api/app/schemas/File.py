@@ -2,7 +2,7 @@
     Схемы для файлов
 """
 from pathlib import Path
-from pydantic import BaseModel, field_serializer
+from pydantic import BaseModel, field_serializer, Field
 
 
 class FileBase(BaseModel) :
@@ -21,14 +21,14 @@ class File(FileBase) :
     """
         Главная схема файла, дополненная именем
     """
-    filename : str #
+    filename : str
 
 
 class FileBinary(File) :
     """
         Дополненная бинарным содержанием схема файла
     """
-    file : bytes
+    file : bytes = Field(repr=False)
 
 
 class FileKeyword(File) :
@@ -36,3 +36,12 @@ class FileKeyword(File) :
         Дополненная схема файла ключевым словом (для связи с SQL-gen)
     """
     keyword : str
+
+
+class FileBinaryKeyword(FileBinary) :
+    """"""
+    keyword : str
+
+
+class FileKeywordList(BaseModel) :
+    files : list[FileKeyword]

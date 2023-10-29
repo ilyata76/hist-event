@@ -1,0 +1,56 @@
+// с этим proto-файлом связаны сервисы:
+//    file-api (+ как клиент)
+//    control-api (как клиент)
+
+syntax = "proto3";
+
+package sql_generator_api;
+
+// долгий синхронный процесс (последовательный обход сущностей),
+//      выделенный в отдельный сервис
+service SQLGeneratorAPI {
+
+  // проверить работоспособность
+  rpc Ping (PingR) returns (PongR) {}
+
+  rpc Validate (ManyFilesR) returns (Status) {}
+
+  rpc Parse (ManyFilesR) returns (Status) {}
+
+  rpc Generate (ManyFilesR) returns (Status) {}
+
+  // TODO: сделать геттеры для сущностей через NoSQL и статусов
+}
+
+message PingR {
+  //
+};
+message PongR {
+  string pong = 1;
+};
+
+//
+
+message ManyFilesR {
+  // набор файлов
+  repeated File files = 1;
+  // если есть, сохранит в случае Generate сюда
+  optional File main_sql = 2; 
+  // строка идентификации операции для разграничения и сохранения порядка
+  string identifier = 3;
+}
+message Status {
+  string status = 1;
+  // идентификатор пронизывает всю цепочку трёх операций
+  string identifier = 3;
+}
+
+// классы
+
+message File {
+  string storage = 1;
+  string path = 2;
+  string filename = 3;
+  // dates, others и пр. сущностные категории
+  string keyword = 4;
+};

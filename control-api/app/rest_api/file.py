@@ -8,17 +8,17 @@ from app.utils.config import StorageIdentifier
 from app.utils.dict_from_message import dict_from_message
 from app.rest_api.log_and_except import log_and_except
 from app.grpc_client.FileAPIgRPCCLient import FileAPIgRPCCLient
-from app.grpc_client.NoSQLDatabaseAPIgRPCClient import NoSQLDatabaseAPIgRPCClient
+# from app.grpc_client.NoSQLDatabaseAPIgRPCClient import NoSQLDatabaseAPIgRPCClient
 from app.schemas.File import FileBinary, File, FileBase
 from app.schemas.Range import Range
 
 
 file = APIRouter(prefix="/file")
 
-
 @file.get("/meta",
           tags=["file"],
           name="Files Meta Info From Storage",
+          response_model=list[File],
           description="Взять мета-информацию файлов через NoSQlDatabaseAPI")
 @log_and_except
 async def fileFTPGetByPath(request : Request,
@@ -33,7 +33,6 @@ async def fileFTPGetByPath(request : Request,
                                                             range=Range(start=start, 
                                                                         end=end))
     return [dict_from_message(file) for file in response.files]
-
 
 @file.get("/meta/{path:path}",
           tags=["file"],
@@ -51,7 +50,6 @@ async def fileFTPGetMetaByPath(request : Request,
                                                                 storage=storage))
     return response.file
 
-
 @file.get("/{path:path}",
           tags=["file"],
           name="File From Storage",
@@ -66,7 +64,6 @@ async def fileFTPGetByPath(request : Request,
     response = Response(content=grpc_response.file.file)
     response.headers["Content-Disposition"] = f"attachment; filename={grpc_response.file.filename}"
     return response
-
 
 @file.put("/{path:path}",
           tags=["file"],
@@ -86,7 +83,6 @@ async def fileFTPPutByPath(request : Request,
                                                           file=file_bytes))
     return response.file
 
-
 @file.delete("/{path:path}",
              tags=["file"],
              name="Delete File from Storage",
@@ -99,7 +95,6 @@ async def fileFTPDeleteByPath(request : Request,
     response = await FileAPIgRPCCLient.DeleteFile(FileBase(path=Path(path), 
                                                            storage=storage))
     return response.file
-
 
 @file.post("/{path:path}",
            tags=["file"],
