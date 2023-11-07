@@ -70,7 +70,8 @@ class FileMongoDB(FileDB) :
         async with await self.client.client.start_session() as s :
             exist = await self.db[file.storage].find_one({DATABASE_PATH_PATH: file.path.as_posix()}, session=s)
             if exist :
-                raise DBException(code=DBExceptionCode.ENTITY_EXISTS, detail="Такой уже существует!")
+                raise DBException(code=DBExceptionCode.ENTITY_EXISTS, 
+                                  detail=f"Такой уже, {file.path} , существует!")
             
             added = await self.db[file.storage].insert_one({FILE_KEY: file.model_dump()}, session=s)
             res = await self.db[file.storage].find_one({"_id": added.inserted_id}, session=s)
@@ -109,7 +110,8 @@ class FileMongoDB(FileDB) :
         async with await self.client.client.start_session() as s :
             res = await self.db[file.storage].find_one({DATABASE_PATH_PATH : file.path.as_posix()}, session=s)
             if not res :
-                raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS, detail="Сущности для удаления не существует!")
+                raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS, detail=
+                                  f"Сущности для удаления {file.path} не существует!")
             await self.db[file.storage].delete_one({"_id": res["_id"]}, session=s)
 
         file = File(**res[FILE_KEY]) if res else None
@@ -128,7 +130,8 @@ class FileMongoDB(FileDB) :
         async with await self.client.client.start_session() as s :
             res = await self.db[file.storage].find_one({DATABASE_PATH_PATH : file.path.as_posix()}, session=s)
             if not res :
-                raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS, detail="Сущности не существует!")
+                raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS, 
+                                  detail=f"Сущности {file.path} не существует!")
 
         file = File(**res[FILE_KEY]) if res else None
         logger.debug(f"{self.prefix()} Был возвращёт из базы файл {file} в FileMongoDB[{file.storage}]: {res['_id']}")
