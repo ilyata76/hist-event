@@ -21,7 +21,7 @@ class File(FileBase) :
     """
         Главная схема файла, дополненная именем
     """
-    filename : str
+    filename : str | None = None
 
 
 class FileBinary(File) :
@@ -45,3 +45,7 @@ class FileBinaryKeyword(FileBinary) :
 
 class FileKeywordList(BaseModel) :
     files : list[FileKeyword]
+
+
+class FileBinaryKeywordList(BaseModel) :
+    files : list[FileBinaryKeyword]

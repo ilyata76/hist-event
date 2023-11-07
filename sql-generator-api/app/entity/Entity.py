@@ -1,13 +1,20 @@
 """
-    Классы работы с сущностями
+    Классы работы с сущностями.
+        Эти классы - компромиссное решение, обусловленное в первую очередь
+        легкостью добавления новых сущностей (получается, что нужно добавить сюда сущность, а в EntityBonds - связать со строками)
 """
 import datetime
 
 from pydantic import BaseModel
 
 from utils.config import EntityContentKeyword as ECK
-from entity.validate import validateEntityOnDict, validateFieldOnCasting, validateFieldOnCrossExcluding,\
-                            validateFieldOnExisting, validateFieldOnHTTP, validateFieldOnOneOfExisting
+from utils.validate import *
+
+
+# TODO set[EntityLink]
+# class EntityLink(BaseModel) :
+#     entity : str
+#     id : int
 
 
 class Entity(BaseModel) :

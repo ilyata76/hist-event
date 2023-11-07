@@ -5,6 +5,7 @@ import datetime
 
 from utils.exception import ValidationException as VE, ValidationExceptionCode as VECode
 
+
 def validateEntityOnDict(entity_identifier : str, dict_entity) :
     if type(dict_entity) != dict :
         raise VE(code=VECode.INVALID_FIELD_OR_ENTITY_TYPE,

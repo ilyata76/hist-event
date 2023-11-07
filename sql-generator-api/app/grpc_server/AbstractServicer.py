@@ -20,7 +20,7 @@ class AbstractServicer :
 
 
     @staticmethod
-    def method(path : str) :
+    def methodDecorator(path : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование
                 запросов, приходящих К СЕРВЕРУ

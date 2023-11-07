@@ -14,19 +14,19 @@ class AbstractgRPCClient :
     """
 
     @staticmethod
-    def logPrefix(path : str, code : str) :
-        return f"[CLIENT] : {path} : {code}"
+    def logPrefix(path : str, code : str, args : list, kwargs : dict) :
+        return f"[CLIENT] : {path} : {args} : {kwargs} : {code}"
 
 
     @staticmethod
-    def method(path : str) :
+    def methodDecorator(path : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование
                 запросов, исходящих ОТ КЛИЕНТА
         """
         def gRPCMethod(function) :
             async def wrap(*args, **kwargs) :
-                prefix = partial(AbstractgRPCClient.logPrefix, path=path)
+                prefix = partial(AbstractgRPCClient.logPrefix, path=path, args=args, kwargs=kwargs)
                 try : 
                     logger.debug(f"{prefix(code=LogCode.PENDING)}")
                     result = await function(*args, **kwargs)

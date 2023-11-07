@@ -2,15 +2,14 @@
     Валидация входных сущностей на правильность заполнения
 """
 from utils.logger import logger
-from schemas.File import FileBase, FileKeywordList, FileBinaryKeyword
-from entity.Entity import Entity
+from schemas.File import FileBinaryKeyword
 from utils.dict_from import dictFromYaml
 from utils.exception import ConfigException, ConfigExceptionCode
-from processor.AbstractProcessor import AbstractProcessor
-from grpc_client.FileAPIgRPCCLient import FileAPIgRPCCLient
+from processor.AbstractProcessor import AbstractProcessor as Processor
+from entity.EntityBonds import EntityBonds
 
 
-class Validator :
+class Validator(Processor) :
     """
         Аккумулирующий валидирующую функцию приложения класс.
             Работает со Storage, файлами и Entity-классами.
@@ -18,46 +17,38 @@ class Validator :
 
     def __init__(self) :
         logger.debug("Создание экземпляра класса Validator")
-        self.keyword_to_keyword : dict[str, str] = AbstractProcessor.keyword_to_keyword
-        self.keyword_to_entity : dict[str, Entity] = AbstractProcessor.keyword_to_entity
+        super().__init__()
 
 
-    @AbstractProcessor.method("validator:__validateEntity")
+    def __invalidKeyword(self, keyword : str) :
+        return keyword not in EntityBonds.keyword_to_keyword.keys() or \
+               EntityBonds.keyword_to_keyword[keyword] not in EntityBonds.keyword_to_entity.keys()
+
+
+    def __checkKeywordIsValid(self, keyword : str) :
+        if self.__invalidKeyword(keyword) :
+            raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
+                                  detail=f"Такое ключевое слово, {keyword}, не предусмотрено")
+
+
+    @Processor.methodDecorator("validator:__validateEntity")
     async def __validateEntity(self, dict_entity : dict, keyword : str, entity_index : int) :
         """
             Валидация конкретной сущности.
             Выбрасывает исключение, если какая-то сущность не может быть провалидирована.
         """
-        self.keyword_to_entity[keyword].validate(f"{keyword}:{entity_index+1}", dict_entity)
+        entity = EntityBonds.keyword_to_entity[keyword]
+        entity.validate(f"{keyword}:{entity_index+1}", dict_entity)
 
 
-    @AbstractProcessor.method("validator:__validateFile")
-    async def __validateFile(self, file : FileBinaryKeyword) :
+    @Processor.methodDecorator("validator:readAndValidateFileEntities")
+    async def readAndValidateFileEntities(self, file : FileBinaryKeyword) :
         """
             Валидация всех сущностей входящих в файл по keyword.
             Выбрасывает исключение, если какая-то сущность не может быть провалидирована.
         """
-        if file.keyword not in self.keyword_to_keyword.keys() or \
-           self.keyword_to_keyword[file.keyword] not in self.keyword_to_entity.keys() :
-            raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
-                                  detail=f"Такое ключевое слово, {file.keyword}, не предусмотрено")
-        try : 
-            yaml = dictFromYaml(file.file, file.keyword)
-            for index, entity in enumerate(yaml) :
-                await self.__validateEntity(entity, self.keyword_to_keyword[file.keyword], index)
-        except KeyError as exc :
-            raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
-                                  detail=f"Невозможно взять значение по ключу {exc.args}")
-
-
-    @AbstractProcessor.method("validator:validateFiles")
-    async def validateFiles(self, files : FileKeywordList) :
-        """
-            Валидация входящих файлов сущностей по их ключевым словам.
-            Выбрасывает исключение, если какая-то сущность не может быть провалидирована.
-        """
-        for file in files.files :
-            file_binary = await FileAPIgRPCCLient.GetFile(file=FileBase(path=file.path, 
-                                                                        storage=file.storage))
-            await self.__validateFile(file=FileBinaryKeyword(**file_binary.model_dump(),
-                                                             keyword=file.keyword))
+        self.__checkKeywordIsValid(file.keyword)
+        
+        yaml = dictFromYaml(file.file, file.keyword)
+        for index, entity in enumerate(yaml) :
+            await self.__validateEntity(entity, EntityBonds.keyword_to_keyword[file.keyword], index)
