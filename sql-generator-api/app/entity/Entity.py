@@ -11,10 +11,9 @@ from utils.config import EntityContentKeyword as ECK
 from utils.validate import *
 
 
-# TODO set[EntityLink]
-# class EntityLink(BaseModel) :
-#     entity : str
-#     id : int
+class EntityLink(BaseModel) :
+    entity : str | None = None
+    id : int | None = None
 
 
 class Entity(BaseModel) :
@@ -25,6 +24,8 @@ class Entity(BaseModel) :
     id : int
     name : str
     description : str | None = None
+    links : dict[str, set[int]] = {} # на кого ссылаемся
+    ex_links : dict[str, set[int]] = {} # кто ссылается на нас
 
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
@@ -33,6 +34,14 @@ class Entity(BaseModel) :
         validateFieldOnExisting(ECK.id, entity_identifier, dict_entity)
         validateFieldOnExisting(ECK.name, entity_identifier, dict_entity)
         validateFieldOnCasting(ECK.id, entity_identifier, dict_entity, int)
+
+    def textsToParseLinks(self) -> list[str] :
+        """Тексты, которые будут проходить проверку на {вставки:id}, чтобы заполнить links & ex_links"""
+        return [self.description]
+
+    def foreignKeys(self) -> list[EntityLink] :
+        """Foreign-key поля для проверки, что эти сущности уже существуют"""
+        return [] # никаких нет
 
 
 class DateTime(BaseModel) :
@@ -128,7 +137,7 @@ class Person(Entity) :
         -   id: int
             name:
             description:
-            date:
+            date: int
     """
     date : int
 
@@ -137,6 +146,9 @@ class Person(Entity) :
         Entity.validate(entity_identifier, dict_entity)
         validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
         validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+    
+    def foreignKeys(self) -> list[EntityLink]:
+        return super().foreignKeys() + [EntityLink(entity=ECK.date, id=self.date)]
 
 
 class Link(BaseModel) :
@@ -181,6 +193,10 @@ class Biblio(Entity) :
         if ECK.link in dict_entity.keys() :
             Link.validate(entity_identifier, dict_entity[ECK.link])
 
+    def foreignKeys(self) -> list[EntityLink]:
+        return super().foreignKeys() + [EntityLink(entity=ECK.date, id=self.date) if self.date else None,
+                                        EntityLink(entity=ECK.author, id=self.author) if self.author else None]
+
 
 class BiblioFragment(Entity) :
     """
@@ -196,6 +212,9 @@ class BiblioFragment(Entity) :
         Entity.validate(entity_identifier, dict_entity)
         validateFieldOnExisting(ECK.biblio, entity_identifier, dict_entity)
         validateFieldOnCasting(ECK.biblio, entity_identifier, dict_entity, int)
+
+    def foreignKeys(self) -> list[EntityLink]:
+        return super().foreignKeys() + [EntityLink(entity=ECK.biblio, id=self.biblio)]
 
 
 class Source(Entity) :
@@ -226,6 +245,10 @@ class Source(Entity) :
         if ECK.link in dict_entity.keys() :
             Link.validate(entity_identifier, dict_entity[ECK.link])
 
+    def foreignKeys(self) -> list[EntityLink]:
+        return super().foreignKeys() + [EntityLink(entity=ECK.date, id=self.date) if self.date else None,
+                                        EntityLink(entity=ECK.author, id=self.author) if self.author else None]
+
 
 class SourceFragment(Entity) :
     """
@@ -241,6 +264,9 @@ class SourceFragment(Entity) :
         Entity.validate(entity_identifier, dict_entity)
         validateFieldOnExisting(ECK.source, entity_identifier, dict_entity)
         validateFieldOnCasting(ECK.source, entity_identifier, dict_entity, int)
+
+    def foreignKeys(self) -> list[EntityLink]:
+        return super().foreignKeys() + [EntityLink(entity=ECK.source, id=self.source)]
 
 
 class Event(Entity) :
@@ -267,6 +293,12 @@ class Event(Entity) :
         validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
         # TODO level можно ограничить!
 
+    def foreignKeys(self) -> list[EntityLink]:
+        return super().foreignKeys() + [EntityLink(entity=ECK.date, id=self.date)]
+
+    def textsToParseLinks(self) -> list[str]:
+        return [self.min, self.max]
+
 
 class Other(Entity) :
     """
@@ -281,13 +313,25 @@ class Other(Entity) :
         Entity.validate(entity_identifier, dict_entity)
 
 
-# TODO решить вопрос с Bond!
-# class Bond(Entity) :
-#     """
-#         -   id:
-#             name:
-#             description:
-#             event: int
-#             parents: set[int]
+class Bond(BaseModel) :
+    """
+        -   event: int
+            parents: set[int]
+            childs : set[int]
+            prerequisites : set[int]
+    """
+    event : int
+    parents : set[int] | None = None
+    childs : set[int] | None = None
+    prerequisites : set[int] | None = None
 
-#     """
+    @staticmethod
+    def validate(entity_identifier : str, dict_entity : dict) :
+        validateFieldOnExisting(ECK.event, entity_identifier, dict_entity)
+        validateFieldOnCasting(ECK.event, entity_identifier, dict_entity, int)
+        if ECK.parents in dict_entity.keys() :
+            validateFieldOnListInt(ECK.parents, entity_identifier, dict_entity)
+        if ECK.childs in dict_entity.keys() :
+            validateFieldOnListInt(ECK.childs, entity_identifier, dict_entity)
+        if ECK.prerequisites in dict_entity.keys() :
+            validateFieldOnListInt(ECK.prerequisites, entity_identifier, dict_entity)

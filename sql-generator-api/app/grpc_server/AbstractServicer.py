@@ -6,7 +6,7 @@ from functools import partial
 
 from utils.logger import logger
 from utils.config import LogCode
-from utils.exception import ConfigException, ConfigExceptionCode, ValidationException
+from utils.exception import *
 
 
 class AbstractServicer :
@@ -43,7 +43,7 @@ class AbstractServicer :
                             await context.abort(grpc.StatusCode.INVALID_ARGUMENT, exc.detail)
                         case _ :
                             await context.abort(grpc.StatusCode.UNKNOWN, "Неизвестная ошибка при конфигурации входных данных")
-                except ValidationException as exc :
+                except (ValidationException, ParsingException) as exc :
                     logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code}:{exc.detail}")
                     await context.abort(grpc.StatusCode.INVALID_ARGUMENT, exc.detail)
                 except BaseException as exc:

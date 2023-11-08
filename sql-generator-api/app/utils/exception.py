@@ -32,3 +32,15 @@ class ValidationException(MyException) :
     """
         Класс для ошибок, возвращаемых при проваленной валидации
     """
+
+
+class ParsingExceptionCode(Enum) :
+    INVALID_ENTITY_TYPE = 1
+    FOREIGN_KEY_DOESNT_EXIST = 2
+    LINKS_ERRORS_WHILE_PARSING = 3
+    ENTITY_TO_LINK_DOESNT_EXIST = 4
+
+class ParsingException(MyException) :
+    """
+        Класс для ошибок, возвращаемых при проваленном парсинге
+    """

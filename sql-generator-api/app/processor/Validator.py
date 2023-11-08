@@ -7,6 +7,8 @@ from utils.dict_from import dictFromYaml
 from utils.exception import ConfigException, ConfigExceptionCode
 from processor.AbstractProcessor import AbstractProcessor as Processor
 from entity.EntityBonds import EntityBonds
+from entity.Entity import Bond
+from utils.config import EntityKeyword
 
 
 class Validator(Processor) :
@@ -52,3 +54,13 @@ class Validator(Processor) :
         yaml = dictFromYaml(file.file, file.keyword)
         for index, entity in enumerate(yaml) :
             await self.__validateEntity(entity, EntityBonds.keyword_to_keyword[file.keyword], index)
+
+
+    @Processor.methodDecorator("validator:readAndValidateFileBonds")
+    async def readAndValidateFileBonds(self, file : FileBinaryKeyword) :
+        if file.keyword != EntityKeyword.bonds :
+            raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
+                                  detail=f"Такое ключевое слово, {file.keyword}, не предусмотрено")
+        yaml = dictFromYaml(file.file, file.keyword)
+        for index, entity in enumerate(yaml) :
+            Bond.validate(f"{file.keyword}:{index+1}", entity)

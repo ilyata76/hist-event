@@ -66,12 +66,24 @@ class Config :
         if not hasattr(self, "_Config__FILE_API_GRPC_HOST") :
             self.__FILE_API_GRPC_HOST = environ.get("FILE_API_GRPC_HOST", "localhost")
         return self.__FILE_API_GRPC_HOST
-    
+
     @property 
     def FILE_API_GRPC_PORT(self) -> str :
         if not hasattr(self, "_Config__FILE_API_GRPC_PORT") :
             self.__FILE_API_GRPC_PORT = environ.get("FILE_API_GRPC_PORT", "50052")
         return self.__FILE_API_GRPC_PORT
+
+    @property 
+    def PARSE_NAME_SPECIAL_SYMBOLS(self) -> str :
+        if not hasattr(self, "_Config__PARSE_NAME_SPECIAL_SYMBOLS") :
+            self.__PARSE_NAME_SPECIAL_SYMBOLS = environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!")
+        return self.__PARSE_NAME_SPECIAL_SYMBOLS
+
+    @property 
+    def PARSE_KEYWORD_SPECIAL_SYMBOLS(self) -> str :
+        if not hasattr(self, "_Config__PARSE_KEYWORD_SPECIAL_SYMBOLS") :
+            self.__PARSE_KEYWORD_SPECIAL_SYMBOLS = environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_")
+        return self.__PARSE_KEYWORD_SPECIAL_SYMBOLS
 
     @property
     def GRPC_MAX_WORKERS(self) -> str :
@@ -85,6 +97,18 @@ class Config :
             self.__GRPC_MAX_WORKERS = 10
         return self.__GRPC_MAX_WORKERS
 
+    @property
+    def MAX_ITERATION_PARSE(self) -> str :
+        """
+            Количество работающих threads у grpc-сервера
+        """
+        try : 
+            if not hasattr(self, "_Config__MAX_ITERATION_PARSE") :
+                self.__MAX_ITERATION_PARSE = int(environ.get("MAX_ITERATION_PARSE", 10)) - 1
+        except BaseException :
+            self.__MAX_ITERATION_PARSE = 9
+        return self.__MAX_ITERATION_PARSE
+
     def __str__(self, indent : str = "") -> str :
         """
             Строковое представление.
@@ -97,6 +121,7 @@ class Config :
                + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "; "\
                + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "; "\
                + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}" + "; "\
+               + indent + f"MAX_ITERATION_PARSE : {self.MAX_ITERATION_PARSE}" + "; "\
                + indent + f"FILE_API_GRPC_HOST : {self.FILE_API_GRPC_HOST}" + "; "\
                + indent + f"FILE_API_GRPC_PORT : {self.FILE_API_GRPC_PORT}"
 
@@ -118,6 +143,7 @@ class EntityKeyword :
     PLACE = "place"
     places = "places"
     PERSON = "person"
+    AUTHOR = "author"
     persons = "persons"
     BIBLIO = "biblio"
     biblios = "biblios"
@@ -131,6 +157,8 @@ class EntityKeyword :
     events = "events"
     OTHER = "other"
     others = "others"
+    bonds = "bonds"
+    BOND = "bond"
     
 
 class EntityContentKeyword :
@@ -154,6 +182,10 @@ class EntityContentKeyword :
     source = "source"
     min = "min"
     max = "max"
+    event = "event"
+    parents = "parents"
+    childs = "childs"
+    prerequisites = "prerequisites"
 
 
 config = Config()

@@ -1,7 +1,7 @@
 """
     Абстрактный процессор
 """
-from utils.exception import ConfigException, ConfigExceptionCode
+from utils.exception import *
 from utils.logger import logger
 from utils.config import LogCode
 
@@ -21,13 +21,20 @@ class AbstractProcessor :
                 try : 
                     logger.debug(f"[PROCESSOR] : {path} : {args} : {kwargs} : {LogCode.PENDING}")
                     res = await function(self, *args, **kwargs)
-                    logger.info(f"[PROCESSOR] : {path} : {args} : {kwargs} : {LogCode.SUCCESS}")
+                    logger.info(f"[PROCESSOR] : {path} : {args} : {kwargs} : {res} : {LogCode.SUCCESS}")
                     return res
                 except KeyError as exc :
                     raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
                                           detail=f"Невозможно взять значение по ключу {exc.args}")
+                except ParsingException as exc :
+                    match exc.code :
+                        case ParsingExceptionCode.LINKS_ERRORS_WHILE_PARSING :
+                            logger.warning(f"[PROCESSOR] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                        case _ :
+                            logger.error(f"[PROCESSOR] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                    raise exc
                 except BaseException as exc :
-                    logger.error(f"[PROCESSOR] : {path} : {args} : {kwargs} : {LogCode.ERROR}")
+                    logger.error(f"[PROCESSOR] : {path} : {args} : {kwargs} : {exc.args} : {LogCode.ERROR}")
                     raise exc
             return wrap
         return processorMethod

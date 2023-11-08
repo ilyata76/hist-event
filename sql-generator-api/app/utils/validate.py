@@ -53,5 +53,11 @@ def validateFieldOnHTTP(field : str, entity_identifier : str, dict_entity : dict
 
 def validateFieldOnCrossExcluding(fields : list[str], entity_identifier : str, dict_entity : dict) :
     if [field in dict_entity.keys() for field in fields].count(True) > 1 :
-            raise VE(code=VECode.CROSS_EXCLUDING_FIELDS,
-                     detail=f"У сущности {entity_identifier} поля {fields} являются взаимоисключающими")
+        raise VE(code=VECode.CROSS_EXCLUDING_FIELDS,
+                 detail=f"У сущности {entity_identifier} поля {fields} являются взаимоисключающими")
+
+
+def validateFieldOnListInt(field : str, entity_identifier : str, dict_entity : dict) :
+    if not all(isinstance(i, int) for i in dict_entity[field]) :
+        raise VE(code=VECode.INVALID_FIELD_CONTENT,
+                 detail=f"У сущности {entity_identifier} поле {field} должно представлять собой массив целых чисел")
