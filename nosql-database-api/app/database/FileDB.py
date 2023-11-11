@@ -55,7 +55,7 @@ class FileMongoDB(FileDB) :
         self.db = self.client.client[config.DATABASE_FILES_DB]
 
     def prefix(self) :
-        return f"[DATABASE][MONGODB]"
+        return f"[DATABASE][MONGODB][FILE]"
 
     @AbstractMongoDB.method("fileMongoDB:appendOne")
     async def appendOne(self, file : File) -> File | None :

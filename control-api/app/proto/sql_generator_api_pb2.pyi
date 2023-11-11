@@ -25,13 +25,25 @@ class ManyFilesR(_message.Message):
     identifier: str
     def __init__(self, files: _Optional[_Iterable[_Union[File, _Mapping]]] = ..., main_sql: _Optional[_Union[File, _Mapping]] = ..., identifier: _Optional[str] = ...) -> None: ...
 
-class Status(_message.Message):
-    __slots__ = ["status", "identifier"]
+class StatusR(_message.Message):
+    __slots__ = ["status"]
     STATUS_FIELD_NUMBER: _ClassVar[int]
-    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
     status: str
+    def __init__(self, status: _Optional[str] = ...) -> None: ...
+
+class IdentifierR(_message.Message):
+    __slots__ = ["identifier"]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
     identifier: str
-    def __init__(self, status: _Optional[str] = ..., identifier: _Optional[str] = ...) -> None: ...
+    def __init__(self, identifier: _Optional[str] = ...) -> None: ...
+
+class IdentifierStatusR(_message.Message):
+    __slots__ = ["identifier", "status"]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    identifier: str
+    status: str
+    def __init__(self, identifier: _Optional[str] = ..., status: _Optional[str] = ...) -> None: ...
 
 class File(_message.Message):
     __slots__ = ["storage", "path", "filename", "keyword"]

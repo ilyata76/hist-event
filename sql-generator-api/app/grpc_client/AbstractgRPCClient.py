@@ -1,8 +1,8 @@
 """
     Файл клиента для gRPC
 """
-from functools import partial
-from grpc import RpcError
+from functools import partial, wraps
+import grpc
 
 from utils.logger import logger
 from utils.config import LogCode
@@ -19,20 +19,25 @@ class AbstractgRPCClient :
 
 
     @staticmethod
-    def methodDecorator(path : str) :
+    def methodAsyncDecorator(path : str, ip : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование
-                запросов, исходящих ОТ КЛИЕНТА
+                запросов, исходящих ОТ КЛИЕНТА.
         """
         def gRPCMethod(function) :
-            async def wrap(*args, **kwargs) :
+            @wraps(function)
+            async def wrap(*args, channel = None, **kwargs) :
                 prefix = partial(AbstractgRPCClient.logPrefix, path=path, args=args, kwargs=kwargs)
                 try : 
                     logger.debug(f"{prefix(code=LogCode.PENDING)}")
-                    result = await function(*args, **kwargs)
-                    logger.info(f"{prefix(code=LogCode.SUCCESS)}")
+                    if not channel : 
+                        with grpc.insecure_channel(ip) as channel :
+                            result = await function(*args, channel=channel, **kwargs)
+                    else :
+                        result = await function(*args, channel=channel, **kwargs)
+                    logger.info(f"{prefix(code=LogCode.SUCCESS)} : {result}")
                     return result
-                except RpcError as exc:
+                except grpc.RpcError as exc:
                     logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code()}:{exc.details()}")
                     raise exc
                 except BaseException as exc:

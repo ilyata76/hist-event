@@ -97,6 +97,10 @@ class Config :
         return "s3_files"
 
     @property
+    def DATABASE_SQL_GENERATOR_DB(self) -> str :
+        return "sql_generator"
+
+    @property
     def GRPC_HOST(self) -> str :
         if not hasattr(self, "_Config__GRPC_HOST") :
             self.__GRPC_HOST = environ.get("GRPC_HOST", "0.0.0.0")

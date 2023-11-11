@@ -2,7 +2,7 @@
     Файл логики gRPC-сервера
 """
 import grpc
-from functools import partial
+from functools import partial, wraps
 
 from utils.logger import logger
 from utils.config import LogCode
@@ -20,12 +20,13 @@ class AbstractServicer :
 
 
     @staticmethod
-    def methodDecorator(path : str) :
+    def methodAsyncDecorator(path : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование
                 запросов, приходящих К СЕРВЕРУ
         """
         def servicerMethod(function) :
+            @wraps(function)
             async def wrap(self, request, context : grpc.ServicerContext, *args, **kwargs) :
                 prefix = partial(AbstractServicer.logPrefix, path=path, peer=context.peer(), request=request)
                 try : 

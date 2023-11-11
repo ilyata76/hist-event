@@ -1,6 +1,8 @@
 """
     Классы хранилищ для сущностей
 """
+from functools import wraps
+
 from utils.logger import logger
 from entity.Entity import Entity, Bond
 from entity.EntityBonds import EntityBonds
@@ -24,36 +26,25 @@ class StorageManager :
 
 
     @staticmethod
-    def __handleExceptionsAndLog(function_call, path, *args, **kwargs) :
-        try : 
-            logger.debug(f"[STORAGE] : {path} : {args} : {kwargs} : {LogCode.PENDING}")
-            res = function_call
-            logger.info(f"[STORAGE] : {path} : {args} : {kwargs} : {res} : {LogCode.SUCCESS}")
-            return res
-        except ParsingException as exc :
-            match exc.code :
-                case ParsingExceptionCode.FOREIGN_KEY_DOESNT_EXIST | ParsingExceptionCode.ENTITY_TO_LINK_DOESNT_EXIST :
-                    logger.warning(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
-                case _ :
-                    logger.error(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
-            raise exc
-        except BaseException as exc :
-            logger.error(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.args} : {LogCode.ERROR}")
-            raise exc
-
-
-    @staticmethod
-    def methodDecorator(path : str, asynchronous=False) :
+    def methodAsyncDecorator(path : str) :
         def method(function) :
-            nonlocal asynchronous
-            if asynchronous : 
-                async def wrap(self, *args, **kwargs) :
-                    return StorageManager.__handleExceptionsAndLog(await function(self, *args, **kwargs),
-                                                                   path, *args, **kwargs)
-            else :
-                def wrap(self, *args, **kwargs) :
-                    return StorageManager.__handleExceptionsAndLog(function(self, *args, **kwargs),
-                                                                   path, *args, **kwargs)
+            @wraps(function)
+            async def wrap(self, *args, **kwargs) :
+                try : 
+                    logger.debug(f"[STORAGE] : {path} : {args} : {kwargs} : {LogCode.PENDING}")
+                    res = await function(self, *args, **kwargs)
+                    logger.info(f"[STORAGE] : {path} : {args} : {kwargs} : {res} : {LogCode.SUCCESS}")
+                    return res
+                except ParsingException as exc :
+                    match exc.code :
+                        case ParsingExceptionCode.FOREIGN_KEY_DOESNT_EXIST | ParsingExceptionCode.ENTITY_TO_LINK_DOESNT_EXIST :
+                            logger.warning(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                        case _ :
+                            logger.error(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                    raise exc
+                except BaseException as exc :
+                    logger.error(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.args} : {LogCode.ERROR}")
+                    raise exc
             return wrap
         return method
 
@@ -89,27 +80,27 @@ class StorageManager :
         return self.__storages[keyword]
 
 
-    @methodDecorator("storage:getEntityByID")
-    def getEntityByID(self, keyword : str, id : int) -> Entity :
+    @methodAsyncDecorator("storage:getEntityByID")
+    async def getEntityByID(self, keyword : str, id : int) -> Entity :
         if (store := self.__storages.get(keyword, None)) is not None : # ура, нашли, где применить :=!
             return store.getByID(id)
         else :
             return None
 
 
-    @methodDecorator("storage:__checkForeignKeys")
-    def __checkForeignKeys(self, keyword, entity : Entity) :
+    @methodAsyncDecorator("storage:__checkForeignKeys")
+    async def __checkForeignKeys(self, keyword, entity : Entity) :
         for foreign_key in entity.foreignKeys() :
             if not foreign_key : # некоторые поля могут быть необязательными
                 continue
             self.__checkReversedKeywordIsValid(foreign_key.entity, f"{keyword}:{entity.id}") # проверить, что поле проверяемое правильно описано >date<: 1
-            if not self.getEntityByID(EntityBonds.keyword_to_keyword_reversed[foreign_key.entity], foreign_key.id) :
+            if not await self.getEntityByID(EntityBonds.keyword_to_keyword_reversed[foreign_key.entity], foreign_key.id) :
                 raise ParsingException(code=ParsingExceptionCode.FOREIGN_KEY_DOESNT_EXIST,
                                        detail=f"Для сущности из {keyword}:{entity.id} ссылка {foreign_key.entity}:{foreign_key.id} ссылается на несуществующую позицию")
 
 
-    @methodDecorator("storage:__parseTextForInclusions")
-    def __parseTextForInclusionsToLinks(self, keyword, entity : Entity) :
+    @methodAsyncDecorator("storage:__parseTextForInclusions")
+    async def __parseTextForInclusionsToLinks(self, keyword, entity : Entity) :
         for text in entity.textsToParseLinks() :
             if not text :
                 continue
@@ -132,23 +123,23 @@ class StorageManager :
                                                                     entity.id)
 
 
-    @methodDecorator("storage:resolveAllLinksInText", asynchronous=True)
+    @methodAsyncDecorator("storage:resolveAllLinksInText")
     async def resolveAllLinksInEntitiesTexts(self) :
         """Функция проверяет все входящие ссылки в текстах (определяемых сущностями), добавляет их в классы сущностей"""
         for storage_key, storage_value in self.__storages.items() :
             for entity in storage_value.entities() :
-                self.__parseTextForInclusionsToLinks(storage_key, entity)
+                await self.__parseTextForInclusionsToLinks(storage_key, entity)
 
 
-    @methodDecorator("storage:append", asynchronous=True)
+    @methodAsyncDecorator("storage:append")
     async def append(self, keyword : str, entity : Entity) :
         self.__checkKeywordIsValid(keyword, f"{keyword}:{entity.id}")
         current_storage = self.__getStorageByKeyword(keyword)
-        self.__checkForeignKeys(keyword, entity)
+        await self.__checkForeignKeys(keyword, entity)
         current_storage.append(entity)
 
 
-    @methodDecorator("storage:appendBond", asynchronous=True)
+    @methodAsyncDecorator("storage:appendBond")
     async def appendBond(self, entity : Bond) :
         if isinstance(entity, Bond):
             self.__bonds.update({entity.event:entity})

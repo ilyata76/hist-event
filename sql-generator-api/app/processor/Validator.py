@@ -2,7 +2,7 @@
     Валидация входных сущностей на правильность заполнения
 """
 from utils.logger import logger
-from schemas.File import FileBinaryKeyword
+from schemas.File import FileBinaryKeyword, FileBase, FileKeyword
 from utils.dict_from import dictFromYaml
 from utils.exception import ConfigException, ConfigExceptionCode
 from processor.AbstractProcessor import AbstractProcessor as Processor
@@ -33,7 +33,7 @@ class Validator(Processor) :
                                   detail=f"Такое ключевое слово, {keyword}, не предусмотрено")
 
 
-    @Processor.methodDecorator("validator:__validateEntity")
+    @Processor.methodAsyncDecorator("validator:__validateEntity")
     async def __validateEntity(self, dict_entity : dict, keyword : str, entity_index : int) :
         """
             Валидация конкретной сущности.
@@ -43,24 +43,25 @@ class Validator(Processor) :
         entity.validate(f"{keyword}:{entity_index+1}", dict_entity)
 
 
-    @Processor.methodDecorator("validator:readAndValidateFileEntities")
-    async def readAndValidateFileEntities(self, file : FileBinaryKeyword) :
+    @Processor.methodAsyncDecorator("validator:readAndValidateFileEntities")
+    async def readAndValidateFileEntities(self, getFile, file : FileKeyword) :
         """
             Валидация всех сущностей входящих в файл по keyword.
             Выбрасывает исключение, если какая-то сущность не может быть провалидирована.
         """
         self.__checkKeywordIsValid(file.keyword)
-        
-        yaml = dictFromYaml(file.file, file.keyword)
+        file_binary = await getFile(file=FileBase(path=file.path, storage=file.storage))
+        yaml = dictFromYaml(file_binary.file, file.keyword)
         for index, entity in enumerate(yaml) :
             await self.__validateEntity(entity, EntityBonds.keyword_to_keyword[file.keyword], index)
 
 
-    @Processor.methodDecorator("validator:readAndValidateFileBonds")
-    async def readAndValidateFileBonds(self, file : FileBinaryKeyword) :
+    @Processor.methodAsyncDecorator("validator:readAndValidateFileBonds")
+    async def readAndValidateFileBonds(self, getFile, file : FileKeyword) :
         if file.keyword != EntityKeyword.bonds :
             raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
                                   detail=f"Такое ключевое слово, {file.keyword}, не предусмотрено")
-        yaml = dictFromYaml(file.file, file.keyword)
+        file_binary = await getFile(file=FileBase(path=file.path, storage=file.storage))
+        yaml = dictFromYaml(file_binary.file, file.keyword)
         for index, entity in enumerate(yaml) :
             Bond.validate(f"{file.keyword}:{index+1}", entity)

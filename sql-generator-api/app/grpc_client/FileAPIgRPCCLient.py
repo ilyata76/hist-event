@@ -4,6 +4,7 @@
 import grpc
 import proto.file_api_pb2 as pb2
 import proto.file_api_pb2_grpc as pb2_grpc
+from functools import wraps
 
 from utils.config import config
 from utils.dict_from import dictFromMessage
@@ -19,19 +20,8 @@ class FileAPIgRPCCLient :
     """
 
     @staticmethod
-    def channelDecorator(function) :
-        async def wrap(channel = None, *args, **kwargs) :
-            if not channel : 
-                with grpc.insecure_channel(f"{config.FILE_API_GRPC_HOST}:{config.FILE_API_GRPC_PORT}") as channel :
-                    return await function(channel=channel, *args, **kwargs)
-            else : 
-                return await function(channel=channel, *args, **kwargs)
-        return wrap
-
-
-    @staticmethod
-    @GrpcClient.methodDecorator("file-api:Ping")
-    @channelDecorator
+    @GrpcClient.methodAsyncDecorator("file-api:Ping",
+                                     f"{config.FILE_API_GRPC_HOST}:{config.FILE_API_GRPC_PORT}")
     async def Ping(channel = None) -> Pong :
         stub = pb2_grpc.FileAPIStub(channel)
         response : pb2.PongR = stub.Ping(pb2.PingR())
@@ -39,8 +29,8 @@ class FileAPIgRPCCLient :
 
 
     @staticmethod
-    @GrpcClient.methodDecorator("file-api:GetFile")
-    @channelDecorator
+    @GrpcClient.methodAsyncDecorator("file-api:GetFile",
+                                     f"{config.FILE_API_GRPC_HOST}:{config.FILE_API_GRPC_PORT}")
     async def GetFile(file : FileBase, channel = None) -> FileBinary:
         stub = pb2_grpc.FileAPIStub(channel)
         response : pb2.FileBinaryR = stub.GetFile(pb2.FileBaseR(file=file.model_dump()))

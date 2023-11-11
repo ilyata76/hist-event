@@ -13,13 +13,17 @@ service SQLGeneratorAPI {
   // проверить работоспособность
   rpc Ping (PingR) returns (PongR) {}
 
-  rpc Validate (ManyFilesR) returns (Status) {}
+  rpc Validate (ManyFilesR) returns (StatusR) {}
 
-  rpc Parse (ManyFilesR) returns (Status) {}
+  rpc Parse (ManyFilesR) returns (StatusR) {}
 
-  rpc Generate (ManyFilesR) returns (Status) {}
+  rpc Generate (ManyFilesR) returns (StatusR) {}
 
-  // TODO: сделать геттеры для сущностей через NoSQL и статусов
+  // 
+  rpc PutSQLGeneratorStatus (IdentifierStatusR) returns (IdentifierStatusR) {}
+
+  //
+  rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
 }
 
 message PingR {
@@ -39,10 +43,18 @@ message ManyFilesR {
   // строка идентификации операции для разграничения и сохранения порядка
   string identifier = 3;
 }
-message Status {
+
+message StatusR {
   string status = 1;
-  // идентификатор пронизывает всю цепочку трёх операций
-  string identifier = 3;
+}
+
+message IdentifierR {
+  string identifier = 1;
+}
+
+message IdentifierStatusR {
+  string identifier = 1;
+  string status = 2;
 }
 
 // классы

@@ -28,6 +28,21 @@ service NoSQLDatabaseAPI {
 
   // получить список мета-информацю всех (или отрезком) файлов
   rpc GetManyFilesMetaInfo (StorageSegmentR) returns (FileSegmentR) {}
+
+  // 
+  rpc PutSQLGeneratorStatus (IdentifierStatusR) returns (IdentifierStatusR) {}
+
+  //
+  rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
+
+  // //
+  // rpc PutSQLGeneratorOneEntity () returns () {}
+
+  // // 
+  // rpc DeleteSQLGeneratorAllEntities () returns () {}
+
+  // //
+  // rpc GetSQLGeneratorAllEntities() returns () {} // TODO stream
 }
 
 message PingR {
@@ -57,6 +72,15 @@ message FileSegmentR {
   repeated File files = 1;
 };
 
+message IdentifierR {
+  string identifier = 1;
+}
+
+message IdentifierStatusR {
+  string identifier = 1;
+  string status = 2;
+}
+
 // классы
 
 message FileBase {
@@ -68,3 +92,5 @@ message File {
   string path = 2;
   string filename = 3;
 };
+
+//

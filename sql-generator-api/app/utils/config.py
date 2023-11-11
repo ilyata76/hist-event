@@ -74,6 +74,18 @@ class Config :
         return self.__FILE_API_GRPC_PORT
 
     @property 
+    def NOSQL_DATABASE_GRPC_HOST(self) -> str :
+        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_HOST") :
+            self.__NOSQL_DATABASE_GRPC_HOST = environ.get("NOSQL_DATABASE_GRPC_HOST", "localhost")
+        return self.__NOSQL_DATABASE_GRPC_HOST
+    
+    @property 
+    def NOSQL_DATABASE_GRPC_PORT(self) -> str :
+        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_PORT") :
+            self.__NOSQL_DATABASE_GRPC_PORT = environ.get("NOSQL_DATABASE_GRPC_PORT", "50051")
+        return self.__NOSQL_DATABASE_GRPC_PORT
+
+    @property 
     def PARSE_NAME_SPECIAL_SYMBOLS(self) -> str :
         if not hasattr(self, "_Config__PARSE_NAME_SPECIAL_SYMBOLS") :
             self.__PARSE_NAME_SPECIAL_SYMBOLS = environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!")
@@ -123,7 +135,9 @@ class Config :
                + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}" + "; "\
                + indent + f"MAX_ITERATION_PARSE : {self.MAX_ITERATION_PARSE}" + "; "\
                + indent + f"FILE_API_GRPC_HOST : {self.FILE_API_GRPC_HOST}" + "; "\
-               + indent + f"FILE_API_GRPC_PORT : {self.FILE_API_GRPC_PORT}"
+               + indent + f"FILE_API_GRPC_PORT : {self.FILE_API_GRPC_PORT}" + "; "\
+               + indent + f"NOSQL_DATABASE_GRPC_HOST : {self.NOSQL_DATABASE_GRPC_HOST}" + "; "\
+               + indent + f"NOSQL_DATABASE_GRPC_PORT : {self.NOSQL_DATABASE_GRPC_PORT}"
 
 
 class StorageIdentifier :

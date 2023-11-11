@@ -16,6 +16,6 @@ class Generator(Processor) :
         super().__init__()
 
 
-    @Processor.methodDecorator("generator:readAndGenerateSQLFromStorage")
+    @Processor.methodAsyncDecorator("generator:readAndGenerateSQLFromStorage")
     async def readAndGenerateSQLFromStorage(self) :
         pass

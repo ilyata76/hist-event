@@ -4,6 +4,7 @@
 from fastapi import APIRouter, Request
 
 from app.schemas.File import FileKeyword
+from app.schemas.StatusIdentifier import Status, StatusIdentifier
 from app.grpc_client.SQLGeneratorAPIgRPCClient import SQLGeneratorAPIgRPCClient
 from app.rest_api.log_and_except import log_and_except
 
@@ -41,7 +42,24 @@ async def SQLGeneratorParse(request : Request,
                    description="Сгенерировать SQL-файл из сущностей после /parse/operation")
 @log_and_except
 async def SQLGeneratorGenerate(request : Request,
-                            operation : str,
-                            files : list[FileKeyword]) -> str :
+                               operation : str,
+                               files : list[FileKeyword]) -> str :
     response = await SQLGeneratorAPIgRPCClient.Generate(files, operation)
     return response.status
+
+@sql_generator.get("/status/{identifier}")
+@log_and_except
+async def GetSQLGeneratorStatus(request : Request,
+                                identifier : str) -> StatusIdentifier :
+    response = await SQLGeneratorAPIgRPCClient.GetSQLGeneratorStatus(identifier)
+    return StatusIdentifier(identifier=response.identifier,
+                            status=response.status)
+
+@sql_generator.put("/status/{identifier}")
+@log_and_except
+async def PutSQLGeneratorStatus(request : Request,
+                                identifier : str,
+                                status : Status) -> StatusIdentifier :
+    response = await SQLGeneratorAPIgRPCClient.PutSQLGeneratorStatus(identifier, status.status)
+    return StatusIdentifier(identifier=response.identifier,
+                            status=response.status)

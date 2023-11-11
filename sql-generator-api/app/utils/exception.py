@@ -22,6 +22,11 @@ class ConfigException(MyException) :
     """
 
 
+class gRPCServicerError(MyException) :
+    pass
+
+
+
 class ValidationExceptionCode(Enum) :
     INVALID_FIELD = 1
     INVALID_FIELD_CONTENT = 2
@@ -39,6 +44,7 @@ class ParsingExceptionCode(Enum) :
     FOREIGN_KEY_DOESNT_EXIST = 2
     LINKS_ERRORS_WHILE_PARSING = 3
     ENTITY_TO_LINK_DOESNT_EXIST = 4
+    FILES_DONT_VALIDATED = 5
 
 class ParsingException(MyException) :
     """

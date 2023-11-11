@@ -34,7 +34,7 @@ class Parser(Processor) :
                                   detail=f"Такое ключевое слово, {keyword}, не предусмотрено")
 
 
-    @Processor.methodDecorator("parser:__appendEntityAndStoreErrors")
+    @Processor.methodAsyncDecorator("parser:__appendEntityAndStoreErrors")
     async def __appendEntityAndStoreErrors(self, errors : list , keyword : str, entity : Entity) :
         """Собирает детали исключений в массив, чтобы в любом случае пройти по всем сущностям"""
         try : 
@@ -47,7 +47,7 @@ class Parser(Processor) :
                     raise exc
 
 
-    @Processor.methodDecorator("parser:__readAndParseFileEntitiesAndSaveInStorage")
+    @Processor.methodAsyncDecorator("parser:__readAndParseFileEntitiesAndSaveInStorage")
     async def readAndParseFileEntitiesAndSaveInStorage(self, file : FileBinaryKeyword) :
         """Поднимает исключение, если произошли ошибки ссылок"""
         self.__checkKeywordIsValid(file.keyword)
@@ -63,7 +63,7 @@ class Parser(Processor) :
                                    detail=errors.__str__())
 
 
-    @Processor.methodDecorator("parser:parseFilesRecursiveToFillStorage")
+    @Processor.methodAsyncDecorator("parser:parseFilesRecursiveToFillStorage")
     async def parseFilesRecursiveToFillStorage(self, getFile, files : list[FileKeyword], iterator = 0) :
         """Рекурсивно проходит все файлы несколько раз, чтобы добавлять новые сущности разной глубины вложенности"""
         errors = []
@@ -91,7 +91,7 @@ class Parser(Processor) :
                                        detail=errors.__str__() + f" (итераций: {iterator + 1})")
 
 
-    @Processor.methodDecorator("parser:resolveAllLinksInEntitiesTexts")
+    @Processor.methodAsyncDecorator("parser:resolveAllLinksInEntitiesTexts")
     async def resolveAllLinksInEntitiesTexts(self) :
         """
             Функция проверяет все входящие ссылки в текстах (определяемых сущностями), добавляет их в классы сущностей.
@@ -100,16 +100,17 @@ class Parser(Processor) :
         return await self.storage.resolveAllLinksInEntitiesTexts()
 
 
-    @Processor.methodDecorator("parser:parseAndResolveEventBondsFileToStorage")
-    async def parseAndResolveEventBondsFileToStorage(self, file : FileBinaryKeyword) :
+    @Processor.methodAsyncDecorator("parser:parseAndResolveEventBondsFileToStorage")
+    async def parseAndResolveEventBondsFileToStorage(self, getFile, file : FileKeyword) :
         """После всех действий нужно образовать связи между ивентами. Связи отдельно."""
         if file.keyword != EntityKeyword.bonds :
             raise ParsingException(code=ParsingExceptionCode.INVALID_ENTITY_TYPE,
                                    detail=f"Ключевое слово для свящей должно быть {EntityKeyword.bonds}!")
-        yaml = dictFromYaml(file.file, file.keyword)
+        file_binary = await getFile(file=FileBase(path=file.path, storage=file.storage))
+        yaml = dictFromYaml(file_binary.file, file.keyword)
 
-        def checkEventExist(bond_id: int, event_id : int, busy_events : list[int]) :
-            if not self.storage.getEntityByID(EntityKeyword.events, event_id) :
+        async def checkEventExist(bond_id: int, event_id : int, busy_events : list[int]) :
+            if not await self.storage.getEntityByID(EntityKeyword.events, event_id) :
                 raise ParsingException(code=ParsingExceptionCode.ENTITY_TO_LINK_DOESNT_EXIST,
                                        detail=f"Сущность связи {bond_id} ссылается на несуществующее событие {event_id}")
             print(busy_events)
@@ -120,19 +121,19 @@ class Parser(Processor) :
         for index, dict_bond in enumerate(yaml) :
             bond = Bond(**dict_bond)
             
-            checkEventExist(index, bond.event, [])
+            await checkEventExist(index, bond.event, [])
             busy_events = [bond.event]
             if bond.parents : 
                 for event in bond.parents :
-                    checkEventExist(index, event, busy_events)
+                    await checkEventExist(index, event, busy_events)
             if bond.childs :
                 if bond.parents : busy_events.extend(bond.parents)
                 for event in bond.childs :
-                    checkEventExist(index, event, busy_events)
+                    await checkEventExist(index, event, busy_events)
             if bond.prerequisites :
                 if bond.childs : busy_events.extend(bond.childs)
                 if bond.parents and not bond.childs : busy_events.extend(bond.parents)
                 for event in bond.prerequisites :
-                    checkEventExist(index, event, busy_events)
+                    await checkEventExist(index, event, busy_events)
             
             await self.storage.appendBond(bond)

@@ -1,6 +1,8 @@
 """
     Абстрактный процессор
 """
+from functools import wraps
+
 from utils.exception import *
 from utils.logger import logger
 from utils.config import LogCode
@@ -11,12 +13,13 @@ class AbstractProcessor :
     """
 
     @staticmethod
-    def methodDecorator(path : str) :
+    def methodAsyncDecorator(path : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование
                 функций главных процессов
         """
         def processorMethod(function) :
+            @wraps(function)
             async def wrap(self, *args, **kwargs) :
                 try : 
                     logger.debug(f"[PROCESSOR] : {path} : {args} : {kwargs} : {LogCode.PENDING}")

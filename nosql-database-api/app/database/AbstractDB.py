@@ -24,22 +24,24 @@ class AbstractDB :
             raise DBException(code=DBExceptionCode.SERVICE_UNAVAIABLE, 
                               detail="КлиентDB не смог подключиться к базам данных!")
 
-    def method(function) : 
+    def method(path : str) : 
         """
             Декоратор для методов работы с базой данных.
         """
-        async def wrap(self, *args, **kwargs) :
-            try : 
-                await self.testConnect()
-                return await function(self, *args, **kwargs)
-            except DBException as exc :
-                logger.error(f"Произошла ошибка, связанная с работой базы данных : {type(exc)}:{exc}")
-                raise exc
-            except Exception as exc :
-                logger.error(f"Произошла непредвиденная ошибка : {type(exc)}:{exc}")
-                raise exc
-        return wrap
-    
+        def m(function) :
+            async def wrap(self, *args, **kwargs) :
+                try : 
+                    await self.testConnect()
+                    return await function(self, *args, **kwargs)
+                except DBException as exc :
+                    logger.error(f"Произошла ошибка, связанная с работой базы данных : {type(exc)}:{exc}")
+                    raise exc
+                except Exception as exc :
+                    logger.error(f"Произошла непредвиденная ошибка : {type(exc)}:{exc}")
+                    raise exc
+            return wrap
+        return m
+
 
 class AbstractMongoDB(AbstractDB) :
     """
@@ -57,7 +59,7 @@ class AbstractMongoDB(AbstractDB) :
         """
         def m(function) :
             async def wrap(self, *args, **kwargs) :
-                prefix = f"[DATABASE] : {path}"
+                prefix = f"[DATABASE] : {path} : {args} : {kwargs}"
                 try : 
                     logger.debug(f"{prefix} : {LogCode.PENDING}")
                     await self.testConnect()
@@ -86,7 +88,7 @@ class AbstractMongoDB(AbstractDB) :
                     raise DBException(code=DBExceptionCode.TOO_LARGE, 
                                     detail=f"Документ слишком много весит! : {type(exc)}:{exc}")
                 except (pyerros.WriteError, pyerros.EncryptionError, pyerros.DuplicateKeyError, pyerros.OperationFailure) :
-                    logger.error("{prefix} : {LogCode.ERROR} : Произошла ошибка с операциями MongoDB")
+                    logger.error(f"{prefix} : {LogCode.ERROR} : Произошла ошибка с операциями MongoDB")
                     raise DBException(code=DBExceptionCode.OPERATION_ERROR, 
                                     detail=f"Произошла ошибка с операциями MongoDB : {type(exc)}:{exc}")
                 except DBException as exc :
