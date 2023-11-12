@@ -13,17 +13,20 @@ service SQLGeneratorAPI {
   // проверить работоспособность
   rpc Ping (PingR) returns (PongR) {}
 
-  rpc Validate (ManyFilesR) returns (StatusR) {}
+  rpc Validate (ManyFilesR) returns (IdentifierStatusR) {}
 
-  rpc Parse (ManyFilesR) returns (StatusR) {}
+  rpc Parse (IdentifierR) returns (IdentifierStatusR) {}
 
-  rpc Generate (ManyFilesR) returns (StatusR) {}
+  rpc Generate (IdentifierR) returns (IdentifierStatusR) {}
 
   // 
   rpc PutSQLGeneratorStatus (IdentifierStatusR) returns (IdentifierStatusR) {}
 
   //
   rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
+
+  //
+  rpc GetSQLGeneratorFiles (IdentifierR) returns (ManyFilesIdentifierR) {}
 }
 
 message PingR {
@@ -37,15 +40,14 @@ message PongR {
 
 message ManyFilesR {
   // набор файлов
-  repeated File files = 1;
-  // если есть, сохранит в случае Generate сюда
-  optional File main_sql = 2; 
-  // строка идентификации операции для разграничения и сохранения порядка
-  string identifier = 3;
+  repeated FileBaseKeyword files = 1;
 }
 
-message StatusR {
-  string status = 1;
+message ManyFilesIdentifierR {
+  // набор файлов
+  repeated FileBaseKeyword files = 1;
+  // строка идентификации операции для разграничения и сохранения порядка
+  string identifier = 2;
 }
 
 message IdentifierR {
@@ -59,10 +61,9 @@ message IdentifierStatusR {
 
 // классы
 
-message File {
+message FileBaseKeyword {
   string storage = 1;
   string path = 2;
-  string filename = 3;
   // dates, others и пр. сущностные категории
   string keyword = 4;
 };

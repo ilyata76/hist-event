@@ -11,6 +11,7 @@ from utils.logger import logger
 from utils.config import config
 from utils.exception import DBException, DBExceptionCode
 from schemas.StatusIdentifier import StatusIdentifier, Identifier
+from schemas.File import FileBaseKeywordList
 
 
 class SQLGeneratorDB(AbstractDB) :
@@ -26,6 +27,7 @@ class SQLGeneratorDB(AbstractDB) :
         self.ENTITY_TYPE = "entity"
         self.STATUS_TYPE = "status"
         self.SQL_TYPE = "sql"
+        self.FILES_TYPE = "files"
 
 
     @AbstractDB.method("SQLGeneratorDB:putStatus")
@@ -53,6 +55,16 @@ class SQLGeneratorDB(AbstractDB) :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getAllEntities!")
 
 
+    @AbstractDB.method("SQLGeneratorDB:putFiles")
+    async def putFiles(self, identifier : Identifier, files : FileBaseKeywordList) -> Identifier | None :
+        raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод putFiles!")
+
+
+    @AbstractDB.method("SQLGeneratorDB:getFiles")
+    async def getFiles(self, identifier : Identifier) -> FileBaseKeywordList | None :
+        raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getFiles!")
+
+
 class SQLGeneratorMongoDB(SQLGeneratorDB) :
     """
         Реализация базы данных через MongoDB(Client).
@@ -61,6 +73,9 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
             
             type: status
             status: ""
+
+            type: files
+            files: [{}]
 
             type: entity
             entity: {}
@@ -114,3 +129,33 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
         
         return StatusIdentifier(identifier=identifier.identifier,
                                 status=res[self.STATUS_TYPE]) if res else res
+
+
+    @AbstractMongoDB.method("SQLGeneratorMongoDB:putFiles")
+    async def putFiles(self, identifier: Identifier, files: FileBaseKeywordList) -> Identifier | None :
+        """"""
+        res = None
+
+        async with await self.client.client.start_session() as s :
+            exist = await self.db[identifier.identifier].find_one_and_replace({ self.TYPE : self.FILES_TYPE },
+                                                                              { self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() },
+                                                                              session=s) 
+            if not exist :
+                await self.db[identifier.identifier].insert_one({ self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() })
+            res = await self.db[identifier.identifier].find_one({ self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() })
+
+        return Identifier(identifier=identifier.identifier) if res else res
+
+
+    @AbstractMongoDB.method("SQLGeneratorMongoDB:getFiles")
+    async def getFiles(self, identifier: Identifier) -> FileBaseKeywordList | None :
+        """"""
+        res = None
+
+        async with await self.client.client.start_session() as s :
+            res = await self.db[identifier.identifier].find_one({ self.TYPE : self.FILES_TYPE }, session=s)
+            if not res :
+                raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS,
+                                  detail=f"Файлы для {identifier.identifier} не определены")
+
+        return FileBaseKeywordList(**res[self.FILES_TYPE]) if res else res

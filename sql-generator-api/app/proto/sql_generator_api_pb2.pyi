@@ -16,20 +16,18 @@ class PongR(_message.Message):
     def __init__(self, pong: _Optional[str] = ...) -> None: ...
 
 class ManyFilesR(_message.Message):
-    __slots__ = ["files", "main_sql", "identifier"]
+    __slots__ = ["files"]
     FILES_FIELD_NUMBER: _ClassVar[int]
-    MAIN_SQL_FIELD_NUMBER: _ClassVar[int]
-    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
-    files: _containers.RepeatedCompositeFieldContainer[File]
-    main_sql: File
-    identifier: str
-    def __init__(self, files: _Optional[_Iterable[_Union[File, _Mapping]]] = ..., main_sql: _Optional[_Union[File, _Mapping]] = ..., identifier: _Optional[str] = ...) -> None: ...
+    files: _containers.RepeatedCompositeFieldContainer[FileBaseKeyword]
+    def __init__(self, files: _Optional[_Iterable[_Union[FileBaseKeyword, _Mapping]]] = ...) -> None: ...
 
-class StatusR(_message.Message):
-    __slots__ = ["status"]
-    STATUS_FIELD_NUMBER: _ClassVar[int]
-    status: str
-    def __init__(self, status: _Optional[str] = ...) -> None: ...
+class ManyFilesIdentifierR(_message.Message):
+    __slots__ = ["files", "identifier"]
+    FILES_FIELD_NUMBER: _ClassVar[int]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    files: _containers.RepeatedCompositeFieldContainer[FileBaseKeyword]
+    identifier: str
+    def __init__(self, files: _Optional[_Iterable[_Union[FileBaseKeyword, _Mapping]]] = ..., identifier: _Optional[str] = ...) -> None: ...
 
 class IdentifierR(_message.Message):
     __slots__ = ["identifier"]
@@ -45,14 +43,12 @@ class IdentifierStatusR(_message.Message):
     status: str
     def __init__(self, identifier: _Optional[str] = ..., status: _Optional[str] = ...) -> None: ...
 
-class File(_message.Message):
-    __slots__ = ["storage", "path", "filename", "keyword"]
+class FileBaseKeyword(_message.Message):
+    __slots__ = ["storage", "path", "keyword"]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
     PATH_FIELD_NUMBER: _ClassVar[int]
-    FILENAME_FIELD_NUMBER: _ClassVar[int]
     KEYWORD_FIELD_NUMBER: _ClassVar[int]
     storage: str
     path: str
-    filename: str
     keyword: str
-    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ..., keyword: _Optional[str] = ...) -> None: ...
+    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., keyword: _Optional[str] = ...) -> None: ...

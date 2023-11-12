@@ -1,10 +1,8 @@
 """
     Файл клиента для gRPC FileAPi сервера и доступа к нему
 """
-import grpc
 import proto.file_api_pb2 as pb2
 import proto.file_api_pb2_grpc as pb2_grpc
-from functools import wraps
 
 from utils.config import config
 from utils.dict_from import dictFromMessage

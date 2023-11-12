@@ -31,6 +31,10 @@ class FileBinary(File) :
     file : bytes = Field(repr=False)
 
 
+class FileBaseKeyword(FileBase) :
+    keyword : str
+
+
 class FileKeyword(File) :
     """
         Дополненная схема файла ключевым словом (для связи с SQL-gen)

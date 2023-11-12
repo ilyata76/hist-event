@@ -226,8 +226,9 @@ class Source(Entity) :
             date: int
             type:
             subtype:
-            link: Link
-    
+            link:
+                web: http <--- OR
+                native:   <--- OR
     """
     author : int | None = None
     date : int | None = None

@@ -7,7 +7,7 @@ import proto.nosql_database_api_pb2_grpc as pb2_grpc
 
 from grpc_server.AbstractServicer import AbstractServicer as Servicer
 import database
-from schemas.File import File, FileBase
+from schemas.File import File, FileBase, FileBaseKeyword, FileBaseKeywordList
 from schemas.Range import Range
 from schemas.StatusIdentifier import StatusIdentifier, Identifier
 from utils.dict_from_message import dict_from_message
@@ -62,6 +62,21 @@ class NoSQLDatabaseAPIServicer(pb2_grpc.NoSQLDatabaseAPIServicer) :
 
 
     @Servicer.method("nosql-database-api:GetSQLGeneratorStatus")
-    async def GetSQLGeneratorStatus(self, request : pb2.IdentifierR, context):
+    async def GetSQLGeneratorStatus(self, request : pb2.IdentifierR, context) :
         st_id : StatusIdentifier = await database.sql_gen.getStatus(Identifier(**dict_from_message(request)))
         return pb2.IdentifierStatusR(**st_id.model_dump())
+
+
+    @Servicer.method("nosql-database-api:PutSQLGeneratorFiles")
+    async def PutSQLGeneratorFiles(self, request : pb2.ManyFilesIdentifierR, context) :
+        st_id : Identifier = await database.sql_gen.putFiles(Identifier(identifier=request.identifier),
+                                                             files=FileBaseKeywordList(files=[FileBaseKeyword(**dict_from_message(file)) for file in request.files]))
+        return pb2.IdentifierR(**st_id.model_dump())
+    
+
+    @Servicer.method("nosql-database-api:GetSQLGeneratorFiles")
+    async def GetSQLGeneratorFiles(self, request : pb2.IdentifierR, context) :
+        st_id : FileBaseKeywordList = await database.sql_gen.getFiles(Identifier(identifier=request.identifier))
+        return pb2.ManyFilesIdentifierR(files=[file.model_dump() for file in st_id.files],
+                                        identifier=request.identifier)
+

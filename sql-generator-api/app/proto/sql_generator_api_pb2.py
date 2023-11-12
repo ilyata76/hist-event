@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17sql-generator-api.proto\x12\x11sql_generator_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"\x85\x01\n\nManyFilesR\x12&\n\x05\x66iles\x18\x01 \x03(\x0b\x32\x17.sql_generator_api.File\x12.\n\x08main_sql\x18\x02 \x01(\x0b\x32\x17.sql_generator_api.FileH\x00\x88\x01\x01\x12\x12\n\nidentifier\x18\x03 \x01(\tB\x0b\n\t_main_sql\"\x19\n\x07StatusR\x12\x0e\n\x06status\x18\x01 \x01(\t\"!\n\x0bIdentifierR\x12\x12\n\nidentifier\x18\x01 \x01(\t\"7\n\x11IdentifierStatusR\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\"H\n\x04\x46ile\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\x12\x0f\n\x07keyword\x18\x04 \x01(\t2\xef\x03\n\x0fSQLGeneratorAPI\x12<\n\x04Ping\x12\x18.sql_generator_api.PingR\x1a\x18.sql_generator_api.PongR\"\x00\x12G\n\x08Validate\x12\x1d.sql_generator_api.ManyFilesR\x1a\x1a.sql_generator_api.StatusR\"\x00\x12\x44\n\x05Parse\x12\x1d.sql_generator_api.ManyFilesR\x1a\x1a.sql_generator_api.StatusR\"\x00\x12G\n\x08Generate\x12\x1d.sql_generator_api.ManyFilesR\x1a\x1a.sql_generator_api.StatusR\"\x00\x12\x65\n\x15PutSQLGeneratorStatus\x12$.sql_generator_api.IdentifierStatusR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12_\n\x15GetSQLGeneratorStatus\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17sql-generator-api.proto\x12\x11sql_generator_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"?\n\nManyFilesR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\"]\n\x14ManyFilesIdentifierR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\x12\x12\n\nidentifier\x18\x02 \x01(\t\"!\n\x0bIdentifierR\x12\x12\n\nidentifier\x18\x01 \x01(\t\"7\n\x11IdentifierStatusR\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\"A\n\x0f\x46ileBaseKeyword\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0f\n\x07keyword\x18\x04 \x01(\t2\xf2\x04\n\x0fSQLGeneratorAPI\x12<\n\x04Ping\x12\x18.sql_generator_api.PingR\x1a\x18.sql_generator_api.PongR\"\x00\x12Q\n\x08Validate\x12\x1d.sql_generator_api.ManyFilesR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12O\n\x05Parse\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12R\n\x08Generate\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12\x65\n\x15PutSQLGeneratorStatus\x12$.sql_generator_api.IdentifierStatusR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12_\n\x15GetSQLGeneratorStatus\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12\x61\n\x14GetSQLGeneratorFiles\x12\x1e.sql_generator_api.IdentifierR\x1a\'.sql_generator_api.ManyFilesIdentifierR\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,16 +24,16 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_PINGR']._serialized_end=53
   _globals['_PONGR']._serialized_start=55
   _globals['_PONGR']._serialized_end=76
-  _globals['_MANYFILESR']._serialized_start=79
-  _globals['_MANYFILESR']._serialized_end=212
-  _globals['_STATUSR']._serialized_start=214
-  _globals['_STATUSR']._serialized_end=239
-  _globals['_IDENTIFIERR']._serialized_start=241
-  _globals['_IDENTIFIERR']._serialized_end=274
-  _globals['_IDENTIFIERSTATUSR']._serialized_start=276
-  _globals['_IDENTIFIERSTATUSR']._serialized_end=331
-  _globals['_FILE']._serialized_start=333
-  _globals['_FILE']._serialized_end=405
-  _globals['_SQLGENERATORAPI']._serialized_start=408
-  _globals['_SQLGENERATORAPI']._serialized_end=903
+  _globals['_MANYFILESR']._serialized_start=78
+  _globals['_MANYFILESR']._serialized_end=141
+  _globals['_MANYFILESIDENTIFIERR']._serialized_start=143
+  _globals['_MANYFILESIDENTIFIERR']._serialized_end=236
+  _globals['_IDENTIFIERR']._serialized_start=238
+  _globals['_IDENTIFIERR']._serialized_end=271
+  _globals['_IDENTIFIERSTATUSR']._serialized_start=273
+  _globals['_IDENTIFIERSTATUSR']._serialized_end=328
+  _globals['_FILEBASEKEYWORD']._serialized_start=330
+  _globals['_FILEBASEKEYWORD']._serialized_end=395
+  _globals['_SQLGENERATORAPI']._serialized_start=398
+  _globals['_SQLGENERATORAPI']._serialized_end=1024
 # @@protoc_insertion_point(module_scope)

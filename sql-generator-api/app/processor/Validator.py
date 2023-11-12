@@ -2,7 +2,7 @@
     Валидация входных сущностей на правильность заполнения
 """
 from utils.logger import logger
-from schemas.File import FileBinaryKeyword, FileBase, FileKeyword
+from schemas.File import FileBase, FileBaseKeyword
 from utils.dict_from import dictFromYaml
 from utils.exception import ConfigException, ConfigExceptionCode
 from processor.AbstractProcessor import AbstractProcessor as Processor
@@ -44,7 +44,7 @@ class Validator(Processor) :
 
 
     @Processor.methodAsyncDecorator("validator:readAndValidateFileEntities")
-    async def readAndValidateFileEntities(self, getFile, file : FileKeyword) :
+    async def readAndValidateFileEntities(self, getFile, file : FileBaseKeyword) :
         """
             Валидация всех сущностей входящих в файл по keyword.
             Выбрасывает исключение, если какая-то сущность не может быть провалидирована.
@@ -57,7 +57,7 @@ class Validator(Processor) :
 
 
     @Processor.methodAsyncDecorator("validator:readAndValidateFileBonds")
-    async def readAndValidateFileBonds(self, getFile, file : FileKeyword) :
+    async def readAndValidateFileBonds(self, getFile, file : FileBaseKeyword) :
         if file.keyword != EntityKeyword.bonds :
             raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
                                   detail=f"Такое ключевое слово, {file.keyword}, не предусмотрено")

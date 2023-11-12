@@ -35,6 +35,12 @@ service NoSQLDatabaseAPI {
   //
   rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
 
+  //
+  rpc PutSQLGeneratorFiles (ManyFilesIdentifierR) returns (IdentifierR) {}
+
+  //
+  rpc GetSQLGeneratorFiles (IdentifierR) returns (ManyFilesIdentifierR) {}
+
   // //
   // rpc PutSQLGeneratorOneEntity () returns () {}
 
@@ -81,6 +87,11 @@ message IdentifierStatusR {
   string status = 2;
 }
 
+message ManyFilesIdentifierR {
+  repeated FileBaseKeyword files = 1;
+  string identifier = 2;
+}
+
 // классы
 
 message FileBase {
@@ -91,6 +102,13 @@ message File {
   string storage = 1;
   string path = 2;
   string filename = 3;
+};
+
+message FileBaseKeyword {
+  string storage = 1;
+  string path = 2;
+  // dates, others и пр. сущностные категории
+  string keyword = 4;
 };
 
 //

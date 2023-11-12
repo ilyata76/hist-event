@@ -24,6 +24,15 @@ class File(FileBase) :
     filename : str #
 
 
+class FileBaseKeyword(FileBase) :
+    keyword : str
+
+
+class FileBaseKeywordList(BaseModel) :
+    files : list[FileBaseKeyword]
+
+
+
 class FileBinary(File) :
     """
         Дополненная бинарным содержанием схема файла
