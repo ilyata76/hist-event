@@ -25,6 +25,7 @@ class FileAPIgRPCCLient :
             response : pb2.PongR = stub.Ping(pb2.PingR())
         return response
 
+
     @staticmethod
     @AbstractgRPCClient.method("file-api:AddFile")
     async def AddFile(file : FileBinary) :
@@ -32,6 +33,7 @@ class FileAPIgRPCCLient :
             stub = pb2_grpc.FileAPIStub(channel)
             response : pb2.FileR = stub.AddFile(pb2.FileBinaryR(file=file.model_dump()))
         return response
+
 
     @staticmethod
     @AbstractgRPCClient.method("file-api:GetFile")
@@ -41,6 +43,7 @@ class FileAPIgRPCCLient :
             response : pb2.FileBinaryR = stub.GetFile(pb2.FileBaseR(file=file.model_dump()))
         return response
 
+
     @staticmethod
     @AbstractgRPCClient.method("file-api:PutFile")
     async def PutFile(file : FileBinary) :
@@ -49,6 +52,7 @@ class FileAPIgRPCCLient :
             response : pb2.FileR = stub.PutFile(pb2.FileBinaryR(file=file.model_dump()))
         return response
 
+
     @staticmethod
     @AbstractgRPCClient.method("file-api:DeleteFile")
     async def DeleteFile(file : FileBase) :
@@ -56,7 +60,8 @@ class FileAPIgRPCCLient :
             stub = pb2_grpc.FileAPIStub(channel)
             response : pb2.FileR = stub.DeleteFile(pb2.FileBaseR(file=file.model_dump()))
         return response
-    
+
+
     @staticmethod
     @AbstractgRPCClient.method("file-api:GetFileMetaInfo")
     async def GetFileMetaInfo(file : FileBase) :
@@ -64,7 +69,8 @@ class FileAPIgRPCCLient :
             stub = pb2_grpc.FileAPIStub(channel)
             response : pb2.FileR = stub.GetFileMetaInfo(pb2.FileBaseR(file=file.model_dump()))
         return response
-    
+
+
     @staticmethod
     @AbstractgRPCClient.method("file-api:GetManyFilesMetaInfo")
     async def GetManyFilesMetaInfo(storage : str, range : Range) : 

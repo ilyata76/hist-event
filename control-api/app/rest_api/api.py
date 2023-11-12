@@ -18,6 +18,7 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+
 @api.middleware("http")
 async def add_logging(request: Request, call_next):
     prefix = f"[MIDDLEWARE][{request.client.host}:{request.client.port}] : {request.method} {request.url}"
@@ -27,15 +28,19 @@ async def add_logging(request: Request, call_next):
     logger.info(f"{prefix} : {status} {response.status_code}")
     return response
 
+
 @api.on_event("startup")
 def onStartup() :
     logger.info(f"ЗАПУСК ПРИ {config}")
 
+
 from app.rest_api.ping import ping
 api.include_router(router=ping)
 
+
 from app.rest_api.file import file
 api.include_router(router=file)
+
 
 from app.rest_api.sql_generator import sql_generator
 api.include_router(router=sql_generator)

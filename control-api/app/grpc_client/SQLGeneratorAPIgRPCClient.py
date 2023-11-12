@@ -24,6 +24,7 @@ class SQLGeneratorAPIgRPCClient :
             response : pb2.PongR = stub.Ping(pb2.PingR())
         return response
 
+
     @staticmethod
     @AbstractgRPCClient.method("sql-generator-api:Validate")
     async def Validate(files : list[FileBaseKeyword], identifier : str | None = None) :
@@ -31,6 +32,7 @@ class SQLGeneratorAPIgRPCClient :
             stub = pb2_grpc.SQLGeneratorAPIStub(channel)
             response : pb2.IdentifierStatusR = stub.Validate(pb2.ManyFilesR(files=[file.model_dump() for file in files]))
         return response
+
 
     @staticmethod
     @AbstractgRPCClient.method("sql-generator-api:Parse")
@@ -40,6 +42,7 @@ class SQLGeneratorAPIgRPCClient :
             response : pb2.IdentifierStatusR = stub.Parse(pb2.IdentifierR(identifier=identifier))
         return response
 
+
     @staticmethod
     @AbstractgRPCClient.method("sql-generator-api:Generate")
     async def Generate(identifier : str) :
@@ -48,14 +51,6 @@ class SQLGeneratorAPIgRPCClient :
             response : pb2.IdentifierStatusR = stub.Generate(pb2.IdentifierR(identifier=identifier))
         return response
 
-    @staticmethod
-    @AbstractgRPCClient.method("sql-generator-api:PutSQLGeneratorStatus")
-    async def PutSQLGeneratorStatus(identifier : str, status : str) :
-        with grpc.insecure_channel(f"{config.SQL_GENERATOR_API_GRPC_HOST}:{config.SQL_GENERATOR_API_GRPC_PORT}") as channel :
-            stub = pb2_grpc.SQLGeneratorAPIStub(channel)
-            response : pb2.IdentifierStatusR = stub.PutSQLGeneratorStatus(pb2.IdentifierStatusR(identifier=identifier, 
-                                                                                                status=status))
-        return response
 
     @staticmethod
     @AbstractgRPCClient.method("sql-generator-api:GetSQLGeneratorStatus")
@@ -64,7 +59,8 @@ class SQLGeneratorAPIgRPCClient :
             stub = pb2_grpc.SQLGeneratorAPIStub(channel)
             response : pb2.IdentifierStatusR = stub.GetSQLGeneratorStatus(pb2.IdentifierR(identifier=identifier))
         return response
-    
+
+  
     @staticmethod
     @AbstractgRPCClient.method("sql-generator-api:GetSQLGeneratorFiles")
     async def GetSQLGeneratorFiles(identifier : str) -> pb2.ManyFilesIdentifierR:

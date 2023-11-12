@@ -15,6 +15,7 @@ from app.schemas.Range import Range
 
 file = APIRouter(prefix="/file")
 
+
 @file.get("/meta",
           tags=["file"],
           name="Files Meta Info From Storage",
@@ -34,6 +35,7 @@ async def fileFTPGetByPath(request : Request,
                                                                         end=end))
     return [dict_from_message(file) for file in response.files]
 
+
 @file.get("/meta/{path:path}",
           tags=["file"],
           name="File Meta Info From Storage",
@@ -50,6 +52,7 @@ async def fileFTPGetMetaByPath(request : Request,
                                                                 storage=storage))
     return response.file
 
+
 @file.get("/{path:path}",
           tags=["file"],
           name="File From Storage",
@@ -64,6 +67,7 @@ async def fileFTPGetByPath(request : Request,
     response = Response(content=grpc_response.file.file)
     response.headers["Content-Disposition"] = f"attachment; filename={grpc_response.file.filename}"
     return response
+
 
 @file.put("/{path:path}",
           tags=["file"],
@@ -83,6 +87,7 @@ async def fileFTPPutByPath(request : Request,
                                                           file=file_bytes))
     return response.file
 
+
 @file.delete("/{path:path}",
              tags=["file"],
              name="Delete File from Storage",
@@ -95,6 +100,7 @@ async def fileFTPDeleteByPath(request : Request,
     response = await FileAPIgRPCCLient.DeleteFile(FileBase(path=Path(path), 
                                                            storage=storage))
     return response.file
+
 
 @file.post("/{path:path}",
            tags=["file"],

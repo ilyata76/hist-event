@@ -12,6 +12,7 @@ from app.utils.dict_from_message import dict_from_message
 
 sql_generator = APIRouter(prefix="/sql-gen")
 
+
 @sql_generator.put("/validate",
                    tags=["process"],
                    name="Валидация YAML",
@@ -22,6 +23,7 @@ async def SQLGeneratorValidate(request : Request,
                                files : list[FileBaseKeyword]) -> StatusIdentifier :
     response = await SQLGeneratorAPIgRPCClient.Validate(files)
     return StatusIdentifier(**dict_from_message(response))
+
 
 @sql_generator.put("/parse/{operation}",
                    tags=["process"],
@@ -34,6 +36,7 @@ async def SQLGeneratorParse(request : Request,
     response = await SQLGeneratorAPIgRPCClient.Parse(operation)
     return StatusIdentifier(**dict_from_message(response))
 
+
 @sql_generator.put("/generate/{operation}",
                    tags=["process"],
                    name="Генерасия SQL-файла",
@@ -45,6 +48,7 @@ async def SQLGeneratorGenerate(request : Request,
     response = await SQLGeneratorAPIgRPCClient.Generate(operation)
     return StatusIdentifier(**dict_from_message(response))
 
+
 @sql_generator.get("/status/{identifier}")
 @log_and_except
 async def GetSQLGeneratorStatus(request : Request,
@@ -53,16 +57,8 @@ async def GetSQLGeneratorStatus(request : Request,
     return StatusIdentifier(identifier=response.identifier,
                             status=response.status)
 
-@sql_generator.put("/status/{identifier}")
-@log_and_except
-async def PutSQLGeneratorStatus(request : Request,
-                                identifier : str,
-                                status : Status) -> StatusIdentifier :
-    response = await SQLGeneratorAPIgRPCClient.PutSQLGeneratorStatus(identifier, status.status)
-    return StatusIdentifier(identifier=response.identifier,
-                            status=response.status)
 
-@sql_generator.put("/files/{identifier}")
+@sql_generator.get("/files/{identifier}")
 @log_and_except
 async def GetSQLGeneratorFiles(request : Request,
                                identifier : str) -> list[FileBaseKeyword] :

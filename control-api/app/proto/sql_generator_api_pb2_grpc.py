@@ -36,11 +36,6 @@ class SQLGeneratorAPIStub(object):
                 request_serializer=sql__generator__api__pb2.IdentifierR.SerializeToString,
                 response_deserializer=sql__generator__api__pb2.IdentifierStatusR.FromString,
                 )
-        self.PutSQLGeneratorStatus = channel.unary_unary(
-                '/sql_generator_api.SQLGeneratorAPI/PutSQLGeneratorStatus',
-                request_serializer=sql__generator__api__pb2.IdentifierStatusR.SerializeToString,
-                response_deserializer=sql__generator__api__pb2.IdentifierStatusR.FromString,
-                )
         self.GetSQLGeneratorStatus = channel.unary_unary(
                 '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorStatus',
                 request_serializer=sql__generator__api__pb2.IdentifierR.SerializeToString,
@@ -83,13 +78,6 @@ class SQLGeneratorAPIServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def PutSQLGeneratorStatus(self, request, context):
-        """
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def GetSQLGeneratorStatus(self, request, context):
         """
         """
@@ -125,11 +113,6 @@ def add_SQLGeneratorAPIServicer_to_server(servicer, server):
             'Generate': grpc.unary_unary_rpc_method_handler(
                     servicer.Generate,
                     request_deserializer=sql__generator__api__pb2.IdentifierR.FromString,
-                    response_serializer=sql__generator__api__pb2.IdentifierStatusR.SerializeToString,
-            ),
-            'PutSQLGeneratorStatus': grpc.unary_unary_rpc_method_handler(
-                    servicer.PutSQLGeneratorStatus,
-                    request_deserializer=sql__generator__api__pb2.IdentifierStatusR.FromString,
                     response_serializer=sql__generator__api__pb2.IdentifierStatusR.SerializeToString,
             ),
             'GetSQLGeneratorStatus': grpc.unary_unary_rpc_method_handler(
@@ -218,23 +201,6 @@ class SQLGeneratorAPI(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/Generate',
             sql__generator__api__pb2.IdentifierR.SerializeToString,
-            sql__generator__api__pb2.IdentifierStatusR.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def PutSQLGeneratorStatus(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/PutSQLGeneratorStatus',
-            sql__generator__api__pb2.IdentifierStatusR.SerializeToString,
             sql__generator__api__pb2.IdentifierStatusR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

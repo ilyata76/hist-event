@@ -24,21 +24,23 @@ class NoSQLDatabaseAPIgRPCClient :
             stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
             response : pb2.PongR = stub.Ping(pb2.PingR())
         return response
-    
-    @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:GetFileMetaInfo")
-    async def GetFileMetaInfo(file : FileBase) :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.FileR = stub.GetFileMetaInfo(pb2.FileBaseR(file=file.model_dump()))
-        return response
 
-    @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:GetManyFilesMetaInfo")
-    async def GetManyFilesMetaInfo(storage : str, range : Range) :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.FileSegmentR = stub.GetManyFilesMetaInfo(pb2.StorageSegmentR(storage=storage,
-                                                                                        start=range.start,
-                                                                                        end=range.end))
-        return response
+
+    # @staticmethod
+    # @AbstractgRPCClient.method("nosql-database-api:GetFileMetaInfo")
+    # async def GetFileMetaInfo(file : FileBase) :
+    #     with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
+    #         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+    #         response : pb2.FileR = stub.GetFileMetaInfo(pb2.FileBaseR(file=file.model_dump()))
+    #     return response
+
+
+    # @staticmethod
+    # @AbstractgRPCClient.method("nosql-database-api:GetManyFilesMetaInfo")
+    # async def GetManyFilesMetaInfo(storage : str, range : Range) :
+    #     with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
+    #         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+    #         response : pb2.FileSegmentR = stub.GetManyFilesMetaInfo(pb2.StorageSegmentR(storage=storage,
+    #                                                                                     start=range.start,
+    #                                                                                     end=range.end))
+    #     return response

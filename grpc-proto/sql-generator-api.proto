@@ -19,9 +19,6 @@ service SQLGeneratorAPI {
 
   rpc Generate (IdentifierR) returns (IdentifierStatusR) {}
 
-  // 
-  rpc PutSQLGeneratorStatus (IdentifierStatusR) returns (IdentifierStatusR) {}
-
   //
   rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
 

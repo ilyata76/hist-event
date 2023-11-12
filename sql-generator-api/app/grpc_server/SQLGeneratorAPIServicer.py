@@ -92,7 +92,6 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
                                      identifier=request.identifier)
 
 
-
     @Servicer.methodAsyncDecorator("sql-generator-api:Generate")
     async def Generate(self, request : pb2.ManyFilesIdentifierR, context) :
         st_id = await NoSQLDatabaseAPIgRPCClient.GetSQLGeneratorStatus(Identifier(identifier=request.identifier))
@@ -105,16 +104,6 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
         status = (await NoSQLDatabaseAPIgRPCClient.GetSQLGeneratorStatus(Identifier(identifier=request.identifier))).status
         return pb2.IdentifierStatusR(status=status,
                                      identifier=request.identifier)
-
-
-    # TODO method all-3
-    # он не будет лишний раз читать из базы и сущности, и статусы
-
-    @Servicer.methodAsyncDecorator("sql-generator-api:PutSQLGeneratorStatus")
-    async def PutSQLGeneratorStatus(self, request : pb2.IdentifierStatusR, context) :
-        print(request.status, request.identifier)
-        response_from_nosql : StatusIdentifier = await NoSQLDatabaseAPIgRPCClient.PutSQLGeneratorStatus(StatusIdentifier(**dictFromMessage(request)))
-        return pb2.IdentifierStatusR(**response_from_nosql.model_dump())
 
 
     @Servicer.methodAsyncDecorator("sql-generator-api:GetSQLGeneratorStatus")

@@ -17,6 +17,7 @@ class AbstractgRPCClient :
     def logPrefix(path : str, code : str) :
         return f"[CLIENT] : {path} : {code}"
 
+
     @staticmethod
     def method(path : str) :
         """
