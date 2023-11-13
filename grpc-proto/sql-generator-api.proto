@@ -9,21 +9,18 @@ package sql_generator_api;
 // долгий синхронный процесс (последовательный обход сущностей),
 //      выделенный в отдельный сервис
 service SQLGeneratorAPI {
-
   // проверить работоспособность
   rpc Ping (PingR) returns (PongR) {}
-
+  //
   rpc Validate (ManyFilesR) returns (IdentifierStatusR) {}
-
-  rpc Parse (IdentifierR) returns (IdentifierStatusR) {}
-
-  rpc Generate (IdentifierR) returns (IdentifierStatusR) {}
-
+  //
+  rpc ParseAndGenerate (IdentifierR) returns (IdentifierStatusR) {}
   //
   rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
-
   //
   rpc GetSQLGeneratorFiles (IdentifierR) returns (ManyFilesIdentifierR) {}
+  // 
+  rpc GetSQLGeneratorSQLFile (IdentifierR) returns (FileBaseIdentifierR) {}
 }
 
 message PingR {
@@ -56,8 +53,17 @@ message IdentifierStatusR {
   string status = 2;
 }
 
+message FileBaseIdentifierR {
+  FileBase file = 1;
+  string identifier = 2;
+}
+
 // классы
 
+message FileBase {
+  string storage = 1;
+  string path = 2;
+};
 message FileBaseKeyword {
   string storage = 1;
   string path = 2;

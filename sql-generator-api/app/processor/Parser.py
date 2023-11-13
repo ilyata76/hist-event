@@ -113,7 +113,6 @@ class Parser(Processor) :
             if not await self.storage.getEntityByID(EntityKeyword.events, event_id) :
                 raise ParsingException(code=ParsingExceptionCode.ENTITY_TO_LINK_DOESNT_EXIST,
                                        detail=f"Сущность связи {bond_id} ссылается на несуществующее событие {event_id}")
-            print(busy_events)
             if event_id in busy_events :
                 raise ParsingException(code=ParsingExceptionCode.INVALID_ENTITY_TYPE,
                                        detail=f"Сущность связи {bond_id} имеет неопределённую связь с событием (самоссылка; два или более) - {event_id}")

@@ -10,45 +10,30 @@ package nosql_database_api;
 // сервис работы NoSQL базы данных, используемой различными сервисами, например,
 //   для запоминания сохранённых файлов на FTP-сервере
 service NoSQLDatabaseAPI {
-
   // проверить работоспособность
   rpc Ping (PingR) returns (PongR) {}
-
   // сохранить мета-информацию о файле в базе
   rpc AddFileMetaInfo (FileR) returns (FileR) {}
-
   // сохранить/заменить (запомнить) мета-информацию о файле в базе
   rpc PutFileMetaInfo (FileR) returns (FileR) {}
-
   // удалить (забыть) мета-информацию о файле в базе
   rpc DeleteFileMetaInfo (FileBaseR) returns (FileR) {}
-
   // получить мета-информацию файла
   rpc GetFileMetaInfo (FileBaseR) returns (FileR) {}
-
   // получить список мета-информацю всех (или отрезком) файлов
   rpc GetManyFilesMetaInfo (StorageSegmentR) returns (FileSegmentR) {}
-
   // 
   rpc PutSQLGeneratorStatus (IdentifierStatusR) returns (IdentifierStatusR) {}
-
   //
   rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
-
   //
   rpc PutSQLGeneratorFiles (ManyFilesIdentifierR) returns (IdentifierR) {}
-
   //
   rpc GetSQLGeneratorFiles (IdentifierR) returns (ManyFilesIdentifierR) {}
-
-  // //
-  // rpc PutSQLGeneratorOneEntity () returns () {}
-
-  // // 
-  // rpc DeleteSQLGeneratorAllEntities () returns () {}
-
-  // //
-  // rpc GetSQLGeneratorAllEntities() returns () {} // TODO stream
+  // 
+  rpc PutSQLGeneratorSQLFile (FileBaseIdentifierR) returns (FileBaseIdentifierR) {}
+  // 
+  rpc GetSQLGeneratorSQLFile (IdentifierR) returns (FileBaseIdentifierR) {}
 }
 
 message PingR {
@@ -89,6 +74,11 @@ message IdentifierStatusR {
 
 message ManyFilesIdentifierR {
   repeated FileBaseKeyword files = 1;
+  string identifier = 2;
+}
+
+message FileBaseIdentifierR {
+  FileBase file = 1;
   string identifier = 2;
 }
 

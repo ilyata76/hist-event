@@ -35,20 +35,11 @@ class SQLGeneratorAPIgRPCClient :
 
 
     @staticmethod
-    @AbstractgRPCClient.method("sql-generator-api:Parse")
-    async def Parse(identifier : str) :
+    @AbstractgRPCClient.method("sql-generator-api:ParseAndGenerate")
+    async def ParseAndGenerate(identifier : str) :
         with grpc.insecure_channel(f"{config.SQL_GENERATOR_API_GRPC_HOST}:{config.SQL_GENERATOR_API_GRPC_PORT}") as channel :
             stub = pb2_grpc.SQLGeneratorAPIStub(channel)
-            response : pb2.IdentifierStatusR = stub.Parse(pb2.IdentifierR(identifier=identifier))
-        return response
-
-
-    @staticmethod
-    @AbstractgRPCClient.method("sql-generator-api:Generate")
-    async def Generate(identifier : str) :
-        with grpc.insecure_channel(f"{config.SQL_GENERATOR_API_GRPC_HOST}:{config.SQL_GENERATOR_API_GRPC_PORT}") as channel :
-            stub = pb2_grpc.SQLGeneratorAPIStub(channel)
-            response : pb2.IdentifierStatusR = stub.Generate(pb2.IdentifierR(identifier=identifier))
+            response : pb2.IdentifierStatusR = stub.ParseAndGenerate(pb2.IdentifierR(identifier=identifier))
         return response
 
 
@@ -63,8 +54,17 @@ class SQLGeneratorAPIgRPCClient :
   
     @staticmethod
     @AbstractgRPCClient.method("sql-generator-api:GetSQLGeneratorFiles")
-    async def GetSQLGeneratorFiles(identifier : str) -> pb2.ManyFilesIdentifierR:
+    async def GetSQLGeneratorFiles(identifier : str) -> pb2.ManyFilesIdentifierR :
         with grpc.insecure_channel(f"{config.SQL_GENERATOR_API_GRPC_HOST}:{config.SQL_GENERATOR_API_GRPC_PORT}") as channel :
             stub = pb2_grpc.SQLGeneratorAPIStub(channel)
             response : pb2.ManyFilesIdentifierR = stub.GetSQLGeneratorFiles(pb2.IdentifierR(identifier=identifier))
+        return response
+
+
+    @staticmethod
+    @AbstractgRPCClient.method("sql-generator-api:GetSQLGeneratorSQLFile")
+    async def GetSQLGeneratorSQLFile(identifier : str) -> pb2.FileBaseIdentifierR :
+        with grpc.insecure_channel(f"{config.SQL_GENERATOR_API_GRPC_HOST}:{config.SQL_GENERATOR_API_GRPC_PORT}") as channel :
+            stub = pb2_grpc.SQLGeneratorAPIStub(channel)
+            response : pb2.FileBaseIdentifierR = stub.GetSQLGeneratorSQLFile(pb2.IdentifierR(identifier=identifier))
         return response

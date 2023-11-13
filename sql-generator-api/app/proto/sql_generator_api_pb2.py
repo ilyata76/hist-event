@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17sql-generator-api.proto\x12\x11sql_generator_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"?\n\nManyFilesR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\"]\n\x14ManyFilesIdentifierR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\x12\x12\n\nidentifier\x18\x02 \x01(\t\"!\n\x0bIdentifierR\x12\x12\n\nidentifier\x18\x01 \x01(\t\"7\n\x11IdentifierStatusR\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\"A\n\x0f\x46ileBaseKeyword\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0f\n\x07keyword\x18\x04 \x01(\t2\x8b\x04\n\x0fSQLGeneratorAPI\x12<\n\x04Ping\x12\x18.sql_generator_api.PingR\x1a\x18.sql_generator_api.PongR\"\x00\x12Q\n\x08Validate\x12\x1d.sql_generator_api.ManyFilesR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12O\n\x05Parse\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12R\n\x08Generate\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12_\n\x15GetSQLGeneratorStatus\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12\x61\n\x14GetSQLGeneratorFiles\x12\x1e.sql_generator_api.IdentifierR\x1a\'.sql_generator_api.ManyFilesIdentifierR\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17sql-generator-api.proto\x12\x11sql_generator_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"?\n\nManyFilesR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\"]\n\x14ManyFilesIdentifierR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\x12\x12\n\nidentifier\x18\x02 \x01(\t\"!\n\x0bIdentifierR\x12\x12\n\nidentifier\x18\x01 \x01(\t\"7\n\x11IdentifierStatusR\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\"T\n\x13\x46ileBaseIdentifierR\x12)\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x1b.sql_generator_api.FileBase\x12\x12\n\nidentifier\x18\x02 \x01(\t\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"A\n\x0f\x46ileBaseKeyword\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0f\n\x07keyword\x18\x04 \x01(\t2\xa6\x04\n\x0fSQLGeneratorAPI\x12<\n\x04Ping\x12\x18.sql_generator_api.PingR\x1a\x18.sql_generator_api.PongR\"\x00\x12Q\n\x08Validate\x12\x1d.sql_generator_api.ManyFilesR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12Z\n\x10ParseAndGenerate\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12_\n\x15GetSQLGeneratorStatus\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12\x61\n\x14GetSQLGeneratorFiles\x12\x1e.sql_generator_api.IdentifierR\x1a\'.sql_generator_api.ManyFilesIdentifierR\"\x00\x12\x62\n\x16GetSQLGeneratorSQLFile\x12\x1e.sql_generator_api.IdentifierR\x1a&.sql_generator_api.FileBaseIdentifierR\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,8 +32,12 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_IDENTIFIERR']._serialized_end=271
   _globals['_IDENTIFIERSTATUSR']._serialized_start=273
   _globals['_IDENTIFIERSTATUSR']._serialized_end=328
-  _globals['_FILEBASEKEYWORD']._serialized_start=330
-  _globals['_FILEBASEKEYWORD']._serialized_end=395
-  _globals['_SQLGENERATORAPI']._serialized_start=398
-  _globals['_SQLGENERATORAPI']._serialized_end=921
+  _globals['_FILEBASEIDENTIFIERR']._serialized_start=330
+  _globals['_FILEBASEIDENTIFIERR']._serialized_end=414
+  _globals['_FILEBASE']._serialized_start=416
+  _globals['_FILEBASE']._serialized_end=457
+  _globals['_FILEBASEKEYWORD']._serialized_start=459
+  _globals['_FILEBASEKEYWORD']._serialized_end=524
+  _globals['_SQLGENERATORAPI']._serialized_start=527
+  _globals['_SQLGENERATORAPI']._serialized_end=1077
 # @@protoc_insertion_point(module_scope)

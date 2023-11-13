@@ -80,3 +80,17 @@ class NoSQLDatabaseAPIServicer(pb2_grpc.NoSQLDatabaseAPIServicer) :
         return pb2.ManyFilesIdentifierR(files=[file.model_dump() for file in st_id.files],
                                         identifier=request.identifier)
 
+
+    @Servicer.method("nosql-database-api:PutSQLGeneratorSQLFile")
+    async def PutSQLGeneratorSQLFile(self, request : pb2.FileBaseIdentifierR, context) :
+        file = await database.sql_gen.putSQL(identifier=Identifier(identifier=request.identifier),
+                                             file=FileBase(**dict_from_message(request.file)))
+        return pb2.FileBaseIdentifierR(file=file.model_dump(),
+                                       identifier=request.identifier)
+
+
+    @Servicer.method("nosql-database-api:GetSQLGeneratorSQLFile")
+    async def GetSQLGeneratorSQLFile(self, request : pb2.IdentifierR, context) :
+        file = await database.sql_gen.getSQL(identifier=Identifier(identifier=request.identifier))
+        return pb2.FileBaseIdentifierR(file=file.model_dump(),
+                                       identifier=request.identifier)

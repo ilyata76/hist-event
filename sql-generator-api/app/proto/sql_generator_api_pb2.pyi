@@ -43,6 +43,22 @@ class IdentifierStatusR(_message.Message):
     status: str
     def __init__(self, identifier: _Optional[str] = ..., status: _Optional[str] = ...) -> None: ...
 
+class FileBaseIdentifierR(_message.Message):
+    __slots__ = ["file", "identifier"]
+    FILE_FIELD_NUMBER: _ClassVar[int]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    file: FileBase
+    identifier: str
+    def __init__(self, file: _Optional[_Union[FileBase, _Mapping]] = ..., identifier: _Optional[str] = ...) -> None: ...
+
+class FileBase(_message.Message):
+    __slots__ = ["storage", "path"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    PATH_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    path: str
+    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ...) -> None: ...
+
 class FileBaseKeyword(_message.Message):
     __slots__ = ["storage", "path", "keyword"]
     STORAGE_FIELD_NUMBER: _ClassVar[int]

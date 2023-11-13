@@ -152,6 +152,8 @@ class LogCode :
 
 
 class EntityKeyword :
+    ENTITY = "entity"
+    entities = "entities"
     DATE = "date"
     dates = "dates"
     PLACE = "place"
@@ -188,18 +190,26 @@ class EntityContentKeyword :
     web = "web"
     native = "native"
     author = "author"
+    state = "state"
+    period = "period"
     link = "link"
     geo = "geo"
     latitude = "latitude"
     longitude = "longitude"
     biblio = "biblio"
     source = "source"
+    type = "type"
+    subtype = "subtype"
     min = "min"
     max = "max"
     event = "event"
     parents = "parents"
     childs = "childs"
     prerequisites = "prerequisites"
+    links = "links"
+    ex_links = "ex_links"
+    meta = "meta"
+    level = "level"
 
 
 config = Config()

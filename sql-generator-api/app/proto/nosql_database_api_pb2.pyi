@@ -65,6 +65,14 @@ class ManyFilesIdentifierR(_message.Message):
     identifier: str
     def __init__(self, files: _Optional[_Iterable[_Union[FileBaseKeyword, _Mapping]]] = ..., identifier: _Optional[str] = ...) -> None: ...
 
+class FileBaseIdentifierR(_message.Message):
+    __slots__ = ["file", "identifier"]
+    FILE_FIELD_NUMBER: _ClassVar[int]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    file: FileBase
+    identifier: str
+    def __init__(self, file: _Optional[_Union[FileBase, _Mapping]] = ..., identifier: _Optional[str] = ...) -> None: ...
+
 class FileBase(_message.Message):
     __slots__ = ["storage", "path"]
     STORAGE_FIELD_NUMBER: _ClassVar[int]

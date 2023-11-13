@@ -153,6 +153,11 @@ class StorageManager :
         return string + "\n\n" + self.__bonds.__str__() + "\n\n" + "|}"
 
 
+    @methodAsyncDecorator("storage:getStorages")
+    async def getStorages(self) :
+        return self.__storages
+
+
 class EntityStorage :
     """
         Класс хранилища для сущности.
@@ -221,13 +226,3 @@ class EntityStorage :
 
     def __str__(self) :
         return f"{self.keyword} : [{self.store}]"
-
-
-class NoSQLStorage :
-    """
-        Класс-интерфейс для работы с NoSQL-хранилищем.
-            Работает с EntityStorage.
-    """
-
-    def __init__(self) :
-        logger.debug("Создание экземпляра класса NoSQLStorage")

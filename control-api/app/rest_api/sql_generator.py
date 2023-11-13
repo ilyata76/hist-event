@@ -3,8 +3,8 @@
 """
 from fastapi import APIRouter, Request
 
-from app.schemas.File import FileBaseKeyword
-from app.schemas.StatusIdentifier import Status, StatusIdentifier
+from app.schemas.File import FileBaseKeyword, File
+from app.schemas.StatusIdentifier import StatusIdentifier
 from app.grpc_client.SQLGeneratorAPIgRPCClient import SQLGeneratorAPIgRPCClient
 from app.rest_api.log_and_except import log_and_except
 from app.utils.dict_from_message import dict_from_message
@@ -25,27 +25,15 @@ async def SQLGeneratorValidate(request : Request,
     return StatusIdentifier(**dict_from_message(response))
 
 
-@sql_generator.put("/parse/{operation}",
+@sql_generator.put("/parse-generate/{operation}",
                    tags=["process"],
-                   name="Парсинг YAML",
+                   name="Парсинг YAML и генерация SQL",
                    response_model=StatusIdentifier,
-                   description="Пропарсить YAML-файлы с последующим сохранением результатов в NoSQL (файлы должны быть валидны)")
+                   description="Пропарсить YAML-файлы и получить SQL-файл")
 @log_and_except
-async def SQLGeneratorParse(request : Request,
-                            operation : str) -> StatusIdentifier :
-    response = await SQLGeneratorAPIgRPCClient.Parse(operation)
-    return StatusIdentifier(**dict_from_message(response))
-
-
-@sql_generator.put("/generate/{operation}",
-                   tags=["process"],
-                   name="Генерасия SQL-файла",
-                   response_model=StatusIdentifier,
-                   description="Сгенерировать SQL-файл из сущностей после /parse/operation")
-@log_and_except
-async def SQLGeneratorGenerate(request : Request,
-                               operation : str) -> StatusIdentifier :
-    response = await SQLGeneratorAPIgRPCClient.Generate(operation)
+async def SQLGeneratorParseAndGenerate(request : Request,
+                                       operation : str) -> StatusIdentifier :
+    response = await SQLGeneratorAPIgRPCClient.ParseAndGenerate(operation)
     return StatusIdentifier(**dict_from_message(response))
 
 
@@ -64,3 +52,11 @@ async def GetSQLGeneratorFiles(request : Request,
                                identifier : str) -> list[FileBaseKeyword] :
     response = await SQLGeneratorAPIgRPCClient.GetSQLGeneratorFiles(identifier)
     return [FileBaseKeyword(**dict_from_message(file)) for file in response.files]
+
+
+@sql_generator.get("/sql/{identifier}")
+@log_and_except
+async def GetSQLGeneratorFiles(request : Request,
+                               identifier : str) -> File :
+    response = await SQLGeneratorAPIgRPCClient.GetSQLGeneratorSQLFile(identifier)
+    return File(**dict_from_message(response.file), filename="main.sql")
