@@ -7,6 +7,7 @@ from entity.Entity import *
 from entity.EntityBonds import EntityBonds
 
 
+
 class Generator(Processor) :
     """
         Аккумулирующий генераторную функцию приложения класс.

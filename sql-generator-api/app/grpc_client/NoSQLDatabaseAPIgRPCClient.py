@@ -7,12 +7,12 @@ import grpc
 import proto.nosql_database_api_pb2 as pb2
 import proto.nosql_database_api_pb2_grpc as pb2_grpc
 
-from utils.config import config
+from utils.config import NOSQL_IP
 from grpc_client.AbstractgRPCClient import AbstractgRPCClient as GrpcClient
-from schemas.Ping import Pong
-from schemas.StatusIdentifier import StatusIdentifier, Identifier
-from schemas.File import FileBaseKeyword, FileBase
+from schemas.File import FileBaseKeyword, FileBase, FileBaseKeywordList
 from utils.dict_from import dictFromMessage
+from schemas import Identifier, Status
+
 
 
 class NoSQLDatabaseAPIgRPCClient :
@@ -22,65 +22,54 @@ class NoSQLDatabaseAPIgRPCClient :
     """
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:Ping",
-                                     f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}")
-    async def Ping(channel = None) -> Pong :
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorStatus", NOSQL_IP)
+    async def PutSQLGeneratorStatus(identifier : Identifier, status : Status, channel = None) -> Status :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        response : pb2.PongR = stub.Ping(pb2.PingR())
-        return Pong(**dictFromMessage(response))
+        request = pb2.IdentifierStatusR(identifier=identifier, status=status)
+        response : pb2.IdentifierStatusR = stub.PutSQLGeneratorStatus(request)
+        return Status(response.status)
 
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorStatus",
-                                     f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}")
-    async def PutSQLGeneratorStatus(status_identifier : StatusIdentifier, channel = None) -> StatusIdentifier :
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorStatus", NOSQL_IP)
+    async def GetSQLGeneratorStatus(identifier : Identifier, channel = None) -> Status :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        response : pb2.IdentifierStatusR = stub.PutSQLGeneratorStatus(pb2.IdentifierStatusR(**status_identifier.model_dump()))
-        return StatusIdentifier(**dictFromMessage(response))
+        request = pb2.IdentifierR(identifier=identifier)
+        response : pb2.IdentifierStatusR = stub.GetSQLGeneratorStatus(request)
+        return Status(response.status)
 
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorStatus",
-                                     f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}")
-    async def GetSQLGeneratorStatus(identifier : Identifier, channel = None) -> StatusIdentifier :
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorFiles", NOSQL_IP)
+    async def PutSQLGeneratorFiles(files : FileBaseKeywordList, identifier : Identifier, channel = None) -> Identifier :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        response : pb2.IdentifierStatusR = stub.GetSQLGeneratorStatus(pb2.IdentifierR(**identifier.model_dump()))
-        return StatusIdentifier(**dictFromMessage(response))
+        request = pb2.ManyFilesIdentifierR(identifier=identifier, **files.model_dump())
+        response : pb2.IdentifierR = stub.PutSQLGeneratorFiles(request)
+        return Identifier(response.identifier)
 
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorFiles",
-                                     f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}")
-    async def PutSQLGeneratorFiles(files : list[FileBaseKeyword], identifier : Identifier, channel = None) -> Identifier:
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorFiles", NOSQL_IP)
+    async def GetSQLGeneratorFiles(identifier : Identifier, channel = None) -> FileBaseKeywordList :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        response : pb2.IdentifierR = stub.PutSQLGeneratorFiles(pb2.ManyFilesIdentifierR(files=[file.model_dump() for file in files],
-                                                                                        identifier=identifier.identifier))
-        return Identifier(**dictFromMessage(response))
+        request = pb2.IdentifierR(identifier=identifier)
+        response : pb2.ManyFilesIdentifierR = stub.GetSQLGeneratorFiles(request)
+        return FileBaseKeywordList(files=[FileBaseKeyword(**dictFromMessage(file)) for file in response.files])
 
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorFiles",
-                                     f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}")
-    async def GetSQLGeneratorFiles(identifier : Identifier, channel = None) -> list[FileBaseKeyword]:
-        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        response : pb2.ManyFilesIdentifierR = stub.GetSQLGeneratorFiles(pb2.IdentifierR(identifier=identifier.identifier))
-        return [FileBaseKeyword(**dictFromMessage(file)) for file in response.files]
-
-
-    @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorSQLFile",
-                                     f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}")
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorSQLFile", NOSQL_IP)
     async def GetSQLGeneratorSQLFile(identifier : Identifier, channel = None) -> FileBase :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        response : pb2.FileBaseIdentifierR = stub.GetSQLGeneratorSQLFile(pb2.IdentifierR(identifier=identifier.identifier))
+        request = pb2.IdentifierR(identifier=identifier)
+        response : pb2.FileBaseIdentifierR = stub.GetSQLGeneratorSQLFile(request)
         return FileBase(**dictFromMessage(response.file))
 
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorSQLFile",
-                                     f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}")
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorSQLFile", NOSQL_IP)
     async def PutSQLGeneratorSQLFile(file : FileBase, identifier : Identifier, channel = None) -> FileBase :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        response : pb2.FileBaseIdentifierR = stub.PutSQLGeneratorSQLFile(pb2.FileBaseIdentifierR(file=file.model_dump(),
-                                                                                                 identifier=identifier.identifier))
+        request = pb2.FileBaseIdentifierR(file=file.model_dump(), identifier=identifier)
+        response : pb2.FileBaseIdentifierR = stub.PutSQLGeneratorSQLFile(request)
         return FileBase(**dictFromMessage(response.file))

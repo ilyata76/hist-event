@@ -7,7 +7,7 @@ from utils.logger import logger
 from entity.Entity import Entity, Bond
 from entity.EntityBonds import EntityBonds
 from utils.exception import *
-from utils.config import LogCode
+from utils.logger import LogCode
 from entity.InclusionParser import InclusionParser
 
 

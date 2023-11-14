@@ -1,10 +1,10 @@
 """
-
+    Класс, связанный с парсингом и поиском вставок в текстах
 """
 import pyparsing
 
 from utils.config import config
-from schemas.ParseResult import ParseResult
+from schemas import ParseResult
 
 
 class InclusionParser :
@@ -17,19 +17,19 @@ class InclusionParser :
 
         return pyparsing.Combine( pyparsing.Suppress("{") + 
                                 pyparsing.ZeroOrMore(" ") + 
-                                      pyparsing.Word(keyword) + #' { abo'
+                                      pyparsing.Word(keyword) +     #' { abo'
              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + 
                                                      ":" + 
-             pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + #' : '
+             pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) +        #' : '
                                       pyparsing.Word(number) + 
              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + 
-                                  pyparsing.Suppress("}") + #'1 }'
-             pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + # и имя 
+                                  pyparsing.Suppress("}") +         #'1 }'
+             pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) +        # и имя 
                                                      "[" + 
                                 pyparsing.ZeroOrMore(" ") + 
-                                      pyparsing.Word(name) + #'[ NAME'
+                                      pyparsing.Word(name) +        #'[ NAME'
              pyparsing.Suppress(pyparsing.ZeroOrMore(" ")) + 
-                                  pyparsing.Suppress("]") ) #' ]'
+                                  pyparsing.Suppress("]") )         #' ]'
 
 
     @staticmethod

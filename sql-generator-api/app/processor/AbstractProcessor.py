@@ -5,11 +5,12 @@ from functools import wraps
 
 from utils.exception import *
 from utils.logger import logger
-from utils.config import LogCode
+from utils.logger import LogCode
 
 
 class AbstractProcessor :
     """
+        Главные функции приложения
     """
 
     @staticmethod
@@ -20,24 +21,26 @@ class AbstractProcessor :
         """
         def processorMethod(function) :
             @wraps(function)
-            async def wrap(self, *args, **kwargs) :
+            async def wrapAbstractProcessorMethod(self, *args, **kwargs) :
+                prefix = f"[PROCESSOR] : {path} : {args} : {kwargs}"
                 try : 
-                    logger.debug(f"[PROCESSOR] : {path} : {args} : {kwargs} : {LogCode.PENDING}")
+                    logger.debug(f"{prefix} : {LogCode.PENDING}")
                     res = await function(self, *args, **kwargs)
-                    logger.info(f"[PROCESSOR] : {path} : {args} : {kwargs} : {res} : {LogCode.SUCCESS}")
+                    logger.info(f"{prefix} : {LogCode.SUCCESS}")
                     return res
                 except KeyError as exc :
                     raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
                                           detail=f"Невозможно взять значение по ключу {exc.args}")
                 except ParsingException as exc :
+                    prefix = f"{prefix} : {exc.code}:{exc.detail} : {LogCode.ERROR}"
                     match exc.code :
                         case ParsingExceptionCode.LINKS_ERRORS_WHILE_PARSING :
-                            logger.warning(f"[PROCESSOR] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                            logger.warning(prefix)
                         case _ :
-                            logger.error(f"[PROCESSOR] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                            logger.error(prefix)
                     raise exc
                 except BaseException as exc :
-                    logger.error(f"[PROCESSOR] : {path} : {args} : {kwargs} : {exc.args} : {LogCode.ERROR}")
+                    logger.error(f"{prefix} : {type(exc)}:{exc.args} : {LogCode.ERROR}")
                     raise exc
-            return wrap
+            return wrapAbstractProcessorMethod
         return processorMethod

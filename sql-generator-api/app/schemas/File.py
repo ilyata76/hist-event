@@ -34,6 +34,9 @@ class FileBinary(File) :
 class FileBaseKeyword(FileBase) :
     keyword : str
 
+class FileBaseKeywordList(BaseModel) :
+    files : list[FileBaseKeyword]
+
 
 class FileKeyword(File) :
     """

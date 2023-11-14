@@ -5,7 +5,7 @@ from functools import partial, wraps
 import grpc
 
 from utils.logger import logger
-from utils.config import LogCode
+from utils.logger import LogCode
 
 
 class AbstractgRPCClient :

@@ -145,12 +145,6 @@ class StorageIdentifier :
     S3 = "s3"
 
 
-class LogCode :
-    PENDING = "PENDING"
-    SUCCESS = "SUCCESS"
-    ERROR = "ERROR"
-
-
 class EntityKeyword :
     ENTITY = "entity"
     entities = "entities"
@@ -213,3 +207,6 @@ class EntityContentKeyword :
 
 
 config = Config()
+
+NOSQL_IP = f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}"
+FILE_IP = f"{config.FILE_API_GRPC_HOST}:{config.FILE_API_GRPC_PORT}"
