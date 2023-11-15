@@ -25,7 +25,7 @@ class AbstractProcessor :
                 try : 
                     logger.debug(f"{prefix} : START")
                     res = await function(self, *args, **kwargs)
-                    logger.info(f"{prefix} : SUCCESS")
+                    logger.info(f"{prefix} : {res if len(str(res)) < 100 else 'res'} : SUCCESS")
                     return res
                 except KeyError as exc :
                     logger.error(f"{prefix} : {type(exc)}:{exc.args}")

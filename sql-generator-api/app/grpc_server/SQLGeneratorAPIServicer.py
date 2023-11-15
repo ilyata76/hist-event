@@ -42,7 +42,7 @@ async def createNewIdentifier() -> Status :
 
 async def checkOperationStatusValidated(identifier : Identifier) -> None :
     status = await NoSQLDatabaseAPIgRPCClient.GetSQLGeneratorStatus(identifier)
-    if status != "validated" and status != "parsed" :
+    if status != "validated" and status != "parsed" and status != "generated" :
         raise ParsingException(code=ParsingExceptionCode.FILES_DONT_VALIDATED,
                                detail=f"Для {identifier} не было проведено операции валидации")
     return None

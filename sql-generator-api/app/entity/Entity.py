@@ -68,7 +68,7 @@ class Entity(BaseModel) :
     def insertIntoTableColumns(self) -> str :
         links, ex_links = set(), set()
         for k, v in self.links.items() : links.add(f"{k}:{list(v)}")
-        for k, v in self.links.items() : ex_links.add(f"{k}:{list(v)}") 
+        for k, v in self.ex_links.items() : ex_links.add(f"{k}:{list(v)}") 
         links = NOV(links)
         if links != "'null'" and links != "null" : 
             links = links[1:len(links)-1].replace("\'", "\"") ## здесь убираются кавычки, замещаются одинарные на двойные (для постгреса)

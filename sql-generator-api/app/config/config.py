@@ -4,8 +4,6 @@
 from os import environ
 from pathlib import Path
 
-import inspect
-
 
 class Config :
     """
