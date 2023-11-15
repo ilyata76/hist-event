@@ -4,140 +4,117 @@
 from os import environ
 from pathlib import Path
 
+import inspect
+
 
 class Config :
     """
         Реактивный конфиг для приложения
     """
 
+    def __AddNewParameter(self, *, param, value, default, 
+                          cast : type = str, reread : bool = False):
+        try :
+            if not hasattr(self, f"_Config__{param}") or reread :
+                setattr(self, f"_Config__{param}", cast(value))
+        except BaseException :
+            setattr(self, f"_Config__{param}", default)
+        return getattr(self, f"_Config__{param}")
+
     @property
     def LOG_DEBUG(self) -> bool :
-        """
-            Определяет, будет ли отображаться DEBUG-уровень в логах
-        """
-        if not hasattr(self, "_Config__LOG_DEBUG"):
-            self.__LOG_DEBUG = environ.get("LOG_DEBUG", "false").lower() in ["true", "yes"]
-        return self.__LOG_DEBUG
+        """Будет ли отображаться DEBUG-уровень (и все выше) в логах"""
+        return self.__AddNewParameter(param="LOG_DEBUG", value=environ.get("LOG_DEBUG", "false").lower() in ["true", "yes"],
+                                      default=False, cast=bool, reread=False)
 
     @property
     def LOG_CONSOLE(self) -> bool :
-        """
-            Определяет, будет ли отображаться лог в консоли
-        """
-        if not hasattr(self, "_Config__LOG_CONSOLE"):
-            self.__LOG_CONSOLE = environ.get("LOG_CONSOLE", "false").lower() in ["true", "yes"]
-        return self.__LOG_CONSOLE
+        """Будет ли отображаться лог в консоли"""
+        return self.__AddNewParameter(param="LOG_CONSOLE", value=environ.get("LOG_CONSOLE", "false").lower() in ["true", "yes"],
+                                      default=False, cast=bool, reread=False)
 
     @property
     def LOG_FOLDER(self) -> Path :
-        """
-            Определяет папку для сохранения логов
-        """
-        try : 
-            if not hasattr(self, "_Config__LOG_FOLDER") :
-                self.__LOG_FOLDER = Path(str(environ.get("LOG_FOLDER", "./logs")))
-        except BaseException :
-            self.__LOG_FOLDER = Path("./logs")
-        return self.__LOG_FOLDER
+        """Папка для сохранения логов"""
+        return self.__AddNewParameter(param="LOG_FOLDER", value=environ.get("LOG_FOLDER", "./logs"),
+                                      default=Path("./logs"), cast=Path, reread=False)
 
     @property
     def LOG_FILENAME(self) -> str :
-        """
-            Определяет название файла, в котором будет храниться лог приложения
-        """
-        if not hasattr(self, "_Config__LOG_FILENAME") :
-            self.__LOG_FILENAME = environ.get("LOG_FILENAME", "sql-generator-api.log")
-        return self.__LOG_FILENAME
+        """Название файла лога"""
+        return self.__AddNewParameter(param="LOG_FILENAME", value=environ.get("LOG_FILENAME", "sql-generator-api.log"),
+                                      default="sql-generator-api.log", cast=str, reread=False)
 
     @property
     def GRPC_HOST(self) -> str :
-        if not hasattr(self, "_Config__GRPC_HOST") :
-            self.__GRPC_HOST = environ.get("GRPC_HOST", "0.0.0.0")
-        return self.__GRPC_HOST
+        """Хост текущего grpc-сервера"""
+        return self.__AddNewParameter(param="GRPC_HOST", value=environ.get("GRPC_HOST", "0.0.0.0"),
+                                      default="0.0.0.0", cast=str, reread=False)
 
     @property
     def GRPC_PORT(self) -> str :
-        if not hasattr(self, "_Config__GRPC_PORT") :
-            self.__GRPC_PORT = environ.get("GRPC_PORT", "50053")
-        return self.__GRPC_PORT
+        """Порт текущего grpc-сервера"""
+        return self.__AddNewParameter(param="GRPC_PORT", value=environ.get("GRPC_PORT", "50053"),
+                                      default="50053", cast=str, reread=False)
 
     @property 
     def FILE_API_GRPC_HOST(self) -> str :
-        if not hasattr(self, "_Config__FILE_API_GRPC_HOST") :
-            self.__FILE_API_GRPC_HOST = environ.get("FILE_API_GRPC_HOST", "localhost")
-        return self.__FILE_API_GRPC_HOST
+        """До grpc управления файлами"""
+        return self.__AddNewParameter(param="FILE_API_GRPC_HOST", value=environ.get("FILE_API_GRPC_HOST", "localhost"),
+                                      default="localhost", cast=str, reread=False)
 
     @property 
     def FILE_API_GRPC_PORT(self) -> str :
-        if not hasattr(self, "_Config__FILE_API_GRPC_PORT") :
-            self.__FILE_API_GRPC_PORT = environ.get("FILE_API_GRPC_PORT", "50052")
-        return self.__FILE_API_GRPC_PORT
+        """До grpc управления файлами"""
+        return self.__AddNewParameter(param="FILE_API_GRPC_PORT", value=environ.get("FILE_API_GRPC_PORT", "50052"),
+                                      default="50052", cast=str, reread=False)
 
     @property 
     def NOSQL_DATABASE_GRPC_HOST(self) -> str :
-        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_HOST") :
-            self.__NOSQL_DATABASE_GRPC_HOST = environ.get("NOSQL_DATABASE_GRPC_HOST", "localhost")
-        return self.__NOSQL_DATABASE_GRPC_HOST
+        """До grpc вспомогательного хранилища"""
+        return self.__AddNewParameter(param="NOSQL_DATABASE_GRPC_HOST", value=environ.get("NOSQL_DATABASE_GRPC_HOST", "localhost"),
+                                      default="localhost", cast=str, reread=False)
     
     @property 
     def NOSQL_DATABASE_GRPC_PORT(self) -> str :
-        if not hasattr(self, "_Config__NOSQL_DATABASE_GRPC_PORT") :
-            self.__NOSQL_DATABASE_GRPC_PORT = environ.get("NOSQL_DATABASE_GRPC_PORT", "50051")
-        return self.__NOSQL_DATABASE_GRPC_PORT
+        """До grpc вспомогательного хранилища"""
+        return self.__AddNewParameter(param="NOSQL_DATABASE_GRPC_PORT", value=environ.get("NOSQL_DATABASE_GRPC_PORT", "50051"),
+                                      default="50051", cast=str, reread=False)
 
     @property 
     def PARSE_NAME_SPECIAL_SYMBOLS(self) -> str :
-        if not hasattr(self, "_Config__PARSE_NAME_SPECIAL_SYMBOLS") :
-            self.__PARSE_NAME_SPECIAL_SYMBOLS = environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!")
-        return self.__PARSE_NAME_SPECIAL_SYMBOLS
+        """Для pyparsing для {вставок:1}[?]"""
+        return self.__AddNewParameter(param="PARSE_NAME_SPECIAL_SYMBOLS", value=environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!"),
+                                      default=" _-/\\:()?!", cast=str, reread=False)
 
     @property 
     def PARSE_KEYWORD_SPECIAL_SYMBOLS(self) -> str :
-        if not hasattr(self, "_Config__PARSE_KEYWORD_SPECIAL_SYMBOLS") :
-            self.__PARSE_KEYWORD_SPECIAL_SYMBOLS = environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_")
-        return self.__PARSE_KEYWORD_SPECIAL_SYMBOLS
+        """Для pyparsing для {вставок:1}[?]"""
+        return self.__AddNewParameter(param="PARSE_KEYWORD_SPECIAL_SYMBOLS", value=environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_"),
+                                      default="_", cast=str, reread=False)
 
     @property
-    def GRPC_MAX_WORKERS(self) -> str :
-        """
-            Количество работающих threads у grpc-сервера
-        """
-        try : 
-            if not hasattr(self, "_Config__GRPC_MAX_WORKERS") :
-                self.__GRPC_MAX_WORKERS = int(environ.get("GRPC_MAX_WORKERS", 10))
-        except BaseException :
-            self.__GRPC_MAX_WORKERS = 10
-        return self.__GRPC_MAX_WORKERS
+    def GRPC_MAX_WORKERS(self) -> int :
+        """Количество работающих threads у текущего сервера grpc"""
+        return self.__AddNewParameter(param="GRPC_MAX_WORKERS", value=environ.get("GRPC_MAX_WORKERS", 10),
+                                      default=10, cast=int, reread=False)
 
     @property
-    def MAX_ITERATION_PARSE(self) -> str :
-        """
-            Количество работающих threads у grpc-сервера
-        """
-        try : 
-            if not hasattr(self, "_Config__MAX_ITERATION_PARSE") :
-                self.__MAX_ITERATION_PARSE = int(environ.get("MAX_ITERATION_PARSE", 10)) - 1
-        except BaseException :
-            self.__MAX_ITERATION_PARSE = 9
-        return self.__MAX_ITERATION_PARSE
+    def MAX_ITERATION_PARSE(self) -> int :
+        """Количество обходов файлов для разрешения обратной вложенности"""
+        return self.__AddNewParameter(param="MAX_ITERATION_PARSE", value=environ.get("MAX_ITERATION_PARSE", 10),
+                                      default=10, cast=int, reread=False) - 1
 
     def __str__(self, indent : str = "") -> str :
         """
             Строковое представление.
                 Также обновляет ENV-взятие переменных, т.к. обращается к ним напрямую
         """
-        return   indent + f"LOG_DEBUG : {self.LOG_DEBUG}" + "; "\
-               + indent + f"LOG_CONSOLE : {self.LOG_CONSOLE}" + "; "\
-               + indent + f"LOG_FOLDER : {self.LOG_FOLDER}" + "; "\
-               + indent + f"LOG_FILENAME : {self.LOG_FILENAME}" + "; "\
-               + indent + f"GRPC_PORT : {self.GRPC_PORT}" + "; "\
-               + indent + f"GRPC_HOST : {self.GRPC_HOST}" + "; "\
-               + indent + f"GRPC_MAX_WORKERS : {self.GRPC_MAX_WORKERS}" + "; "\
-               + indent + f"MAX_ITERATION_PARSE : {self.MAX_ITERATION_PARSE}" + "; "\
-               + indent + f"FILE_API_GRPC_HOST : {self.FILE_API_GRPC_HOST}" + "; "\
-               + indent + f"FILE_API_GRPC_PORT : {self.FILE_API_GRPC_PORT}" + "; "\
-               + indent + f"NOSQL_DATABASE_GRPC_HOST : {self.NOSQL_DATABASE_GRPC_HOST}" + "; "\
-               + indent + f"NOSQL_DATABASE_GRPC_PORT : {self.NOSQL_DATABASE_GRPC_PORT}"
+        return " ; ".join([f"{indent}{x} : {getattr(self, x)}" for x in ["LOG_DEBUG", "LOG_CONSOLE", "LOG_FOLDER", "LOG_FILENAME",
+                                                                "GRPC_PORT", "GRPC_HOST", "GRPC_MAX_WORKERS",
+                                                                "MAX_ITERATION_PARSE", "FILE_API_GRPC_HOST", "FILE_API_GRPC_PORT",
+                                                                "NOSQL_DATABASE_GRPC_HOST", "NOSQL_DATABASE_GRPC_PORT",
+                                                                "PARSE_KEYWORD_SPECIAL_SYMBOLS", "PARSE_NAME_SPECIAL_SYMBOLS"]])
 
 
 config = Config()
