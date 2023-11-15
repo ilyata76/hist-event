@@ -1,1 +1,1 @@
-from .logger_initialize import logger
+from .logger import logger
