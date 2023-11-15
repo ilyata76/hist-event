@@ -4,10 +4,12 @@
 import proto.file_api_pb2 as pb2
 import proto.file_api_pb2_grpc as pb2_grpc
 
-from utils.config import FILE_IP
-from utils.dict_from import dictFromMessage
-from grpc_client.AbstractgRPCClient import AbstractgRPCClient as GrpcClient
-from schemas.File import FileBinary, FileBase, File
+from config import FILE_IP
+from utils import dictFromGoogleMessage
+from schemas import FileBinary, FileBase, File
+
+from .AbstractgRPCClient import AbstractgRPCClient as GrpcClient
+
 
 class FileAPIgRPCCLient :
     """
@@ -21,7 +23,7 @@ class FileAPIgRPCCLient :
         stub = pb2_grpc.FileAPIStub(channel)
         request = pb2.FileBaseR(file=file.model_dump())
         response : pb2.FileBinaryR = stub.GetFile(request)
-        return FileBinary(**dictFromMessage(response.file))
+        return FileBinary(**dictFromGoogleMessage(response.file))
 
 
     @staticmethod
@@ -30,4 +32,4 @@ class FileAPIgRPCCLient :
         stub = pb2_grpc.FileAPIStub(channel)
         request = pb2.FileBinaryR(file=file.model_dump())
         response : pb2.FileR = stub.PutFile(request)
-        return File(**dictFromMessage(response.file))
+        return File(**dictFromGoogleMessage(response.file))

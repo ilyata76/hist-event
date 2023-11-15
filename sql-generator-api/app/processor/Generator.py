@@ -1,11 +1,10 @@
 """
     Генерация SQL
 """
-from processor.AbstractProcessor import AbstractProcessor as Processor
-from entity.Storage import StorageManager, EntityStorage
-from entity.Entity import *
-from entity.EntityBonds import EntityBonds
+from logger import logger
+from entity import *
 
+from .AbstractProcessor import AbstractProcessor as Processor
 
 
 class Generator(Processor) :
@@ -15,6 +14,7 @@ class Generator(Processor) :
     """
 
     def __init__(self, storage : StorageManager) :
+        logger.debug("Создание экземпляра класса Generator")
         self.storage = storage
         super().__init__()
 

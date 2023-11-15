@@ -1,8 +1,9 @@
 """
     Связи между ключевыми словами, сущностями и пр.
 """
-from entity.Entity import *
-from utils.config import EntityKeyword as EK
+from config import EntityKeyword as EK
+
+from .Entity import *
 
 
 class EntityBonds :

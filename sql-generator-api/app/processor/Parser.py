@@ -1,15 +1,14 @@
 """
     Парсинг в NoSQL-схемы
 """
-from entity.Storage import StorageManager
-from entity.EntityBonds import EntityBonds
-from entity.Entity import Entity, Bond
-from processor.AbstractProcessor import AbstractProcessor as Processor
-from schemas.File import FileBinaryKeyword, FileKeyword, FileBase, FileBinary
+from logger import logger
+from entity import *
+from schemas import FileBinaryKeyword, FileKeyword, FileBase
+from utils import dictFromYaml
 from utils.exception import *
-from utils.dict_from import dictFromYaml
-from utils.config import config, EntityKeyword
-from utils.validate import *
+from config import config, EntityKeyword
+
+from .AbstractProcessor import AbstractProcessor as Processor
 
 
 class Parser(Processor) :
@@ -19,6 +18,7 @@ class Parser(Processor) :
     """
 
     def __init__(self, storage : StorageManager) :
+        logger.debug("Создание экземпляра класса Parser")
         self.storage = storage
         super().__init__()
 

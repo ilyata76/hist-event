@@ -26,7 +26,6 @@ class gRPCServicerError(MyException) :
     pass
 
 
-
 class ValidationExceptionCode(Enum) :
     INVALID_FIELD = 1
     INVALID_FIELD_CONTENT = 2

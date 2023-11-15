@@ -7,8 +7,8 @@ import datetime
 
 from pydantic import BaseModel
 
-from utils.config import EntityContentKeyword as ECK, EntityKeyword as EK
-from utils.validate import *
+from config import EntityContentKeyword as ECK, EntityKeyword as EK
+from utils import validate as v
 
 
 class EntityLink(BaseModel) :
@@ -35,10 +35,10 @@ class Entity(BaseModel) :
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
         """Базовая функция валидации всех сущностей"""
-        validateEntityOnDict(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.id, entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.name, entity_identifier, dict_entity)
-        validateFieldOnCasting(ECK.id, entity_identifier, dict_entity, int)
+        v.validateEntityOnDict(entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.id, entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.name, entity_identifier, dict_entity)
+        v.validateFieldOnCasting(ECK.id, entity_identifier, dict_entity, int)
 
     def textsToParseLinks(self) -> list[str] :
         """Тексты, которые будут проходить проверку на {вставки:id}, чтобы заполнить links & ex_links"""
@@ -97,12 +97,12 @@ class DateTime(BaseModel) :
 
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
-        validateEntityOnDict(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
+        v.validateEntityOnDict(entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
         if dict_entity[ECK.date] != "..." : # TODO: разные варианты могут быть: нет данных, настоящее время и пр.
-            validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, datetime.date.fromisoformat)
+            v.validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, datetime.date.fromisoformat)
         if ECK.time in dict_entity.keys() and dict_entity[ECK.time] != "...":
-            validateFieldOnCasting(ECK.time, entity_identifier, dict_entity, datetime.time.fromisoformat)
+            v.validateFieldOnCasting(ECK.time, entity_identifier, dict_entity, datetime.time.fromisoformat)
 
     @staticmethod
     def createTableRows(prefix : str) -> str :
@@ -124,9 +124,9 @@ class DateProcess(BaseModel) :
 
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
-        validateEntityOnDict(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.start, entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.end, entity_identifier, dict_entity)
+        v.validateEntityOnDict(entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.start, entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.end, entity_identifier, dict_entity)
         DateTime.validate(entity_identifier, dict_entity[ECK.start])
         DateTime.validate(entity_identifier, dict_entity[ECK.end])
 
@@ -168,8 +168,8 @@ class Date(Entity) :
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
-        validateFieldOnOneOfExisting([ECK.point, ECK.process], entity_identifier, dict_entity)
-        validateFieldOnCrossExcluding([ECK.point, ECK.process], entity_identifier, dict_entity)
+        v.validateFieldOnOneOfExisting([ECK.point, ECK.process], entity_identifier, dict_entity)
+        v.validateFieldOnCrossExcluding([ECK.point, ECK.process], entity_identifier, dict_entity)
         if ECK.point in dict_entity.keys() :
             DateTime.validate(entity_identifier, dict_entity[ECK.point])
         if ECK.process in dict_entity.keys() :
@@ -211,11 +211,11 @@ class Geo(BaseModel) :
 
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
-        validateEntityOnDict(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.latitude, entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.longitude, entity_identifier, dict_entity)
-        validateFieldOnCasting(ECK.latitude, entity_identifier, dict_entity, float)
-        validateFieldOnCasting(ECK.longitude, entity_identifier, dict_entity, float)
+        v.validateEntityOnDict(entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.latitude, entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.longitude, entity_identifier, dict_entity)
+        v.validateFieldOnCasting(ECK.latitude, entity_identifier, dict_entity, float)
+        v.validateFieldOnCasting(ECK.longitude, entity_identifier, dict_entity, float)
 
     @staticmethod
     def createTableRows() -> str :
@@ -287,8 +287,8 @@ class Person(Entity) :
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
-        validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+        v.validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
+        v.validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
     
     def foreignKeys(self) -> list[EntityLink] :
         return super().foreignKeys() + [EntityLink(entity=ECK.date, id=self.date)]
@@ -326,11 +326,11 @@ class Link(BaseModel) :
 
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
-        validateEntityOnDict(entity_identifier, dict_entity)
-        validateFieldOnOneOfExisting([ECK.web, ECK.native], entity_identifier, dict_entity)
+        v.validateEntityOnDict(entity_identifier, dict_entity)
+        v.validateFieldOnOneOfExisting([ECK.web, ECK.native], entity_identifier, dict_entity)
         #validateFieldOnCrossExcluding([ECK.web, ECK.native], entity_identifier, dict_entity)
         if ECK.web in dict_entity.keys() :
-            validateFieldOnHTTP(ECK.web, entity_identifier, dict_entity)
+            v.validateFieldOnHTTP(ECK.web, entity_identifier, dict_entity)
 
     @staticmethod
     def createTableRows() -> str :
@@ -369,9 +369,9 @@ class Biblio(Entity) :
     def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
         if ECK.author in dict_entity.keys() :
-            validateFieldOnCasting(ECK.author, entity_identifier, dict_entity, int)
+            v.validateFieldOnCasting(ECK.author, entity_identifier, dict_entity, int)
         if ECK.date in dict_entity.keys() :
-            validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+            v.validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
         if ECK.link in dict_entity.keys() :
             Link.validate(entity_identifier, dict_entity[ECK.link])
 
@@ -423,8 +423,8 @@ class BiblioFragment(Entity) :
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.biblio, entity_identifier, dict_entity)
-        validateFieldOnCasting(ECK.biblio, entity_identifier, dict_entity, int)
+        v.validateFieldOnExisting(ECK.biblio, entity_identifier, dict_entity)
+        v.validateFieldOnCasting(ECK.biblio, entity_identifier, dict_entity, int)
 
     def foreignKeys(self) -> list[EntityLink]:
         return super().foreignKeys() + [EntityLink(entity=ECK.biblio, id=self.biblio)]
@@ -479,9 +479,9 @@ class Source(Entity) :
     def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
         if ECK.author in dict_entity.keys() :
-            validateFieldOnCasting(ECK.author, entity_identifier, dict_entity, int)
+            v.validateFieldOnCasting(ECK.author, entity_identifier, dict_entity, int)
         if ECK.date in dict_entity.keys() :
-            validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+            v.validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
         if ECK.link in dict_entity.keys() :
             Link.validate(entity_identifier, dict_entity[ECK.link])
 
@@ -532,8 +532,8 @@ class SourceFragment(Entity) :
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.source, entity_identifier, dict_entity)
-        validateFieldOnCasting(ECK.source, entity_identifier, dict_entity, int)
+        v.validateFieldOnExisting(ECK.source, entity_identifier, dict_entity)
+        v.validateFieldOnCasting(ECK.source, entity_identifier, dict_entity, int)
 
     def foreignKeys(self) -> list[EntityLink]:
         return super().foreignKeys() + [EntityLink(entity=ECK.source, id=self.source)]
@@ -583,10 +583,10 @@ class Event(Entity) :
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
         Entity.validate(entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.min, entity_identifier, dict_entity)
-        validateFieldOnExisting(ECK.max, entity_identifier, dict_entity)
-        validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
+        v.validateFieldOnExisting(ECK.date, entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.min, entity_identifier, dict_entity)
+        v.validateFieldOnExisting(ECK.max, entity_identifier, dict_entity)
+        v.validateFieldOnCasting(ECK.date, entity_identifier, dict_entity, int)
         # TODO level можно ограничить!
 
     def foreignKeys(self) -> list[EntityLink]:
@@ -677,14 +677,14 @@ class Bond(BaseModel) :
 
     @staticmethod
     def validate(entity_identifier : str, dict_entity : dict) :
-        validateFieldOnExisting(ECK.event, entity_identifier, dict_entity)
-        validateFieldOnCasting(ECK.event, entity_identifier, dict_entity, int)
+        v.validateFieldOnExisting(ECK.event, entity_identifier, dict_entity)
+        v.validateFieldOnCasting(ECK.event, entity_identifier, dict_entity, int)
         if ECK.parents in dict_entity.keys() :
-            validateFieldOnListInt(ECK.parents, entity_identifier, dict_entity)
+            v.validateFieldOnListInt(ECK.parents, entity_identifier, dict_entity)
         if ECK.childs in dict_entity.keys() :
-            validateFieldOnListInt(ECK.childs, entity_identifier, dict_entity)
+            v.validateFieldOnListInt(ECK.childs, entity_identifier, dict_entity)
         if ECK.prerequisites in dict_entity.keys() :
-            validateFieldOnListInt(ECK.prerequisites, entity_identifier, dict_entity)
+            v.validateFieldOnListInt(ECK.prerequisites, entity_identifier, dict_entity)
 
     @staticmethod
     def dropTableIfExists() -> str :

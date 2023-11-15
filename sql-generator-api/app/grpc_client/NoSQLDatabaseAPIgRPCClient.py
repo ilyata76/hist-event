@@ -1,18 +1,15 @@
 """
     Файл клиента для gRPC NoSQLDatabase сервера и доступа к нему
 """
-from functools import wraps
-
-import grpc
 import proto.nosql_database_api_pb2 as pb2
 import proto.nosql_database_api_pb2_grpc as pb2_grpc
 
-from utils.config import NOSQL_IP
-from grpc_client.AbstractgRPCClient import AbstractgRPCClient as GrpcClient
-from schemas.File import FileBaseKeyword, FileBase, FileBaseKeywordList
-from utils.dict_from import dictFromMessage
-from schemas import Identifier, Status
+from config import NOSQL_IP
+from schemas import Identifier, Status, FileBase,\
+                    FileBaseKeywordList, FileBaseKeyword
+from utils import dictFromGoogleMessage
 
+from .AbstractgRPCClient import AbstractgRPCClient as GrpcClient
 
 
 class NoSQLDatabaseAPIgRPCClient :
@@ -54,7 +51,7 @@ class NoSQLDatabaseAPIgRPCClient :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
         request = pb2.IdentifierR(identifier=identifier)
         response : pb2.ManyFilesIdentifierR = stub.GetSQLGeneratorFiles(request)
-        return FileBaseKeywordList(files=[FileBaseKeyword(**dictFromMessage(file)) for file in response.files])
+        return FileBaseKeywordList(files=[FileBaseKeyword(**dictFromGoogleMessage(file)) for file in response.files])
 
 
     @staticmethod
@@ -63,7 +60,7 @@ class NoSQLDatabaseAPIgRPCClient :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
         request = pb2.IdentifierR(identifier=identifier)
         response : pb2.FileBaseIdentifierR = stub.GetSQLGeneratorSQLFile(request)
-        return FileBase(**dictFromMessage(response.file))
+        return FileBase(**dictFromGoogleMessage(response.file))
 
 
     @staticmethod
@@ -72,4 +69,4 @@ class NoSQLDatabaseAPIgRPCClient :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
         request = pb2.FileBaseIdentifierR(file=file.model_dump(), identifier=identifier)
         response : pb2.FileBaseIdentifierR = stub.PutSQLGeneratorSQLFile(request)
-        return FileBase(**dictFromMessage(response.file))
+        return FileBase(**dictFromGoogleMessage(response.file))

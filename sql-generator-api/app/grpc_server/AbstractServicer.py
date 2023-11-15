@@ -2,10 +2,9 @@
     Файл логики gRPC-сервера
 """
 import grpc
-from functools import partial, wraps
+from functools import wraps
 
-from utils.logger import logger
-from utils.logger import LogCode
+from logger import logger
 from utils.exception import *
 
 

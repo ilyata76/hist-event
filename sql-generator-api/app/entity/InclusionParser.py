@@ -3,7 +3,7 @@
 """
 import pyparsing
 
-from utils.config import config
+from config import config
 from schemas import ParseResult
 
 

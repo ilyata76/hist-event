@@ -5,5 +5,5 @@ Identifier = NewType("identifier", str)
 Status = NewType("status", str)
 
 
-from schemas.Parse import *
-from schemas.File import * 
+from .Parse import *
+from .File import * 

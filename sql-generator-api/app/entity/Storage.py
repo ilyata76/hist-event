@@ -3,12 +3,12 @@
 """
 from functools import wraps
 
-from utils.logger import logger
-from entity.Entity import Entity, Bond
-from entity.EntityBonds import EntityBonds
+from logger import logger
 from utils.exception import *
-from utils.logger import LogCode
-from entity.InclusionParser import InclusionParser
+
+from .Entity import Entity, Bond
+from .EntityBonds import EntityBonds
+from .InclusionParser import InclusionParser
 
 
 class StorageManager :
@@ -30,20 +30,22 @@ class StorageManager :
         def method(function) :
             @wraps(function)
             async def wrap(self, *args, **kwargs) :
+                prefix = f"[STORAGE] : {path} : {args} : {kwargs}"
                 try : 
-                    logger.debug(f"[STORAGE] : {path} : {args} : {kwargs} : {LogCode.PENDING}")
+                    logger.debug(f"{prefix} : PENDING")
                     res = await function(self, *args, **kwargs)
-                    logger.info(f"[STORAGE] : {path} : {args} : {kwargs} : {res} : {LogCode.SUCCESS}")
+                    logger.info(f"{prefix} : {res}")
                     return res
                 except ParsingException as exc :
+                    msg = f"{prefix} : {exc.detail}"
                     match exc.code :
                         case ParsingExceptionCode.FOREIGN_KEY_DOESNT_EXIST | ParsingExceptionCode.ENTITY_TO_LINK_DOESNT_EXIST :
-                            logger.warning(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                            logger.warning(msg)
                         case _ :
-                            logger.error(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.detail} : {LogCode.ERROR}")
+                            logger.error(msg)
                     raise exc
                 except BaseException as exc :
-                    logger.error(f"[STORAGE] : {path} : {args} : {kwargs} : {exc.args} : {LogCode.ERROR}")
+                    logger.error(f"{prefix} : {exc.args}")
                     raise exc
             return wrap
         return method
@@ -59,7 +61,7 @@ class StorageManager :
             raise ConfigException(code=ConfigExceptionCode.INVALID_KEYWORD,
                                   detail=f"Такое ключевое слово, {keyword} ({entity_identifier}), не предусмотрено")
 
-    
+
     def __checkReversedKeywordIsValid(self, keyword, entity_identifier = "") :
         if keyword not in EntityBonds.keyword_to_keyword_reversed.keys() :
             raise ParsingException(code=ParsingExceptionCode.INVALID_ENTITY_TYPE,

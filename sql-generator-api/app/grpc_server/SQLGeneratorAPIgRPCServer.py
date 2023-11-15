@@ -2,13 +2,15 @@
     Файл управления самим gRPC сервером
 """
 from concurrent import futures
-import grpc
 from asyncio import CancelledError
+
+import grpc
 import proto.sql_generator_api_pb2_grpc as pb2_grpc
 
-from grpc_server.SQLGeneratorAPIServicer import SQLGeneratorAPIServicer
-from utils.logger import logger
-from utils.config import config
+from logger import logger
+from config import config
+
+from .SQLGeneratorAPIServicer import SQLGeneratorAPIServicer
 
 
 class SQLGeneratorAPIgRPCServer :

@@ -1,15 +1,14 @@
 """
     Валидация входных сущностей на правильность заполнения
 """
-from utils.logger import logger
+from logger import logger
 from schemas.File import FileBase, FileBaseKeyword
-from utils.dict_from import dictFromYaml
-from utils.exception import ConfigException, ConfigExceptionCode
-from processor.AbstractProcessor import AbstractProcessor as Processor
-from entity.EntityBonds import EntityBonds
-from entity.Entity import Bond
-from utils.config import EntityKeyword
+from utils import dictFromYaml
+from utils.exception import *
+from entity import EntityBonds, Bond
+from config import EntityKeyword
 
+from .AbstractProcessor import AbstractProcessor as Processor
 
 class Validator(Processor) :
     """

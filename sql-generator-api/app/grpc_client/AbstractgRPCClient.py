@@ -1,11 +1,10 @@
 """
     Файл клиента для gRPC
 """
-from functools import partial, wraps
+from functools import wraps
 import grpc
 
-from utils.logger import logger
-from utils.logger import LogCode
+from logger import logger
 
 
 class AbstractgRPCClient :
@@ -27,21 +26,21 @@ class AbstractgRPCClient :
         def gRPCMethod(function) :
             @wraps(function)
             async def wrap(*args, channel = None, **kwargs) :
-                prefix = partial(AbstractgRPCClient.logPrefix, path=path, args=args, kwargs=kwargs)
+                msg = f"[CLIENT] : {path} : {args} : {kwargs}"
                 try : 
-                    logger.debug(f"{prefix(code=LogCode.PENDING)}")
+                    logger.pending(msg)
                     if not channel : 
                         with grpc.insecure_channel(ip) as channel :
                             result = await function(*args, channel=channel, **kwargs)
                     else :
                         result = await function(*args, channel=channel, **kwargs)
-                    logger.info(f"{prefix(code=LogCode.SUCCESS)} : {result}")
+                    logger.success(f"{msg} : {result}")
                     return result
                 except grpc.RpcError as exc:
-                    logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code()}:{exc.details()}")
+                    logger.error(f"{msg} : {exc.code()}:{exc.details()}")
                     raise exc
                 except BaseException as exc:
-                    logger.exception(f"{prefix(code=LogCode.ERROR)} : {type(exc)}:{exc}")
+                    logger.exception(f"{msg} : {type(exc)}:{exc}")
                     raise RuntimeError(f"При обработке запроса произошла непредвиденная ошибка : {type(exc)}:{exc}")
             return wrap
         return gRPCMethod

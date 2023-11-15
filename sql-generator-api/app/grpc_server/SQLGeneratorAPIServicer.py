@@ -2,22 +2,20 @@
     Файл логики gRPC-сервера
 """
 import uuid
+
 import proto.sql_generator_api_pb2 as pb2
 import proto.sql_generator_api_pb2_grpc as pb2_grpc
 
-from grpc_server.AbstractServicer import AbstractServicer as Servicer
-from grpc_client.FileAPIgRPCCLient import FileAPIgRPCCLient
-from grpc_client.NoSQLDatabaseAPIgRPCClient import NoSQLDatabaseAPIgRPCClient
-from utils.dict_from import dictFromMessage
-from schemas.File import FileBaseKeyword, FileBase, FileBinary, FileBaseKeywordList
-from processor.Validator import Validator
-from processor.Parser import Parser
-from processor.Generator import Generator
-from entity.Storage import StorageManager
-from utils.config import EntityKeyword
+from config import EntityKeyword
+from schemas import FileBaseKeyword, FileBase, FileBinary, FileBaseKeywordList,\
+                    Identifier, Status
+from entity import StorageManager
+from utils import dictFromGoogleMessage
 from utils.exception import *
-from schemas import Identifier, Status
+from processor import *
+from grpc_client import FileAPIgRPCCLient, NoSQLDatabaseAPIgRPCClient
 
+from .AbstractServicer import AbstractServicer as Servicer
 
 
 def splitFiles(request : FileBaseKeywordList) -> tuple[list[FileBaseKeyword], FileBaseKeyword] :
@@ -64,7 +62,6 @@ async def parseFilesToStorage(parser : Parser, identifier : Identifier) -> Parse
     return parser
 
 
-
 class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
     """
         Логика сервера (сервисер))
@@ -78,7 +75,7 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
     @Servicer.methodAsyncDecorator("sql-generator-api:Validate")
     async def Validate(self, request : pb2.ManyFilesR, context) :
         validator = Validator()
-        files, bonds_file = splitFiles(FileBaseKeywordList(files=[FileBaseKeyword(**dictFromMessage(file)) for file in request.files]))
+        files, bonds_file = splitFiles(FileBaseKeywordList(files=[FileBaseKeyword(**dictFromGoogleMessage(file)) for file in request.files]))
         for file in files :
             await validator.readAndValidateFileEntities(FileAPIgRPCCLient.GetFile, file)
         if bonds_file :
