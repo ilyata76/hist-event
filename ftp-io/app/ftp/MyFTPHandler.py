@@ -4,7 +4,7 @@
 """
 from pyftpdlib.handlers import FTPHandler
 
-from utils.logger import logger
+from logger import logger
 
 
 class MyFTPHandler(FTPHandler) :
@@ -15,9 +15,7 @@ class MyFTPHandler(FTPHandler) :
 
 
 class MyFTPHandlerLoguru(MyFTPHandler) :
-    """
-        Хендлер сохраняет логи через loguru
-    """
+    """Хендлер сохраняет логи через loguru"""
 
     def on_connect(self):
         logger.info(f"{self.prefix} Подключен клиент")

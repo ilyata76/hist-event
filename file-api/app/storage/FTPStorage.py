@@ -5,67 +5,15 @@ from io import BytesIO
 from pathlib import Path
 from ftplib import FTP
 
-from utils.logger import logger
-from utils.config import LogCode, config
-from utils.exception import StorageException, StorageExceptionCode
-from schemas.File import FileBinary, File, FileBase
+from logger import logger
+from config import config
+from utils.exception import *
+from schemas import FileBinary, File, FileBase
+
+from .AbstractStorage import AbstractStorage as Storage
 
 
-class AbstractStorage :
-    """
-        Класс описывает операции с хранилищем и файлами в нём
-    """
-    def __init__(self) :
-        pass
-
-    def method(path : str) :
-        """
-            Декоратор для методов над хранилищем
-        """
-        def gRPCMethod(function) :
-            async def wrap(self, *args, **kwargs) :
-                self.connect()
-                prefix = f"[STORAGE] : {path}"
-                try : 
-                    logger.debug(f"{prefix} : {LogCode.PENDING}")
-                    result = await function(self, *args, **kwargs)
-                    logger.info(f"{prefix} : {LogCode.SUCCESS}")
-                    return result
-                except StorageException as exc:
-                    raise exc
-                except BaseException as exc:
-                    logger.exception(f"{prefix} : {LogCode.ERROR} : {type(exc)}:{exc}")
-                    raise RuntimeError(f"При работа с хранилищами произошла непредвиденная ошибка : {type(exc)}:{exc}")
-            return wrap
-        return gRPCMethod
-
-    def connect(self) :
-        """Тестовое подключение, подключение"""
-        raise StorageException(code=StorageExceptionCode.METHOD_NOT_REALIZED,
-                               detail="Хранилище не реализует метод connect")       
-
-    @method("storage:appendOne")
-    async def appendOne(self, file : FileBinary) -> File:
-        raise StorageException(code=StorageExceptionCode.METHOD_NOT_REALIZED,
-                               detail="Хранилище не реализует метод appendOne")
-
-    @method("storage:getOne")
-    async def getOne(self, file : FileBase) -> FileBinary:
-        raise StorageException(code=StorageExceptionCode.METHOD_NOT_REALIZED,
-                               detail="Хранилище не реализует метод getOne")
-
-    @method("storage:deleteOne")
-    async def deleteOne(self, file : FileBase) -> File:
-        raise StorageException(code=StorageExceptionCode.METHOD_NOT_REALIZED,
-                               detail="Хранилище не реализует метод deleteOne")
-
-    @method("storage:putOne")
-    async def putOne(self, file : FileBinary) -> File:
-        raise StorageException(code=StorageExceptionCode.METHOD_NOT_REALIZED,
-                               detail="Хранилище не реализует метод putOne")
-
-
-class FTPStorage(AbstractStorage) :
+class FTPStorage(Storage) :
 
     def __init__(self, ftp : FTP = FTP()) :
         self.ftp = ftp
@@ -105,7 +53,7 @@ class FTPStorage(AbstractStorage) :
         except Exception :
             return False
 
-    @AbstractStorage.method("ftp:appendOne")
+    @Storage.methodAsyncDecorator("ftp:appendOne")
     async def appendOne(self, file : FileBinary) -> File:
         """Поднимет исключение, если файл существует"""
         logger.debug(f"{self.prefix()} Добавление нового файла {file.path}")
@@ -117,7 +65,7 @@ class FTPStorage(AbstractStorage) :
         logger.info(f"{self.prefix()} Был добавлен файл {file.path}")
         return File(**file.model_dump())
 
-    @AbstractStorage.method("ftp:getOne")
+    @Storage.methodAsyncDecorator("ftp:getOne")
     async def getOne(self, file : FileBase) -> FileBinary:
         """Поднимет ислкючение, если файла не существует"""
         logger.debug(f"{self.prefix()} Взятие файла {file.path}")
@@ -137,7 +85,7 @@ class FTPStorage(AbstractStorage) :
                           filename=file.path.name,
                           file=file_bytes)
 
-    @AbstractStorage.method("ftp:putOne")
+    @Storage.methodAsyncDecorator("ftp:putOne")
     async def putOne(self, file : FileBinary) -> File :
         """Добавляет файл независимо от его существования"""
         logger.info(f"{self.prefix()} Замена файла по пути {file.path}")
@@ -146,7 +94,7 @@ class FTPStorage(AbstractStorage) :
         logger.info(f"{self.prefix()} Заменен файл {file.path}")
         return File(**file.model_dump())
 
-    @AbstractStorage.method("ftp:deleteOne")
+    @Storage.methodAsyncDecorator("ftp:deleteOne")
     async def deleteOne(self, file : FileBase) -> File :
         """Поднимет исключение, если файл не существует"""
         logger.debug(f"{self.prefix()} Удаление файла {file.path}")
@@ -158,12 +106,4 @@ class FTPStorage(AbstractStorage) :
         return File(path=file.path,
                     storage=file.storage,
                     filename=file.path.name)
-
-
-class S3Storage(AbstractStorage) :
-    """
-        Не реализован TODO
-    """
-    pass
-
 

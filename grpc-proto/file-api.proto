@@ -9,25 +9,18 @@ package file_api;
 // сервис по управлению файлами:
 //   получать, отдавать, сохранять и пр. 
 service FileAPI {
-
   // проверить работоспособность
   rpc Ping (PingR) returns (PongR) {}
-
   // загрузить файл
   rpc AddFile (FileBinaryR) returns (FileR) {}
-
   // получить файл
   rpc GetFile (FileBaseR) returns (FileBinaryR) {}
-
   // получить мета-информацию о файле (сгодится для проверки существования файла)
   rpc GetFileMetaInfo (FileBaseR) returns (FileR) {}
-
   // удалить файл
   rpc DeleteFile (FileBaseR) returns (FileR) {}
-
   // сохранить/заменить файл
   rpc PutFile (FileBinaryR) returns (FileR) {}
-
   // получить список мета-информацю всех (или отрезком) файлов
   rpc GetManyFilesMetaInfo (StorageSegmentR) returns (FileSegmentR) {}
 };

@@ -4,6 +4,7 @@
 from functools import wraps
 import grpc
 
+from utils import cutLog
 from logger import logger
 
 
@@ -11,11 +12,6 @@ class AbstractgRPCClient :
     """
         храним декоратор
     """
-
-    @staticmethod
-    def logPrefix(path : str, code : str, args : list, kwargs : dict) :
-        return f"[CLIENT] : {path} : {args} : {kwargs} : {code}"
-
 
     @staticmethod
     def methodAsyncDecorator(path : str, ip : str) :
@@ -26,7 +22,7 @@ class AbstractgRPCClient :
         def gRPCMethod(function) :
             @wraps(function)
             async def wrap(*args, channel = None, **kwargs) :
-                msg = f"[CLIENT] : {path} : {args} : {kwargs}"
+                msg = f"[CLIENT] : {path} : {cutLog(args)} : {cutLog(kwargs)}"
                 try : 
                     logger.pending(msg)
                     if not channel : 
@@ -34,7 +30,7 @@ class AbstractgRPCClient :
                             result = await function(*args, channel=channel, **kwargs)
                     else :
                         result = await function(*args, channel=channel, **kwargs)
-                    logger.success(f"{msg} : {result}")
+                    logger.success(f"{msg} : {cutLog(result)}")
                     return result
                 except grpc.RpcError as exc:
                     logger.error(f"{msg} : {exc.code()}:{exc.details()}")

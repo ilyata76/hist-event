@@ -2,7 +2,7 @@
     Валидация входных сущностей на правильность заполнения
 """
 from logger import logger
-from schemas.File import FileBase, FileBaseKeyword
+from schemas import FileBase, FileBaseKeyword
 from utils import dictFromYaml
 from utils.exception import *
 from entity import EntityBonds, Bond

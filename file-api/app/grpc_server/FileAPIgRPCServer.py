@@ -2,13 +2,15 @@
     Файл управления самим gRPC сервером
 """
 from concurrent import futures
-import grpc
 from asyncio import CancelledError
 
+import grpc
 import proto.file_api_pb2_grpc as pb2_grpc
-from grpc_server.FileAPIServicer import FileAPIServicer
-from utils.logger import logger
-from utils.config import config
+
+from logger import logger
+from config import config
+
+from .FileAPIServicer import FileAPIServicer
 
 
 class FileAPIgRPCServer :
@@ -25,6 +27,7 @@ class FileAPIgRPCServer :
         self._ip = ip
         self._server.add_insecure_port(self._ip + ":" + self._port)
 
+
     async def serve(self) :
         """
             Запустить сервер
@@ -36,4 +39,5 @@ class FileAPIgRPCServer :
         except (KeyboardInterrupt, CancelledError)  :
             logger.info("Сервер был принудительно остановлен")
         except BaseException as exc :
+            logger.critical(f"Произошла непредвиденная ошибка с сервером : {type(exc)}:{exc}")
             logger.exception(f"Произошла непредвиденная ошибка с сервером : {type(exc)}:{exc}")

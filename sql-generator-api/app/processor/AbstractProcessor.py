@@ -3,6 +3,7 @@
 """
 from functools import wraps
 
+from utils import cutLog
 from utils.exception import *
 from logger import logger
 
@@ -21,11 +22,11 @@ class AbstractProcessor :
         def processorMethod(function) :
             @wraps(function)
             async def wrapAbstractProcessorMethod(self, *args, **kwargs) :
-                prefix = f"[PROCESSOR] : {path} : {args} : {kwargs}"
+                prefix = f"[PROCESSOR] : {path} : {cutLog(args)} : {cutLog(kwargs)}"
                 try : 
                     logger.debug(f"{prefix} : START")
                     res = await function(self, *args, **kwargs)
-                    logger.info(f"{prefix} : {res if len(str(res)) < 100 else 'res'} : SUCCESS")
+                    logger.info(f"{prefix} : {cutLog(res)}")
                     return res
                 except KeyError as exc :
                     logger.error(f"{prefix} : {type(exc)}:{exc.args}")

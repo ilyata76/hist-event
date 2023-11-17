@@ -47,11 +47,12 @@ class AbstractMongoDB(AbstractDB) :
     """
         Для работы с классами от MongoDB
     """
+
     def __init__(self, client : MongoDBClient) :
         logger.debug("Создание класса AbstartMongoDB")
         super().__init__(client)
 
-    
+
     def method(path : str) : 
         """
             Декоратор для методов работы с файлами.
@@ -82,15 +83,15 @@ class AbstractMongoDB(AbstractDB) :
                         pyerros.InvalidName) :
                     logger.error(f"{prefix} : {LogCode.ERROR} : База данных стала недоступна для Клиент : {type(exc)}:{exc}")
                     raise DBException(code=DBExceptionCode.INVALIDATED, 
-                                    detail=f"База данных стала недоступна для Клиент : {type(exc)}:{exc}")
+                                      detail=f"База данных стала недоступна для Клиент : {type(exc)}:{exc}")
                 except pyerros.DocumentTooLarge :
                     logger.error(f"{prefix} : {LogCode.ERROR} : Документ слишком много весит! : {type(exc)}:{exc}")
                     raise DBException(code=DBExceptionCode.TOO_LARGE, 
-                                    detail=f"Документ слишком много весит! : {type(exc)}:{exc}")
+                                      detail=f"Документ слишком много весит! : {type(exc)}:{exc}")
                 except (pyerros.WriteError, pyerros.EncryptionError, pyerros.DuplicateKeyError, pyerros.OperationFailure) :
                     logger.error(f"{prefix} : {LogCode.ERROR} : Произошла ошибка с операциями MongoDB")
                     raise DBException(code=DBExceptionCode.OPERATION_ERROR, 
-                                    detail=f"Произошла ошибка с операциями MongoDB : {type(exc)}:{exc}")
+                                      detail=f"Произошла ошибка с операциями MongoDB : {type(exc)}:{exc}")
                 except DBException as exc :
                     logger.error(f"{prefix} : {LogCode.ERROR} : Произошла ошибка, связанная с работой базы данных : {type(exc)}:{exc}")
                     raise exc

@@ -1,17 +1,15 @@
 """
     Файл логики gRPC-сервера
 """
-import grpc
 import proto.file_api_pb2 as pb2
-import proto.nosql_database_api_pb2 as nosql_pb2
 import proto.file_api_pb2_grpc as pb2_grpc
 
-from grpc_server.AbstractServicer import AbstractServicer
-from grpc_client.NoSQLDatabaseAPIgRPCClient import NoSQLDatabaseAPIgRPCClient
-from storage import FileStorage
-from schemas.File import FileBinary, File, FileBase
-from schemas.Range import Range
-from utils.dict_from_message import dict_from_message
+from grpc_client import NoSQLDatabaseAPIgRPCClient
+from schemas import FileBinary, File, FileBase, Range, Storage
+from utils import dictFromGoogleMessage
+from storage import FileStorageFabric
+
+from .AbstractServicer import AbstractServicer
 
 
 class FileAPIServicer(pb2_grpc.FileAPIServicer) :
@@ -19,46 +17,59 @@ class FileAPIServicer(pb2_grpc.FileAPIServicer) :
         Логика сервера (сервисер))
     """
     
-    @AbstractServicer.method("file-api:Ping")
-    async def Ping(self, request : pb2.PingR, context : grpc.ServicerContext) :
+    @AbstractServicer.methodAsyncDecorator("file-api:Ping")
+    async def Ping(self, request : pb2.PingR, context) :
         return pb2.PongR(pong="pong")
 
-    @AbstractServicer.method("file-api:AddFile")
-    async def AddFile(self, request : pb2.FileBinaryR, context : grpc.ServicerContext) :
-        storage = FileStorage.get(storage_identifier=request.file.storage)
-        await NoSQLDatabaseAPIgRPCClient.AddFileMetaInfo(File(**dict_from_message(request.file)))
-        file : File = await storage.appendOne(FileBinary(**dict_from_message(request.file)))
+
+    @AbstractServicer.methodAsyncDecorator("file-api:AddFile")
+    async def AddFile(self, request : pb2.FileBinaryR, context) :
+        storage = FileStorageFabric.get(Storage(request.file.storage))
+        file = File(**dictFromGoogleMessage(request.file))
+        await NoSQLDatabaseAPIgRPCClient.AddFileMetaInfo(file)
+        file : File = await storage.appendOne(FileBinary(**file.model_dump(),
+                                                         file=request.file.file))
         return pb2.FileR(file=file.model_dump())
 
-    @AbstractServicer.method("file-api:GetFile")
-    async def GetFile(self, request : pb2.FileBaseR, context : grpc.ServicerContext):
-        storage = FileStorage.get(storage_identifier=request.file.storage)
-        await NoSQLDatabaseAPIgRPCClient.GetFileMetaInfo(FileBase(**dict_from_message(request.file)))
-        file : FileBinary = await storage.getOne(FileBase(**dict_from_message(request.file)))
+
+    @AbstractServicer.methodAsyncDecorator("file-api:GetFile")
+    async def GetFile(self, request : pb2.FileBaseR, context):
+        storage = FileStorageFabric.get(Storage(request.file.storage))
+        file = FileBase(**dictFromGoogleMessage(request.file))
+        await NoSQLDatabaseAPIgRPCClient.GetFileMetaInfo(file)
+        file : FileBinary = await storage.getOne(file)
         return pb2.FileBinaryR(file=file.model_dump())
 
-    @AbstractServicer.method("file-api:PutFile")
-    async def PutFile(self, request : pb2.FileBinaryR, context : grpc.ServicerContext):
-        storage = FileStorage.get(storage_identifier=request.file.storage)
-        await NoSQLDatabaseAPIgRPCClient.PutFileMetaInfo(File(**dict_from_message(request.file)))
-        file : FileBinary = await storage.putOne(FileBinary(**dict_from_message(request.file)))
+
+    @AbstractServicer.methodAsyncDecorator("file-api:PutFile")
+    async def PutFile(self, request : pb2.FileBinaryR, context):
+        storage = FileStorageFabric.get(Storage(request.file.storage))
+        file = File(**dictFromGoogleMessage(request.file))
+        await NoSQLDatabaseAPIgRPCClient.PutFileMetaInfo(file)
+        file : FileBinary = await storage.putOne(FileBinary(**file.model_dump(),
+                                                            file=request.file.file))
         return pb2.FileR(file=file.model_dump())
 
-    @AbstractServicer.method("file-api:DeleteFile")
-    async def DeleteFile(self, request : pb2.FileBaseR, context : grpc.ServicerContext):
-        storage = FileStorage.get(storage_identifier=request.file.storage)
-        await NoSQLDatabaseAPIgRPCClient.DeleteFileMetaInfo(FileBase(**dict_from_message(request.file)))
-        file : File = await storage.deleteOne(FileBase(**dict_from_message(request.file)))
+
+    @AbstractServicer.methodAsyncDecorator("file-api:DeleteFile")
+    async def DeleteFile(self, request : pb2.FileBaseR, context):
+        storage = FileStorageFabric.get(Storage(request.file.storage))
+        file = FileBase(**dictFromGoogleMessage(request.file))
+        await NoSQLDatabaseAPIgRPCClient.DeleteFileMetaInfo(file)
+        file : File = await storage.deleteOne(file)
         return pb2.FileR(file=file.model_dump())
-    
-    @AbstractServicer.method("file-api:GetFileMetaInfo")
-    async def GetFileMetaInfo(self, request : pb2.FileBaseR, context : grpc.ServicerContext):
-        file : nosql_pb2.FileR = await NoSQLDatabaseAPIgRPCClient.GetFileMetaInfo(FileBase(**dict_from_message(request.file)))
-        return pb2.FileR(file=dict_from_message(file.file))
-    
-    @AbstractServicer.method("file-api:GetManyFilesMetaInfo")
-    async def GetManyFilesMetaInfo(self, request : pb2.StorageSegmentR, context : grpc.ServicerContext):
-        files : nosql_pb2.FileSegmentR = await NoSQLDatabaseAPIgRPCClient.GetManyFilesMetaInfo(storage=request.storage,
-                                                                                               range=Range(start=request.start,
-                                                                                                           end=request.end))
-        return pb2.FileSegmentR(files=[pb2.File(**dict_from_message(file)) for file in files.files])
+
+
+    @AbstractServicer.methodAsyncDecorator("file-api:GetFileMetaInfo")
+    async def GetFileMetaInfo(self, request : pb2.FileBaseR, context):
+        file = FileBase(**dictFromGoogleMessage(request.file))
+        file : File = await NoSQLDatabaseAPIgRPCClient.GetFileMetaInfo(file)
+        return pb2.FileR(file=file.model_dump())
+
+
+    @AbstractServicer.methodAsyncDecorator("file-api:GetManyFilesMetaInfo")
+    async def GetManyFilesMetaInfo(self, request : pb2.StorageSegmentR, context):
+        files = await NoSQLDatabaseAPIgRPCClient.GetManyFilesMetaInfo(storage=Storage(request.storage),
+                                                                      range=Range(start=request.start,
+                                                                                  end=request.end))
+        return pb2.FileSegmentR(**files.model_dump())

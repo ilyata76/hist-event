@@ -6,7 +6,7 @@ import uuid
 import proto.sql_generator_api_pb2 as pb2
 import proto.sql_generator_api_pb2_grpc as pb2_grpc
 
-from config import EntityKeyword
+from config import EntityKeyword, StorageIdentifier, SQL_PATH
 from schemas import FileBaseKeyword, FileBase, FileBinary, FileBaseKeywordList,\
                     Identifier, Status
 from entity import StorageManager
@@ -62,6 +62,14 @@ async def parseFilesToStorage(parser : Parser, identifier : Identifier) -> Parse
     return parser
 
 
+async def validateFiles(validator : Validator, files : FileBaseKeywordList) :
+    files, bonds_file = splitFiles(files)
+    for file in files :
+        await validator.readAndValidateFileEntities(FileAPIgRPCCLient.GetFile, file)
+    if bonds_file :
+        await validator.readAndValidateFileBonds(FileAPIgRPCCLient.GetFile, bonds_file)
+
+
 class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
     """
         Логика сервера (сервисер))
@@ -75,18 +83,13 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
     @Servicer.methodAsyncDecorator("sql-generator-api:Validate")
     async def Validate(self, request : pb2.ManyFilesR, context) :
         validator = Validator()
-        files, bonds_file = splitFiles(FileBaseKeywordList(files=[FileBaseKeyword(**dictFromGoogleMessage(file)) for file in request.files]))
-        for file in files :
-            await validator.readAndValidateFileEntities(FileAPIgRPCCLient.GetFile, file)
-        if bonds_file :
-            await validator.readAndValidateFileBonds(FileAPIgRPCCLient.GetFile, bonds_file)
+        file_list = FileBaseKeywordList(files=[FileBaseKeyword(**dictFromGoogleMessage(file)) for file in request.files])
+        await validateFiles(validator, file_list)
         identifier = await createNewIdentifier()
         status = await NoSQLDatabaseAPIgRPCClient.PutSQLGeneratorStatus(Identifier(identifier), Status("validated"))
-        await NoSQLDatabaseAPIgRPCClient.PutSQLGeneratorFiles(FileBaseKeywordList(files=files+[bonds_file]),
-                                                              Identifier(identifier))
+        await NoSQLDatabaseAPIgRPCClient.PutSQLGeneratorFiles(file_list, Identifier(identifier))
         status = await NoSQLDatabaseAPIgRPCClient.GetSQLGeneratorStatus(Identifier(identifier))
-        return pb2.IdentifierStatusR(status=status, 
-                                     identifier=identifier)
+        return pb2.IdentifierStatusR(status=status, identifier=identifier)
 
 
     @Servicer.methodAsyncDecorator("sql-generator-api:ParseAndGenerate")
@@ -101,8 +104,8 @@ class SQLGeneratorAPIServicer(pb2_grpc.SQLGeneratorAPIServicer) :
         status = await NoSQLDatabaseAPIgRPCClient.PutSQLGeneratorStatus(identifier, Status("parsed"))
         # AND GENERATE
         sql_string = await generator.readAndGenerateSQLFromStorage()
-        sql_path = f"/sql/{request.identifier}.sql"
-        sql_storage = "ftp"
+        sql_path = SQL_PATH(request.identifier)
+        sql_storage = StorageIdentifier.FTP
         await FileAPIgRPCCLient.PutFile(FileBinary(path=sql_path, 
                                                    storage=sql_storage, 
                                                    filename="main.sql",

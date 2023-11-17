@@ -16,6 +16,10 @@ class FileBase(BaseModel) :
         return path.as_posix()
 
 
+class FileBaseList(BaseModel) :
+    files : list[FileBase]
+
+
 class FileBaseKeyword(FileBase) :
     """Ключевое слово dates, others etc."""
     keyword : str
@@ -30,6 +34,10 @@ class File(FileBase) :
     filename : str | None = None
 
 
+class FileList(BaseModel) :
+    files : list[File]
+
+
 class FileKeyword(File) :
     """Ключевое слово dates, others etc."""
     keyword : str
@@ -42,6 +50,10 @@ class FileKeywordList(BaseModel) :
 class FileBinary(File) :
     """Дополненная бинарным содержанием схема файла"""
     file : bytes = Field(repr=False)
+
+
+class FileBinaryList(BaseModel) :
+    files : list[FileBinary]
 
 
 class FileBinaryKeyword(FileBinary) :

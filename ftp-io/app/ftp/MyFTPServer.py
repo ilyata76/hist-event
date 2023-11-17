@@ -5,8 +5,8 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
-from utils.logger import logger
-from utils.config import config
+from logger import logger
+from config import config
 
 
 class MyFTPServer() :

@@ -4,6 +4,7 @@
 from functools import wraps
 
 from logger import logger
+from utils import cutLog
 from utils.exception import *
 
 from .Entity import Entity, Bond
@@ -29,12 +30,12 @@ class StorageManager :
     def methodAsyncDecorator(path : str) :
         def method(function) :
             @wraps(function)
-            async def wrap(self, *args, **kwargs) :
-                prefix = f"[STORAGE] : {path} : {args} : {kwargs}"
+            async def wrapStorageMethod(self, *args, **kwargs) :
+                prefix = f"[STORAGE] : {path} : {cutLog(args)} : {cutLog(kwargs)}"
                 try : 
                     logger.debug(f"{prefix} : PENDING")
                     res = await function(self, *args, **kwargs)
-                    logger.info(f"{prefix} : {res}")
+                    logger.info(f"{prefix} : {cutLog(res)}")
                     return res
                 except ParsingException as exc :
                     msg = f"{prefix} : {exc.detail}"
@@ -47,7 +48,7 @@ class StorageManager :
                 except BaseException as exc :
                     logger.error(f"{prefix} : {exc.args}")
                     raise exc
-            return wrap
+            return wrapStorageMethod
         return method
 
 

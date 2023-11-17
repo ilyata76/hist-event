@@ -1,11 +1,9 @@
 """
     Точка входа
 """
-
-from utils.logger import logger
-from utils.config import config
-from ftp.server import MyFTPServer
-from ftp.ftp_handler import MyFTPHandlerLoguru
+from logger import logger
+from config import config
+from ftp import MyFTPServer, MyFTPHandlerLoguru
 
 
 def serve() -> None :
@@ -14,9 +12,10 @@ def serve() -> None :
 
 
 if __name__ == "__main__" :
-    logger.info(f"ЗАПУСК ПРИ {config}")
+    logger.info(f"Запуск {config}")
 
     try : 
         serve()
     except Exception as exc :
-        logger.exception(f"Во время работы сервера произошла ошибка [{type(exc)}:{exc}]")
+        logger.critical(f"Во время работы сервера произошла ошибка : {type(exc)}:{exc}")
+        logger.exception(f"Во время работы сервера произошла ошибка : {type(exc)}:{exc}")

@@ -1,67 +1,62 @@
 """
     Файл клиента для gRPC NoSQLDatabase сервера и доступа к нему
 """
-import grpc
 import proto.nosql_database_api_pb2 as pb2
 import proto.nosql_database_api_pb2_grpc as pb2_grpc
 
-from utils.config import config
-from schemas.File import FileBase, File
-from schemas.Range import Range
-from grpc_client.AbstractgRPCClient import AbstractgRPCClient
+from config import NOSQL_IP
+from utils import dictFromGoogleMessage
+from schemas import FileBase, File, Range, FileList, Storage
+
+from .AbstractgRPCClient import AbstractgRPCClient
 
 
 class NoSQLDatabaseAPIgRPCClient :
     """
-        Класс доступа до gRPC сервера с NoSQLDatabase
+        Класс доступа до gRPC сервера с NoSQLDatabase.
+            Его методы вызываются в коде при обработке запросов.
     """
-
-    @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:Ping")
-    async def Ping() :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.PongR = stub.Ping(pb2.PingR())
-        return response
     
     @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:AddFileMetaInfo")
-    async def AddFileMetaInfo(file : File) :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.FileR = stub.AddFileMetaInfo(pb2.FileR(file=file.model_dump()))
-        return response
+    @AbstractgRPCClient.methodAsyncDecorator("nosql-database-api:AddFileMetaInfo", NOSQL_IP)
+    async def AddFileMetaInfo(file : File, channel = None) -> File :
+        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+        request = pb2.FileR(file=file.model_dump())
+        response : pb2.FileR = stub.AddFileMetaInfo(request)
+        return File(**dictFromGoogleMessage(response.file))
+
 
     @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:GetFileMetaInfo")
-    async def GetFileMetaInfo(file : FileBase) :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.FileR = stub.GetFileMetaInfo(pb2.FileBaseR(file=file.model_dump()))
-        return response
+    @AbstractgRPCClient.methodAsyncDecorator("nosql-database-api:GetFileMetaInfo", NOSQL_IP)
+    async def GetFileMetaInfo(file : FileBase, channel = None) -> File :
+        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+        request = pb2.FileBaseR(file=file.model_dump())
+        response : pb2.FileR = stub.GetFileMetaInfo(request)
+        return File(**dictFromGoogleMessage(response.file))
+
 
     @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:PutFileMetaInfo")
-    async def PutFileMetaInfo(file : File) :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.FileR = stub.PutFileMetaInfo(pb2.FileR(file=file.model_dump()))
-        return response
+    @AbstractgRPCClient.methodAsyncDecorator("nosql-database-api:PutFileMetaInfo", NOSQL_IP)
+    async def PutFileMetaInfo(file : File, channel = None) -> File :
+        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+        request = pb2.FileR(file=file.model_dump())
+        response : pb2.FileR = stub.PutFileMetaInfo(request)
+        return File(**dictFromGoogleMessage(response.file))
+
 
     @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:DeleteFileMetaInfo")
-    async def DeleteFileMetaInfo(file : FileBase) :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.FileR = stub.DeleteFileMetaInfo(pb2.FileBaseR(file=file.model_dump()))
-        return response
+    @AbstractgRPCClient.methodAsyncDecorator("nosql-database-api:DeleteFileMetaInfo", NOSQL_IP)
+    async def DeleteFileMetaInfo(file : FileBase, channel = None) -> File :
+        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+        request = pb2.FileBaseR(file=file.model_dump())
+        response : pb2.FileR = stub.DeleteFileMetaInfo(request)
+        return File(**dictFromGoogleMessage(response.file))
+
 
     @staticmethod
-    @AbstractgRPCClient.method("nosql-database-api:GetManyFilesMetaInfo")
-    async def GetManyFilesMetaInfo(storage : str, range : Range) :
-        with grpc.insecure_channel(f"{config.NOSQL_DATABASE_GRPC_HOST}:{config.NOSQL_DATABASE_GRPC_PORT}") as channel :
-            stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-            response : pb2.FileSegmentR = stub.GetManyFilesMetaInfo(pb2.StorageSegmentR(storage=storage,
-                                                                                        start=range.start,
-                                                                                        end=range.end))
-        return response
+    @AbstractgRPCClient.methodAsyncDecorator("nosql-database-api:GetManyFilesMetaInfo", NOSQL_IP)
+    async def GetManyFilesMetaInfo(storage : Storage, range : Range, channel = None) -> FileList :
+        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+        request = pb2.StorageSegmentR(storage=storage, start=range.start, end=range.end)
+        response : pb2.FileSegmentR = stub.GetManyFilesMetaInfo(request)
+        return FileList(files=[File(**dictFromGoogleMessage(file)) for file in response.files])

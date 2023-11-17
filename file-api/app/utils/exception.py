@@ -22,8 +22,6 @@ class StorageExceptionCode(Enum) :
     ALREADY_EXISTS = 3
     ENTITY_DOESNT_EXISTS = 4
 
-
-
 class StorageException(MyException) :
     """
         Класс для ошибок, связанных с работой хранилищ
@@ -32,7 +30,6 @@ class StorageException(MyException) :
 
 class ConfigExceptionCode(Enum) :
     INVALID_STORAGE_IDENTIFIER = 1
-
 
 class ConfigException(MyException) :
     """

@@ -3,8 +3,8 @@
 """
 import datetime
 
-from utils.exception import ValidationException as VE,\
-                            ValidationExceptionCode as VECode
+from utils import ValidationException as VE,\
+                  ValidationExceptionCode as VECode
 
 
 def validateEntityOnDict(entity_identifier : str, dict_entity) :

@@ -39,4 +39,5 @@ class SQLGeneratorAPIgRPCServer :
         except (KeyboardInterrupt, CancelledError) :
             logger.info("Сервер был принудительно остановлен")
         except BaseException as exc :
+            logger.critical(f"Произошла непредвиденная ошибка с сервером : {type(exc)}:{exc}")
             logger.exception(f"Произошла непредвиденная ошибка с сервером : {type(exc)}:{exc}")
