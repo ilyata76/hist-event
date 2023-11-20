@@ -7,8 +7,8 @@ from asyncio import CancelledError
 import grpc
 import proto.nosql_database_api_pb2_grpc as pb2_grpc
 
-from utils.logger import logger
-from utils.config import config
+from logger import logger
+from config import config
 
 from .NoSQLDatabaseAPIServicer import NoSQLDatabaseAPIServicer
 

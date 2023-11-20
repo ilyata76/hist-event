@@ -14,12 +14,15 @@ from .AbstractStorage import AbstractStorage as Storage
 
 
 class FTPStorage(Storage) :
+    """Работа с файловой системой"""
 
     def __init__(self, ftp : FTP = FTP()) :
         self.ftp = ftp
 
+
     def prefix(self) : 
         return f"[STORAGE][FTP]"
+
 
     def connect(self):
         """Используется в method декораторе"""
@@ -34,7 +37,8 @@ class FTPStorage(Storage) :
             except Exception as exc :
                 raise StorageException(code=StorageExceptionCode.SERVICE_UNAVAILABLE,
                                        detail="Невозможно подключиться к FTP-хранилищу")
-    
+
+
     def __createFolerFromFilePath(self, path : Path) :
         """Создать папку по пути path до имени файла"""
         logger.debug(f"{self.prefix()} Созадние папки для пути {path}")
@@ -44,6 +48,7 @@ class FTPStorage(Storage) :
             except Exception :
                 pass
 
+
     def __checkFileExists(self, path : Path) :
         """Проверяет существование файла в директории по пути path"""
         logger.debug(f"{self.prefix()} Проверка, что файл {path} существует")
@@ -52,6 +57,7 @@ class FTPStorage(Storage) :
             return True
         except Exception :
             return False
+
 
     @Storage.methodAsyncDecorator("ftp:appendOne")
     async def appendOne(self, file : FileBinary) -> File:
@@ -64,6 +70,7 @@ class FTPStorage(Storage) :
         self.ftp.storbinary(f"STOR {file.path}", BytesIO(file.file))
         logger.info(f"{self.prefix()} Был добавлен файл {file.path}")
         return File(**file.model_dump())
+
 
     @Storage.methodAsyncDecorator("ftp:getOne")
     async def getOne(self, file : FileBase) -> FileBinary:
@@ -85,6 +92,7 @@ class FTPStorage(Storage) :
                           filename=file.path.name,
                           file=file_bytes)
 
+
     @Storage.methodAsyncDecorator("ftp:putOne")
     async def putOne(self, file : FileBinary) -> File :
         """Добавляет файл независимо от его существования"""
@@ -93,6 +101,7 @@ class FTPStorage(Storage) :
         self.ftp.storbinary(f"STOR {file.path}", BytesIO(file.file))
         logger.info(f"{self.prefix()} Заменен файл {file.path}")
         return File(**file.model_dump())
+
 
     @Storage.methodAsyncDecorator("ftp:deleteOne")
     async def deleteOne(self, file : FileBase) -> File :

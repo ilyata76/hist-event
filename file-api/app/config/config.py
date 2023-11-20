@@ -103,7 +103,6 @@ class Config :
         return self.__AddNewParameter(param="GRPC_MAX_WORKERS", value=environ.get("GRPC_MAX_WORKERS", 10),
                                       default=10, cast=int, reread=False)
 
-
     def __str__(self, indent : str = "") -> str :
         """
             Строковое представление.

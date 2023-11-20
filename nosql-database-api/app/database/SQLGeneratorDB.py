@@ -4,14 +4,13 @@
         сущностей.
     В частности, хранить сами сущности, хранить статус.
 """
+from logger import logger
+from config import config
+from schemas import *
+from utils.exception import *
 
-from database.DBClient import DBClient, MongoDBClient
-from database.AbstractDB import AbstractDB, AbstractMongoDB
-from utils.logger import logger
-from utils.config import config
-from utils.exception import DBException, DBExceptionCode
-from schemas.StatusIdentifier import StatusIdentifier, Identifier
-from schemas.File import FileBaseKeywordList, FileBase
+from .DBClient import DBClient, MongoDBClient
+from .AbstractDB import AbstractDB, AbstractMongoDB
 
 
 class SQLGeneratorDB(AbstractDB) :
@@ -28,27 +27,33 @@ class SQLGeneratorDB(AbstractDB) :
         self.SQL_TYPE = "sql"
         self.FILES_TYPE = "files"
 
-    @AbstractDB.method("SQLGeneratorDB:putStatus")
-    async def putStatus(self, status_identifier : StatusIdentifier) -> StatusIdentifier | None :
+
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:putStatus")
+    async def putStatus(self, identifier : Identifier, status : Status) -> Status | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод putStatus!")
 
-    @AbstractDB.method("SQLGeneratorDB:getStatus")
-    async def getStatus(self, identifier : Identifier) -> StatusIdentifier | None :
+
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:getStatus")
+    async def getStatus(self, identifier : Identifier) -> Status | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getStatus!")
 
-    @AbstractDB.method("SQLGeneratorDB:putFiles")
-    async def putFiles(self, identifier : Identifier, files : FileBaseKeywordList) -> Identifier | None :
+
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:putFiles")
+    async def putFiles(self, identifier : Identifier, files : FileBaseKeywordList) -> FileBaseKeywordList | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод putFiles!")
 
-    @AbstractDB.method("SQLGeneratorDB:getFiles")
+
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:getFiles")
     async def getFiles(self, identifier : Identifier) -> FileBaseKeywordList | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getFiles!")
 
-    @AbstractDB.method("SQLGeneratorDB:putSQL")
+
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:putSQL")
     async def putSQL(self, identifier : Identifier, file : FileBase) -> FileBase | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод putSQL!")
 
-    @AbstractDB.method("SQLGeneratorDB:getSQL")
+
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:getSQL")
     async def getSQL(self, identifier : Identifier) -> FileBase | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getSQL!")
 
@@ -75,31 +80,26 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
         self.db = self.client.client[config.DATABASE_SQL_GENERATOR_DB]
 
 
-    def prefix(self) :
-        return f"[DATABASE][MONGODB][SQLGENERATOR]"
-
-
-    @AbstractMongoDB.method("SQLGeneratorMongoDB:putStatus")
-    async def putStatus(self, status_identifier : StatusIdentifier) -> StatusIdentifier | None :
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:putStatus")
+    async def putStatus(self, identifier : Identifier, status : Status) -> Status | None :
         """
             Заменить или внести сведения о статусе для операции по её коллекции-идентификатору
         """
         res = None
 
         async with await self.client.client.start_session() as s :
-            exist = await self.db[status_identifier.identifier].find_one_and_replace({ self.TYPE : self.STATUS_TYPE },
-                                                                                     { self.TYPE : self.STATUS_TYPE, self.STATUS_TYPE : status_identifier.status },
-                                                                                     session=s)    
+            exist = await self.db[identifier].find_one_and_replace({ self.TYPE : self.STATUS_TYPE },
+                                                                   { self.TYPE : self.STATUS_TYPE, self.STATUS_TYPE : status },
+                                                                   session=s)    
             if not exist :
-                await self.db[status_identifier.identifier].insert_one({ self.TYPE : self.STATUS_TYPE, self.STATUS_TYPE : status_identifier.status })
-            res = await self.db[status_identifier.identifier].find_one({ self.TYPE : self.STATUS_TYPE }, session=s)
+                await self.db[identifier].insert_one({ self.TYPE : self.STATUS_TYPE, self.STATUS_TYPE : status })
+            res = await self.db[identifier].find_one({ self.TYPE : self.STATUS_TYPE }, session=s)
 
-        return StatusIdentifier(identifier=status_identifier.identifier,
-                                status=res[self.STATUS_TYPE]) if res else res
+        return Status(res[self.STATUS_TYPE]) if res else res
 
 
-    @AbstractMongoDB.method("SQLGeneratorMongoDB:getStatus")
-    async def getStatus(self, identifier : Identifier) -> StatusIdentifier | None :
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:getStatus")
+    async def getStatus(self, identifier : Identifier) -> Status | None :
         """
             Получить сведения о статусе для операции по её коллекции-идентификатору.
                 Если таковых нет, поднимает исключение
@@ -107,70 +107,69 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[identifier.identifier].find_one({ self.TYPE : self.STATUS_TYPE }, session=s)
+            res = await self.db[identifier].find_one({ self.TYPE : self.STATUS_TYPE }, session=s)
             if not res :
                 raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS,
-                                  detail=f"Статус для {identifier.identifier} не определён")
-        
-        return StatusIdentifier(identifier=identifier.identifier,
-                                status=res[self.STATUS_TYPE]) if res else res
+                                  detail=f"Статус для {identifier} не определён")
+
+        return Status(res[self.STATUS_TYPE]) if res else res
 
 
-    @AbstractMongoDB.method("SQLGeneratorMongoDB:putFiles")
-    async def putFiles(self, identifier : Identifier, files : FileBaseKeywordList) -> Identifier | None :
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:putFiles")
+    async def putFiles(self, identifier : Identifier, files : FileBaseKeywordList) -> FileBaseKeywordList | None :
         """Файлы, которые связаны с текущей операцией"""
         res = None
 
         async with await self.client.client.start_session() as s :
-            exist = await self.db[identifier.identifier].find_one_and_replace({ self.TYPE : self.FILES_TYPE },
-                                                                              { self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() },
-                                                                              session=s) 
+            exist = await self.db[identifier].find_one_and_replace({ self.TYPE : self.FILES_TYPE },
+                                                                   { self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() },
+                                                                   session=s) 
             if not exist :
-                await self.db[identifier.identifier].insert_one({ self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() })
-            res = await self.db[identifier.identifier].find_one({ self.TYPE : self.FILES_TYPE})
+                await self.db[identifier].insert_one({ self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() })
+            res = await self.db[identifier].find_one({ self.TYPE : self.FILES_TYPE})
 
-        return Identifier(identifier=identifier.identifier) if res else res
+        return FileBaseKeywordList(**res[self.FILES_TYPE]) if res else res
 
 
-    @AbstractMongoDB.method("SQLGeneratorMongoDB:getFiles")
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:getFiles")
     async def getFiles(self, identifier : Identifier) -> FileBaseKeywordList | None :
         """Файлы, которые связны с текущей операцией"""
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[identifier.identifier].find_one({ self.TYPE : self.FILES_TYPE }, session=s)
+            res = await self.db[identifier].find_one({ self.TYPE : self.FILES_TYPE }, session=s)
             if not res :
                 raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS,
-                                  detail=f"Файлы для {identifier.identifier} не определены")
+                                  detail=f"Файлы для {identifier} не определены")
 
         return FileBaseKeywordList(**res[self.FILES_TYPE]) if res else res
 
 
-    @AbstractMongoDB.method("SQLGeneratorMongoDB:putSQL")
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:putSQL")
     async def putSQL(self, identifier : Identifier, file : FileBase) -> FileBase | None :
         """"""
         res = None
 
         async with await self.client.client.start_session() as s :
-            exist = await self.db[identifier.identifier].find_one_and_replace({self.TYPE : self.SQL_TYPE},
-                                                                              { self.TYPE : self.SQL_TYPE, self.SQL_TYPE : file.model_dump() }, 
-                                                                              session=s)
+            exist = await self.db[identifier].find_one_and_replace({self.TYPE : self.SQL_TYPE},
+                                                                   { self.TYPE : self.SQL_TYPE, self.SQL_TYPE : file.model_dump() }, 
+                                                                   session=s)
             if not exist :
-                await self.db[identifier.identifier].insert_one({ self.TYPE : self.SQL_TYPE, self.SQL_TYPE : file.model_dump() })
-            res = await self.db[identifier.identifier].find_one({ self.TYPE : self.SQL_TYPE})
+                await self.db[identifier].insert_one({ self.TYPE : self.SQL_TYPE, self.SQL_TYPE : file.model_dump() })
+            res = await self.db[identifier].find_one({ self.TYPE : self.SQL_TYPE})
 
         return FileBase(**res[self.SQL_TYPE]) if res else res
 
 
-    @AbstractMongoDB.method("SQLGeneratorMongoDB:getSQL")
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:getSQL")
     async def getSQL(self, identifier : Identifier) -> FileBase | None :
         """"""
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[identifier.identifier].find_one({ self.TYPE : self.SQL_TYPE})
+            res = await self.db[identifier].find_one({ self.TYPE : self.SQL_TYPE})
             if not res :
                 raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS,
-                                  detail=f"Статус для {identifier.identifier} не определён")
+                                  detail=f"Файл SQL для {identifier} не определён (не сгенерирован)")
         
         return FileBase(**res[self.SQL_TYPE]) if res else res

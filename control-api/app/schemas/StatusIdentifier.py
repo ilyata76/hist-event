@@ -1,14 +1,12 @@
+from typing import NewType
+
 from pydantic import BaseModel
 
 
-class Identifier(BaseModel) :
-    identifier : str
+Identifier = NewType("identifier", str)
+Status = NewType("status", str)
 
 
-class Status(BaseModel) :
-    status : str
-
-
-class StatusIdentifier(Status, 
-                       Identifier) :
-    pass
+class StatusIdentifier(BaseModel) :
+    identifier : Identifier
+    status : Status

@@ -25,7 +25,6 @@ class DBExceptionCode(Enum) :
     METHOD_NOT_REALIZED = 6
     ENTITY_DONT_EXISTS = 7
 
-
 class DBException(MyException) :
     """
         Класс для ошибок, связанных с работой баз данных
@@ -34,7 +33,6 @@ class DBException(MyException) :
 
 class ConfigExceptionCode(Enum) :
     INVALID_STORAGE_IDENTIFIER = 1
-
 
 class ConfigException(MyException) :
     """

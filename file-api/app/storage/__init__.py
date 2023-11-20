@@ -9,7 +9,7 @@ from .S3Storage import S3Storage
 
 
 # для предотвращения постоянного переподключения
-ftp = FTPStorage(FTP())
+ftp = FTPStorage(FTP(timeout=1000))
 s3 = S3Storage()
 
 

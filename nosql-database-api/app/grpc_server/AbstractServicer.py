@@ -2,12 +2,11 @@
     Файл логики gRPC-сервера
 """
 import grpc
-from functools import partial
+from functools import wraps
 
-from utils.logger import logger
-from utils.config import LogCode
-from utils.exception import DBException, DBExceptionCode,\
-    ConfigException, ConfigExceptionCode
+from logger import logger
+from utils import cutLog
+from utils.exception import *
 
 
 class AbstractServicer :
@@ -16,54 +15,51 @@ class AbstractServicer :
     """
 
     @staticmethod
-    def logPrefix(path : str, peer : str, code : str) :
-        return f"[SERVER][{peer}] : {path} : {code}"
-
-    @staticmethod
-    def method(path : str) :
+    def methodAsyncDecorator(path : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование
                 запросов, приходящих К СЕРВЕРУ
         """
         def servicerMethod(function) :
-            async def wrap(self, request, context : grpc.ServicerContext, *args, **kwargs) :
-                prefix = partial(AbstractServicer.logPrefix, path=path, peer=context.peer())
+            @wraps(function)
+            async def wrapServicerMethod(self, request, context : grpc.ServicerContext, *args, **kwargs) :
+                msg = f"[SERVER][{context.peer()}] : {path} : {cutLog(request)} : {cutLog(args)} : {cutLog(kwargs)}"
+                code, details = grpc.StatusCode.UNKNOWN, "unknown"
                 try : 
-                    logger.debug(f"{prefix(code=LogCode.PENDING)}")
+                    logger.pendingProcess(msg)
                     res = await function(self, request=request, context=context, *args, **kwargs)
-                    logger.info(f"{prefix(code=LogCode.SUCCESS)}")
+                    logger.successProcess(f"{msg} : {cutLog(res)}")
                     return res
                 except grpc.RpcError as exc :
-                    logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code()}:{exc.details()}")
-                    await context.abort(exc.code(), exc.details())
+                    code, details = exc.code(), exc.details()
                 except DBException as exc :
-                    logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code}:{exc.detail}")
-                    abort = partial(context.abort, details=exc.detail)
+                    details = exc.detail
                     match exc.code :
                         case DBExceptionCode.SERVICE_UNAVAIABLE | DBExceptionCode.INVALIDATED :
-                            await abort(grpc.StatusCode.UNAVAILABLE)
+                            code = grpc.StatusCode.UNAVAILABLE
                         case DBExceptionCode.ENTITY_EXISTS :
-                            await abort(grpc.StatusCode.ALREADY_EXISTS)
+                            code = grpc.StatusCode.ALREADY_EXISTS
                         case DBExceptionCode.TOO_LARGE : 
-                            await abort(grpc.StatusCode.RESOURCE_EXHAUSTED)
+                            code = grpc.StatusCode.RESOURCE_EXHAUSTED
                         case DBExceptionCode.OPERATION_ERROR :
-                            await abort(grpc.StatusCode.ABORTED)
+                            code = grpc.StatusCode.ABORTED
                         case DBExceptionCode.METHOD_NOT_REALIZED :
-                            await abort(grpc.StatusCode.UNIMPLEMENTED)
+                            code = grpc.StatusCode.UNIMPLEMENTED
                         case DBExceptionCode.ENTITY_DONT_EXISTS :
-                            await abort(grpc.StatusCode.NOT_FOUND)
+                            code = grpc.StatusCode.NOT_FOUND
                         case _ :
-                            await abort(grpc.StatusCode.UNKNOWN)
+                            code, details = grpc.StatusCode.UNKNOWN, "Неизвестная ошибка при работе с базой данных"
                 except ConfigException as exc :
-                    logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code}:{exc.detail}")
-                    abort = partial(context.abort, details=exc.detail)
-                    match exc.code :
+                    match exc.code : 
                         case ConfigExceptionCode.INVALID_STORAGE_IDENTIFIER :
-                            await abort(grpc.StatusCode.INVALID_ARGUMENT)
+                            code, details = grpc.StatusCode.INVALID_ARGUMENT, exc.detail
                         case _ :
-                            await abort(grpc.StatusCode.UNKNOWN)
+                            code, details = grpc.StatusCode.UNKNOWN, "Неизвестная ошибка при конфигурации входных данных"
                 except BaseException as exc:
-                    logger.exception(f"{prefix(code=LogCode.ERROR)} : {type(exc)}:{exc}")
-                    await context.abort(grpc.StatusCode.INTERNAL, f"internal server error : {type(exc)}:{exc}")
-            return wrap
+                    code, details = grpc.StatusCode.INTERNAL, f"{type(exc)}:{exc}"
+                    logger.critical(f"{msg} : {details}")
+                    logger.exception(f"{msg} : {details}")
+                logger.errorProcess(f"{msg} : {details}")
+                await context.abort(code, details)
+            return wrapServicerMethod
         return servicerMethod

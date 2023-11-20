@@ -1,11 +1,11 @@
 """
     Файл клиента для gRPC
 """
-from functools import partial
-from grpc import RpcError
+from functools import wraps
+import grpc
 
-from app.utils.logger import logger
-from app.utils.config import LogCode
+from app.utils import cutLog
+from app.logger import logger
 
 
 class AbstractgRPCClient :
@@ -14,29 +14,29 @@ class AbstractgRPCClient :
     """
 
     @staticmethod
-    def logPrefix(path : str, code : str) :
-        return f"[CLIENT] : {path} : {code}"
-
-
-    @staticmethod
-    def method(path : str) :
+    def methodAsyncDecorator(path : str, ip : str) :
         """
             Декоратор, который обрабатывает исключения и берёт на себя логирование
-                запросов, исходящих ОТ КЛИЕНТА
+                запросов, исходящих ОТ КЛИЕНТА.
         """
         def gRPCMethod(function) :
-            async def wrap(*args, **kwargs) :
-                prefix = partial(AbstractgRPCClient.logPrefix, path=path)
+            @wraps(function)
+            async def wrap(*args, channel = None, **kwargs) :
+                msg = f"[CLIENT] : {path} : {cutLog(args)} : {cutLog(kwargs)}"
                 try : 
-                    logger.debug(f"{prefix(code=LogCode.PENDING)}")
-                    result = await function(*args, **kwargs)
-                    logger.info(f"{prefix(code=LogCode.SUCCESS)}")
+                    logger.pending(msg)
+                    if not channel : 
+                        with grpc.insecure_channel(ip) as channel :
+                            result = await function(*args, channel=channel, **kwargs)
+                    else :
+                        result = await function(*args, channel=channel, **kwargs)
+                    logger.success(f"{msg} : {cutLog(result)}")
                     return result
-                except RpcError as exc:
-                    logger.error(f"{prefix(code=LogCode.ERROR)} : {exc.code()}:{exc.details()}")
+                except grpc.RpcError as exc:
+                    logger.error(f"{msg} : {exc.code()}:{exc.details()}")
                     raise exc
                 except BaseException as exc:
-                    logger.exception(f"{prefix(code=LogCode.ERROR)} : {type(exc)}:{exc}")
+                    logger.exception(f"{msg} : {type(exc)}:{exc}")
                     raise RuntimeError(f"При обработке запроса произошла непредвиденная ошибка : {type(exc)}:{exc}")
             return wrap
         return gRPCMethod

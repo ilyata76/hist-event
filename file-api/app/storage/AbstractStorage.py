@@ -55,6 +55,7 @@ class AbstractStorage :
         raise StorageException(code=StorageExceptionCode.METHOD_NOT_REALIZED,
                                detail="Хранилище не реализует метод deleteOne")
 
+
     @methodAsyncDecorator("storage:putOne")
     async def putOne(self, file : FileBinary) -> File:
         raise StorageException(code=StorageExceptionCode.METHOD_NOT_REALIZED,

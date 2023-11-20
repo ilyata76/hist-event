@@ -41,26 +41,14 @@ class Config :
     @property
     def LOG_FILENAME(self) -> str :
         """Название файла лога"""
-        return self.__AddNewParameter(param="LOG_FILENAME", value=environ.get("LOG_FILENAME", "sql-generator-api.log"),
-                                      default="sql-generator-api.log", cast=str, reread=False)
+        return self.__AddNewParameter(param="LOG_FILENAME", value=environ.get("LOG_FILENAME", "control-api.log"),
+                                      default="control-api.log", cast=str, reread=False)
 
     @property
     def LOG_CUT_LEN(self) -> int :
         """Максимальное количество символов при логировании"""
         return self.__AddNewParameter(param="LOG_CUT_LEN", value=environ.get("LOG_CUT_LEN", 200),
                                       default=200, cast=int, reread=False)
-
-    @property
-    def GRPC_HOST(self) -> str :
-        """Хост текущего grpc-сервера"""
-        return self.__AddNewParameter(param="GRPC_HOST", value=environ.get("GRPC_HOST", "0.0.0.0"),
-                                      default="0.0.0.0", cast=str, reread=False)
-
-    @property
-    def GRPC_PORT(self) -> str :
-        """Порт текущего grpc-сервера"""
-        return self.__AddNewParameter(param="GRPC_PORT", value=environ.get("GRPC_PORT", "50053"),
-                                      default="50053", cast=str, reread=False)
 
     @property 
     def FILE_API_GRPC_HOST(self) -> str :
@@ -87,28 +75,16 @@ class Config :
                                       default="50051", cast=str, reread=False)
 
     @property 
-    def PARSE_NAME_SPECIAL_SYMBOLS(self) -> str :
-        """Для pyparsing для {вставок:1}[?]"""
-        return self.__AddNewParameter(param="PARSE_NAME_SPECIAL_SYMBOLS", value=environ.get("PARSE_NAME_SPECIAL_SYMBOLS", " _-/\\:()?!"),
-                                      default=" _-/\\:()?!", cast=str, reread=False)
-
+    def SQL_GENERATOR_API_GRPC_HOST(self) -> str :
+        """До grpc с процессами валидации->генерации"""
+        return self.__AddNewParameter(param="SQL_GENERATOR_API_GRPC_HOST", value=environ.get("SQL_GENERATOR_API_GRPC_HOST", "localhost"),
+                                      default="localhost", cast=str, reread=False)
+    
     @property 
-    def PARSE_KEYWORD_SPECIAL_SYMBOLS(self) -> str :
-        """Для pyparsing для {вставок:1}[?]"""
-        return self.__AddNewParameter(param="PARSE_KEYWORD_SPECIAL_SYMBOLS", value=environ.get("PARSE_KEYWORD_SPECIAL_SYMBOLS", "_"),
-                                      default="_", cast=str, reread=False)
-
-    @property
-    def GRPC_MAX_WORKERS(self) -> int :
-        """Количество работающих threads у текущего сервера grpc"""
-        return self.__AddNewParameter(param="GRPC_MAX_WORKERS", value=environ.get("GRPC_MAX_WORKERS", 10),
-                                      default=10, cast=int, reread=False)
-
-    @property
-    def MAX_ITERATION_PARSE(self) -> int :
-        """Количество обходов файлов для разрешения обратной вложенности"""
-        return self.__AddNewParameter(param="MAX_ITERATION_PARSE", value=environ.get("MAX_ITERATION_PARSE", 10),
-                                      default=10, cast=int, reread=False) - 1
+    def SQL_GENERATOR_API_GRPC_PORT(self) -> str :
+        """До grpc с процессами валидации->генерации"""
+        return self.__AddNewParameter(param="SQL_GENERATOR_API_GRPC_PORT", value=environ.get("SQL_GENERATOR_API_GRPC_PORT", "50053"),
+                                      default="50053", cast=str, reread=False)
 
     def __str__(self, indent : str = "") -> str :
         """
@@ -117,11 +93,9 @@ class Config :
         """
         return " ; ".join([f"{indent}{x} : {getattr(self, x)}" for x in ["LOG_DEBUG", "LOG_CONSOLE", "LOG_CUT_LEN",
                                                                          "LOG_FOLDER", "LOG_FILENAME",
-                                                                         "GRPC_PORT", "GRPC_HOST", 
-                                                                         "GRPC_MAX_WORKERS", "MAX_ITERATION_PARSE", 
+                                                                         "SQL_GENERATOR_API_GRPC_HOST", "SQL_GENERATOR_API_GRPC_PORT",
                                                                          "FILE_API_GRPC_HOST", "FILE_API_GRPC_PORT",
-                                                                         "NOSQL_DATABASE_GRPC_HOST", "NOSQL_DATABASE_GRPC_PORT",
-                                                                         "PARSE_KEYWORD_SPECIAL_SYMBOLS", "PARSE_NAME_SPECIAL_SYMBOLS"]])
+                                                                         "NOSQL_DATABASE_GRPC_HOST", "NOSQL_DATABASE_GRPC_PORT"]])
 
 
 config = Config()

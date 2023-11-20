@@ -5,8 +5,7 @@ import proto.nosql_database_api_pb2 as pb2
 import proto.nosql_database_api_pb2_grpc as pb2_grpc
 
 from config import NOSQL_IP
-from schemas import Identifier, Status, FileBase,\
-                    FileBaseKeywordList, FileBaseKeyword
+from schemas import *
 from utils import dictFromGoogleMessage
 
 from .AbstractgRPCClient import AbstractgRPCClient as GrpcClient

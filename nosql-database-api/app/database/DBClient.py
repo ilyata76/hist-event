@@ -1,11 +1,12 @@
 """
     Файл для работы с клиентом базы данных
 """
-import motor.motor_asyncio as motor
 from datetime import datetime
 
-from utils.logger import logger
-from utils.config import config
+import motor.motor_asyncio as motor
+
+from logger import logger
+from config import config, DATABASE_IP
 from utils.exception import DBException, DBExceptionCode
 
 
@@ -14,11 +15,12 @@ class DBClient() :
         Объект для управления базой данных
     """
 
-    def __init__(self, uri : str = config.DATABASE_URI) :
+    def __init__(self, uri : str = DATABASE_IP) :
         logger.debug(f"Создание экземпляра DBClient по {uri}")
         self.uri = uri
         self._previous = datetime(year=2000, month=1, day=1)
         self._connected = False
+
 
     async def _testConnection(self) -> bool :
         """
@@ -26,6 +28,7 @@ class DBClient() :
         """
         logger.error(f"DBClient не реализует метод _testConnection!")
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail=f"DBClient не реализует метод _testConnection!")
+
 
     async def testConnection(self) -> bool :
         """
@@ -36,7 +39,8 @@ class DBClient() :
             self._previous = datetime.now()
             return await self._testConnection()
         return self._connected
-    
+
+
     @property # getter
     def connected(self) -> bool :
         return self._connected
@@ -47,16 +51,18 @@ class MongoDBClient(DBClient) :
         Объект для управления базой данных MongoDB
     """
 
-    def __init__(self, uri : str = config.DATABASE_URI) :
+    def __init__(self, uri : str = DATABASE_IP) :
         super().__init__(uri)
         logger.debug(f"Инициализация клиента для базы данных MongoDBClient по {self.uri}")
         self._client = motor.AsyncIOMotorClient(self.uri, 
                                                 connectTimeoutMS=config.DATABASE_TIMEOUT_MS, 
                                                 timeoutMS=config.DATABASE_TIMEOUT_MS)
 
+
     @property
     def client(self) :
         return self._client
+
 
     async def _testConnection(self) -> bool :
         """

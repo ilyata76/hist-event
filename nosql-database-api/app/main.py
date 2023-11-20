@@ -3,10 +3,10 @@
 """
 import asyncio
 
-from utils.config import config
-from utils.logger import logger
+from config import config
+from logger import logger
 
-from grpc_server.NoSQLDatabaseAPIgRPCServer import NoSQLDatabaseAPIgRPCServer
+from grpc_server import NoSQLDatabaseAPIgRPCServer
 
 
 async def serve() -> None:

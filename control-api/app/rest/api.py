@@ -4,8 +4,8 @@
 import time
 from fastapi import FastAPI, Request
 
-from app.utils.logger import logger
-from app.utils.config import config, LogCode
+from app.logger import logger
+from app.config import config
 
 
 api = FastAPI()
@@ -22,10 +22,9 @@ async def add_process_time_header(request: Request, call_next):
 @api.middleware("http")
 async def add_logging(request: Request, call_next):
     prefix = f"[MIDDLEWARE][{request.client.host}:{request.client.port}] : {request.method} {request.url}"
-    logger.debug(f"{prefix} : {LogCode.PENDING}")
+    logger.debug(f"{prefix}")
     response = await call_next(request)
-    status = LogCode.ERROR if response.status_code // 100 != 2 else LogCode.SUCCESS
-    logger.info(f"{prefix} : {status} {response.status_code}")
+    logger.info(f"{prefix} : {response.status_code}")
     return response
 
 
@@ -34,13 +33,13 @@ def onStartup() :
     logger.info(f"ЗАПУСК ПРИ {config}")
 
 
-from app.rest_api.ping import ping
+from .ping import ping
 api.include_router(router=ping)
 
 
-from app.rest_api.file import file
+from .file import file
 api.include_router(router=file)
 
 
-from app.rest_api.sql_generator import sql_generator
+from .sql_generator import sql_generator
 api.include_router(router=sql_generator)
