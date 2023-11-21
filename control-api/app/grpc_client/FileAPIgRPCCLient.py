@@ -73,8 +73,17 @@ class FileAPIgRPCCLient :
 
     @staticmethod
     @AbstractgRPCClient.methodAsyncDecorator("file-api:GetManyFilesMetaInfo", FILE_IP)
-    async def GetManyFilesMetaInfo(storage : str, range : Range, channel = None) -> FileList : 
+    async def GetManyFilesMetaInfo(storage : Storage, range : Range, channel = None) -> FileList : 
         stub = pb2_grpc.FileAPIStub(channel)
         request = pb2.StorageSegmentR(storage=storage, start=range.start, end=range.end)
         response : pb2.FileSegmentR = stub.GetManyFilesMetaInfo(request)
         return FileList(files=[File(**dictFromGoogleMessage(file)) for file in response.files])
+
+
+    @staticmethod
+    @AbstractgRPCClient.methodAsyncDecorator("file-api:GetFilesMetaInfoCount", FILE_IP)
+    async def GetFilesMetaInfoCount(storage : Storage, channel = None) -> Count :
+        stub = pb2_grpc.FileAPIStub(channel)
+        request = pb2.StorageR(storage=storage)
+        response : pb2.CountR = stub.GetFilesMetaInfoCount(request)
+        return Count(count=response.count)

@@ -18,21 +18,21 @@ class NoSQLDatabaseAPIgRPCClient :
     """
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorStatus", NOSQL_IP)
-    async def PutSQLGeneratorStatus(identifier : Identifier, status : Status, channel = None) -> Status :
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorMeta", NOSQL_IP)
+    async def PutSQLGeneratorMeta(identifier : Identifier, meta : Meta, channel = None) -> Meta :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
-        request = pb2.IdentifierStatusR(identifier=identifier, status=status)
-        response : pb2.IdentifierStatusR = stub.PutSQLGeneratorStatus(request)
-        return Status(response.status)
+        request = pb2.IdentifierMetaR(identifier=identifier, **meta.model_dump())
+        response : pb2.IdentifierMetaR = stub.PutSQLGeneratorMeta(request)
+        return Meta(**dictFromGoogleMessage(response))
 
 
     @staticmethod
-    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorStatus", NOSQL_IP)
-    async def GetSQLGeneratorStatus(identifier : Identifier, channel = None) -> Status :
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorMeta", NOSQL_IP)
+    async def GetSQLGeneratorMeta(identifier : Identifier, channel = None) -> Meta :
         stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
         request = pb2.IdentifierR(identifier=identifier)
-        response : pb2.IdentifierStatusR = stub.GetSQLGeneratorStatus(request)
-        return Status(response.status)
+        response : pb2.IdentifierMetaR = stub.GetSQLGeneratorMeta(request)
+        return Meta(**dictFromGoogleMessage(response))
 
 
     @staticmethod
@@ -69,3 +69,12 @@ class NoSQLDatabaseAPIgRPCClient :
         request = pb2.FileBaseIdentifierR(file=file.model_dump(), identifier=identifier)
         response : pb2.FileBaseIdentifierR = stub.PutSQLGeneratorSQLFile(request)
         return FileBase(**dictFromGoogleMessage(response.file))
+
+
+    @staticmethod
+    @GrpcClient.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorSQLIDs", NOSQL_IP)
+    async def GetSQLGeneratorSQLIDs(channel = None) -> MetaIdentifierList :
+        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+        request = pb2.NothingR()
+        response : pb2.ManyIdentifierMetaR = stub.GetSQLGeneratorSQLIDs(request)
+        return MetaIdentifierList(metas=[MetaIdentifier(**dictFromGoogleMessage(meta)) for meta in response.metas])

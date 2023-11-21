@@ -5,6 +5,12 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
+class StorageR(_message.Message):
+    __slots__ = ["storage"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    def __init__(self, storage: _Optional[str] = ...) -> None: ...
+
 class PingR(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
@@ -43,6 +49,44 @@ class FileSegmentR(_message.Message):
     files: _containers.RepeatedCompositeFieldContainer[File]
     def __init__(self, files: _Optional[_Iterable[_Union[File, _Mapping]]] = ...) -> None: ...
 
+class IdentifierR(_message.Message):
+    __slots__ = ["identifier"]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    identifier: str
+    def __init__(self, identifier: _Optional[str] = ...) -> None: ...
+
+class IdentifierMetaR(_message.Message):
+    __slots__ = ["identifier", "status", "name"]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    STATUS_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    identifier: str
+    status: str
+    name: str
+    def __init__(self, identifier: _Optional[str] = ..., status: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+
+class ManyFilesIdentifierR(_message.Message):
+    __slots__ = ["files", "identifier"]
+    FILES_FIELD_NUMBER: _ClassVar[int]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    files: _containers.RepeatedCompositeFieldContainer[FileBaseKeyword]
+    identifier: str
+    def __init__(self, files: _Optional[_Iterable[_Union[FileBaseKeyword, _Mapping]]] = ..., identifier: _Optional[str] = ...) -> None: ...
+
+class FileBaseIdentifierR(_message.Message):
+    __slots__ = ["file", "identifier"]
+    FILE_FIELD_NUMBER: _ClassVar[int]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    file: FileBase
+    identifier: str
+    def __init__(self, file: _Optional[_Union[FileBase, _Mapping]] = ..., identifier: _Optional[str] = ...) -> None: ...
+
+class CountR(_message.Message):
+    __slots__ = ["count"]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
+    count: int
+    def __init__(self, count: _Optional[int] = ...) -> None: ...
+
 class FileBase(_message.Message):
     __slots__ = ["storage", "path"]
     STORAGE_FIELD_NUMBER: _ClassVar[int]
@@ -60,3 +104,13 @@ class File(_message.Message):
     path: str
     filename: str
     def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., filename: _Optional[str] = ...) -> None: ...
+
+class FileBaseKeyword(_message.Message):
+    __slots__ = ["storage", "path", "keyword"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    PATH_FIELD_NUMBER: _ClassVar[int]
+    KEYWORD_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    path: str
+    keyword: str
+    def __init__(self, storage: _Optional[str] = ..., path: _Optional[str] = ..., keyword: _Optional[str] = ...) -> None: ...

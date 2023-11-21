@@ -9,7 +9,7 @@ from schemas import FileBinary, File, FileBase, Range, Storage
 from utils import dictFromGoogleMessage
 from storage import FileStorageFabric
 
-from .AbstractServicer import AbstractServicer
+from .AbstractServicer import AbstractServicer as Servicer
 
 
 class FileAPIServicer(pb2_grpc.FileAPIServicer) :
@@ -17,12 +17,12 @@ class FileAPIServicer(pb2_grpc.FileAPIServicer) :
         Логика сервера (сервисер))
     """
     
-    @AbstractServicer.methodAsyncDecorator("file-api:Ping")
+    @Servicer.methodAsyncDecorator("file-api:Ping")
     async def Ping(self, request : pb2.PingR, context) :
         return pb2.PongR(pong="pong")
 
 
-    @AbstractServicer.methodAsyncDecorator("file-api:AddFile")
+    @Servicer.methodAsyncDecorator("file-api:AddFile")
     async def AddFile(self, request : pb2.FileBinaryR, context) :
         storage = FileStorageFabric.get(Storage(request.file.storage))
         file = File(**dictFromGoogleMessage(request.file))
@@ -32,7 +32,7 @@ class FileAPIServicer(pb2_grpc.FileAPIServicer) :
         return pb2.FileR(file=file.model_dump())
 
 
-    @AbstractServicer.methodAsyncDecorator("file-api:GetFile")
+    @Servicer.methodAsyncDecorator("file-api:GetFile")
     async def GetFile(self, request : pb2.FileBaseR, context):
         storage = FileStorageFabric.get(Storage(request.file.storage))
         file = FileBase(**dictFromGoogleMessage(request.file))
@@ -41,7 +41,7 @@ class FileAPIServicer(pb2_grpc.FileAPIServicer) :
         return pb2.FileBinaryR(file=file.model_dump())
 
 
-    @AbstractServicer.methodAsyncDecorator("file-api:PutFile")
+    @Servicer.methodAsyncDecorator("file-api:PutFile")
     async def PutFile(self, request : pb2.FileBinaryR, context):
         storage = FileStorageFabric.get(Storage(request.file.storage))
         file = File(**dictFromGoogleMessage(request.file))
@@ -51,7 +51,7 @@ class FileAPIServicer(pb2_grpc.FileAPIServicer) :
         return pb2.FileR(file=file.model_dump())
 
 
-    @AbstractServicer.methodAsyncDecorator("file-api:DeleteFile")
+    @Servicer.methodAsyncDecorator("file-api:DeleteFile")
     async def DeleteFile(self, request : pb2.FileBaseR, context):
         storage = FileStorageFabric.get(Storage(request.file.storage))
         file = FileBase(**dictFromGoogleMessage(request.file))
@@ -60,16 +60,22 @@ class FileAPIServicer(pb2_grpc.FileAPIServicer) :
         return pb2.FileR(file=file.model_dump())
 
 
-    @AbstractServicer.methodAsyncDecorator("file-api:GetFileMetaInfo")
+    @Servicer.methodAsyncDecorator("file-api:GetFileMetaInfo")
     async def GetFileMetaInfo(self, request : pb2.FileBaseR, context):
         file = FileBase(**dictFromGoogleMessage(request.file))
         file : File = await NoSQLDatabaseAPIgRPCClient.GetFileMetaInfo(file)
         return pb2.FileR(file=file.model_dump())
 
 
-    @AbstractServicer.methodAsyncDecorator("file-api:GetManyFilesMetaInfo")
+    @Servicer.methodAsyncDecorator("file-api:GetManyFilesMetaInfo")
     async def GetManyFilesMetaInfo(self, request : pb2.StorageSegmentR, context):
         files = await NoSQLDatabaseAPIgRPCClient.GetManyFilesMetaInfo(storage=Storage(request.storage),
                                                                       range=Range(start=request.start,
                                                                                   end=request.end))
         return pb2.FileSegmentR(**files.model_dump())
+
+
+    @Servicer.methodAsyncDecorator("file-api:GetFilesMetaInfoCount")
+    async def GetFilesMetaInfoCount(self, request : pb2.StorageR, context) :
+        count = (await NoSQLDatabaseAPIgRPCClient.GetFilesMetaInfoCount(Storage(request.storage))).count
+        return pb2.CountR(count=count)

@@ -28,6 +28,9 @@ class FileBaseKeyword(FileBase) :
 class FileBaseKeywordList(BaseModel) :
     files : list[FileBaseKeyword]
 
+class FileBaseKeywordListName(FileBaseKeywordList) :
+    name : str | None = None
+
 
 class File(FileBase) :
     """Главная схема файла, дополненная именем"""

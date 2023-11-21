@@ -12,15 +12,17 @@ service SQLGeneratorAPI {
   // проверить работоспособность
   rpc Ping (PingR) returns (PongR) {}
   //
-  rpc Validate (ManyFilesR) returns (IdentifierStatusR) {}
+  rpc Validate (ManyFilesNameR) returns (IdentifierMetaR) {}
   //
-  rpc ParseAndGenerate (IdentifierR) returns (IdentifierStatusR) {}
+  rpc ParseAndGenerate (IdentifierR) returns (IdentifierMetaR) {}
   //
-  rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
+  rpc GetSQLGeneratorMeta (IdentifierR) returns (IdentifierMetaR) {}
   //
   rpc GetSQLGeneratorFiles (IdentifierR) returns (ManyFilesIdentifierR) {}
   // 
   rpc GetSQLGeneratorSQLFile (IdentifierR) returns (FileBaseIdentifierR) {}
+  //
+  rpc GetSQLGeneratorSQLIDs (NothingR) returns (ManyIdentifierMetaR) {}
 }
 
 message PingR {
@@ -32,9 +34,10 @@ message PongR {
 
 //
 
-message ManyFilesR {
+message ManyFilesNameR {
   // набор файлов
   repeated FileBaseKeyword files = 1;
+  string name = 2;
 }
 
 message ManyFilesIdentifierR {
@@ -48,14 +51,21 @@ message IdentifierR {
   string identifier = 1;
 }
 
-message IdentifierStatusR {
+message IdentifierMetaR {
   string identifier = 1;
   string status = 2;
+  string name = 3;
 }
 
 message FileBaseIdentifierR {
   FileBase file = 1;
   string identifier = 2;
+}
+
+message NothingR {}
+
+message ManyIdentifierMetaR {
+  repeated IdentifierMetaR metas = 1;
 }
 
 // классы

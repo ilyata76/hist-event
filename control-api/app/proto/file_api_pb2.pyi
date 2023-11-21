@@ -15,6 +15,18 @@ class PongR(_message.Message):
     pong: str
     def __init__(self, pong: _Optional[str] = ...) -> None: ...
 
+class StorageR(_message.Message):
+    __slots__ = ["storage"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    def __init__(self, storage: _Optional[str] = ...) -> None: ...
+
+class CountR(_message.Message):
+    __slots__ = ["count"]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
+    count: int
+    def __init__(self, count: _Optional[int] = ...) -> None: ...
+
 class FileBinaryR(_message.Message):
     __slots__ = ["file"]
     FILE_FIELD_NUMBER: _ClassVar[int]

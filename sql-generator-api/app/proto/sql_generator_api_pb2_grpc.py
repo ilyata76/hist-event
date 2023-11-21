@@ -23,18 +23,18 @@ class SQLGeneratorAPIStub(object):
                 )
         self.Validate = channel.unary_unary(
                 '/sql_generator_api.SQLGeneratorAPI/Validate',
-                request_serializer=sql__generator__api__pb2.ManyFilesR.SerializeToString,
-                response_deserializer=sql__generator__api__pb2.IdentifierStatusR.FromString,
+                request_serializer=sql__generator__api__pb2.ManyFilesNameR.SerializeToString,
+                response_deserializer=sql__generator__api__pb2.IdentifierMetaR.FromString,
                 )
         self.ParseAndGenerate = channel.unary_unary(
                 '/sql_generator_api.SQLGeneratorAPI/ParseAndGenerate',
                 request_serializer=sql__generator__api__pb2.IdentifierR.SerializeToString,
-                response_deserializer=sql__generator__api__pb2.IdentifierStatusR.FromString,
+                response_deserializer=sql__generator__api__pb2.IdentifierMetaR.FromString,
                 )
-        self.GetSQLGeneratorStatus = channel.unary_unary(
-                '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorStatus',
+        self.GetSQLGeneratorMeta = channel.unary_unary(
+                '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorMeta',
                 request_serializer=sql__generator__api__pb2.IdentifierR.SerializeToString,
-                response_deserializer=sql__generator__api__pb2.IdentifierStatusR.FromString,
+                response_deserializer=sql__generator__api__pb2.IdentifierMetaR.FromString,
                 )
         self.GetSQLGeneratorFiles = channel.unary_unary(
                 '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorFiles',
@@ -45,6 +45,11 @@ class SQLGeneratorAPIStub(object):
                 '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorSQLFile',
                 request_serializer=sql__generator__api__pb2.IdentifierR.SerializeToString,
                 response_deserializer=sql__generator__api__pb2.FileBaseIdentifierR.FromString,
+                )
+        self.GetSQLGeneratorSQLIDs = channel.unary_unary(
+                '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorSQLIDs',
+                request_serializer=sql__generator__api__pb2.NothingR.SerializeToString,
+                response_deserializer=sql__generator__api__pb2.ManyIdentifierMetaR.FromString,
                 )
 
 
@@ -74,7 +79,7 @@ class SQLGeneratorAPIServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def GetSQLGeneratorStatus(self, request, context):
+    def GetSQLGeneratorMeta(self, request, context):
         """
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -95,6 +100,13 @@ class SQLGeneratorAPIServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetSQLGeneratorSQLIDs(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SQLGeneratorAPIServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -105,18 +117,18 @@ def add_SQLGeneratorAPIServicer_to_server(servicer, server):
             ),
             'Validate': grpc.unary_unary_rpc_method_handler(
                     servicer.Validate,
-                    request_deserializer=sql__generator__api__pb2.ManyFilesR.FromString,
-                    response_serializer=sql__generator__api__pb2.IdentifierStatusR.SerializeToString,
+                    request_deserializer=sql__generator__api__pb2.ManyFilesNameR.FromString,
+                    response_serializer=sql__generator__api__pb2.IdentifierMetaR.SerializeToString,
             ),
             'ParseAndGenerate': grpc.unary_unary_rpc_method_handler(
                     servicer.ParseAndGenerate,
                     request_deserializer=sql__generator__api__pb2.IdentifierR.FromString,
-                    response_serializer=sql__generator__api__pb2.IdentifierStatusR.SerializeToString,
+                    response_serializer=sql__generator__api__pb2.IdentifierMetaR.SerializeToString,
             ),
-            'GetSQLGeneratorStatus': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetSQLGeneratorStatus,
+            'GetSQLGeneratorMeta': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSQLGeneratorMeta,
                     request_deserializer=sql__generator__api__pb2.IdentifierR.FromString,
-                    response_serializer=sql__generator__api__pb2.IdentifierStatusR.SerializeToString,
+                    response_serializer=sql__generator__api__pb2.IdentifierMetaR.SerializeToString,
             ),
             'GetSQLGeneratorFiles': grpc.unary_unary_rpc_method_handler(
                     servicer.GetSQLGeneratorFiles,
@@ -127,6 +139,11 @@ def add_SQLGeneratorAPIServicer_to_server(servicer, server):
                     servicer.GetSQLGeneratorSQLFile,
                     request_deserializer=sql__generator__api__pb2.IdentifierR.FromString,
                     response_serializer=sql__generator__api__pb2.FileBaseIdentifierR.SerializeToString,
+            ),
+            'GetSQLGeneratorSQLIDs': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSQLGeneratorSQLIDs,
+                    request_deserializer=sql__generator__api__pb2.NothingR.FromString,
+                    response_serializer=sql__generator__api__pb2.ManyIdentifierMetaR.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -169,8 +186,8 @@ class SQLGeneratorAPI(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/Validate',
-            sql__generator__api__pb2.ManyFilesR.SerializeToString,
-            sql__generator__api__pb2.IdentifierStatusR.FromString,
+            sql__generator__api__pb2.ManyFilesNameR.SerializeToString,
+            sql__generator__api__pb2.IdentifierMetaR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -187,12 +204,12 @@ class SQLGeneratorAPI(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/ParseAndGenerate',
             sql__generator__api__pb2.IdentifierR.SerializeToString,
-            sql__generator__api__pb2.IdentifierStatusR.FromString,
+            sql__generator__api__pb2.IdentifierMetaR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def GetSQLGeneratorStatus(request,
+    def GetSQLGeneratorMeta(request,
             target,
             options=(),
             channel_credentials=None,
@@ -202,9 +219,9 @@ class SQLGeneratorAPI(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorStatus',
+        return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorMeta',
             sql__generator__api__pb2.IdentifierR.SerializeToString,
-            sql__generator__api__pb2.IdentifierStatusR.FromString,
+            sql__generator__api__pb2.IdentifierMetaR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -239,5 +256,22 @@ class SQLGeneratorAPI(object):
         return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorSQLFile',
             sql__generator__api__pb2.IdentifierR.SerializeToString,
             sql__generator__api__pb2.FileBaseIdentifierR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetSQLGeneratorSQLIDs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/sql_generator_api.SQLGeneratorAPI/GetSQLGeneratorSQLIDs',
+            sql__generator__api__pb2.NothingR.SerializeToString,
+            sql__generator__api__pb2.ManyIdentifierMetaR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

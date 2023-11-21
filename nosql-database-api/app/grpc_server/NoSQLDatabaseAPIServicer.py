@@ -47,24 +47,27 @@ class NoSQLDatabaseAPIServicer(pb2_grpc.NoSQLDatabaseAPIServicer) :
 
     @Servicer.methodAsyncDecorator("nosql-database-api:GetManyFilesMetaInfo")
     async def GetManyFilesMetaInfo(self, request : pb2.StorageSegmentR, context) :
-        files : list[File] = await database.files.getMany(Range(start=request.start, end=request.end), 
-                                                          Identifier(request.storage))
-        return pb2.FileSegmentR(files=[x.model_dump() for x in files])
+        files : FileList = await database.files.getMany(Range(start=request.start, end=request.end), 
+                                                        Storage(request.storage))
+        return pb2.FileSegmentR(**files.model_dump())
 
 
-    @Servicer.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorStatus")
-    async def PutSQLGeneratorStatus(self, request : pb2.IdentifierStatusR, context) :
-        status = await database.sql_gen.putStatus(Identifier(request.identifier),
-                                                  Status(request.status))
-        return pb2.IdentifierStatusR(identifier=request.identifier,
-                                     status=status)
+    @Servicer.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorMeta")
+    async def PutSQLGeneratorMeta(self, request : pb2.IdentifierMetaR, context) :
+        meta = await database.sql_gen.putMeta(Identifier(request.identifier),
+                                              Meta(status=request.status,
+                                                   name=request.name))
+        return pb2.IdentifierMetaR(identifier=request.identifier,
+                                   status=meta.status,
+                                   name=meta.name)
 
 
-    @Servicer.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorStatus")
-    async def GetSQLGeneratorStatus(self, request : pb2.IdentifierR, context) :
-        status = await database.sql_gen.getStatus(Identifier(request.identifier))
-        return pb2.IdentifierStatusR(identifier=request.identifier,
-                                     status=status)
+    @Servicer.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorMeta")
+    async def GetSQLGeneratorMeta(self, request : pb2.IdentifierR, context) :
+        meta = await database.sql_gen.getMeta(Identifier(request.identifier))
+        return pb2.IdentifierMetaR(identifier=request.identifier,
+                                   status=meta.status,
+                                   name=meta.name)
 
 
     @Servicer.methodAsyncDecorator("nosql-database-api:PutSQLGeneratorFiles")
@@ -94,3 +97,15 @@ class NoSQLDatabaseAPIServicer(pb2_grpc.NoSQLDatabaseAPIServicer) :
         file = await database.sql_gen.getSQL(identifier=Identifier(request.identifier))
         return pb2.FileBaseIdentifierR(file=file.model_dump(),
                                        identifier=request.identifier)
+
+
+    @Servicer.methodAsyncDecorator("nosql-database-api:GetFilesMetaInfoCount")
+    async def GetFilesMetaInfoCount(self, request : pb2.StorageR, context) :
+        count = (await database.files.getCount(request.storage)).count
+        return pb2.CountR(count=count)
+
+
+    @Servicer.methodAsyncDecorator("nosql-database-api:GetSQLGeneratorSQLIDs")
+    async def GetSQLGeneratorSQLIDs(self, request : pb2.NothingR, context) :
+        metas = await database.sql_gen.getAllSQLIDs()
+        return pb2.ManyIdentifierMetaR(**metas.model_dump())

@@ -6,7 +6,7 @@ import proto.nosql_database_api_pb2_grpc as pb2_grpc
 
 from config import NOSQL_IP
 from utils import dictFromGoogleMessage
-from schemas import FileBase, File, Range, FileList, Storage
+from schemas import *
 
 from .AbstractgRPCClient import AbstractgRPCClient
 
@@ -60,3 +60,12 @@ class NoSQLDatabaseAPIgRPCClient :
         request = pb2.StorageSegmentR(storage=storage, start=range.start, end=range.end)
         response : pb2.FileSegmentR = stub.GetManyFilesMetaInfo(request)
         return FileList(files=[File(**dictFromGoogleMessage(file)) for file in response.files])
+
+
+    @staticmethod
+    @AbstractgRPCClient.methodAsyncDecorator("nosql-database-api:GetFilesMetaInfoCount", NOSQL_IP)
+    async def GetFilesMetaInfoCount(storage : Storage, channel = None) -> Count :
+        stub = pb2_grpc.NoSQLDatabaseAPIStub(channel)
+        request = pb2.StorageR(storage=storage)
+        response : pb2.CountR = stub.GetFilesMetaInfoCount(request)
+        return Count(count=response.count)

@@ -46,6 +46,41 @@ class NoSQLDatabaseAPIStub(object):
                 request_serializer=nosql__database__api__pb2.StorageSegmentR.SerializeToString,
                 response_deserializer=nosql__database__api__pb2.FileSegmentR.FromString,
                 )
+        self.GetFilesMetaInfoCount = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/GetFilesMetaInfoCount',
+                request_serializer=nosql__database__api__pb2.StorageR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.CountR.FromString,
+                )
+        self.PutSQLGeneratorMeta = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/PutSQLGeneratorMeta',
+                request_serializer=nosql__database__api__pb2.IdentifierMetaR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.IdentifierMetaR.FromString,
+                )
+        self.GetSQLGeneratorMeta = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/GetSQLGeneratorMeta',
+                request_serializer=nosql__database__api__pb2.IdentifierR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.IdentifierMetaR.FromString,
+                )
+        self.PutSQLGeneratorFiles = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/PutSQLGeneratorFiles',
+                request_serializer=nosql__database__api__pb2.ManyFilesIdentifierR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.IdentifierR.FromString,
+                )
+        self.GetSQLGeneratorFiles = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/GetSQLGeneratorFiles',
+                request_serializer=nosql__database__api__pb2.IdentifierR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.ManyFilesIdentifierR.FromString,
+                )
+        self.PutSQLGeneratorSQLFile = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/PutSQLGeneratorSQLFile',
+                request_serializer=nosql__database__api__pb2.FileBaseIdentifierR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.FileBaseIdentifierR.FromString,
+                )
+        self.GetSQLGeneratorSQLFile = channel.unary_unary(
+                '/nosql_database_api.NoSQLDatabaseAPI/GetSQLGeneratorSQLFile',
+                request_serializer=nosql__database__api__pb2.IdentifierR.SerializeToString,
+                response_deserializer=nosql__database__api__pb2.FileBaseIdentifierR.FromString,
+                )
 
 
 class NoSQLDatabaseAPIServicer(object):
@@ -95,6 +130,55 @@ class NoSQLDatabaseAPIServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetFilesMetaInfoCount(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PutSQLGeneratorMeta(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetSQLGeneratorMeta(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PutSQLGeneratorFiles(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetSQLGeneratorFiles(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def PutSQLGeneratorSQLFile(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetSQLGeneratorSQLFile(self, request, context):
+        """
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_NoSQLDatabaseAPIServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -127,6 +211,41 @@ def add_NoSQLDatabaseAPIServicer_to_server(servicer, server):
                     servicer.GetManyFilesMetaInfo,
                     request_deserializer=nosql__database__api__pb2.StorageSegmentR.FromString,
                     response_serializer=nosql__database__api__pb2.FileSegmentR.SerializeToString,
+            ),
+            'GetFilesMetaInfoCount': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFilesMetaInfoCount,
+                    request_deserializer=nosql__database__api__pb2.StorageR.FromString,
+                    response_serializer=nosql__database__api__pb2.CountR.SerializeToString,
+            ),
+            'PutSQLGeneratorMeta': grpc.unary_unary_rpc_method_handler(
+                    servicer.PutSQLGeneratorMeta,
+                    request_deserializer=nosql__database__api__pb2.IdentifierMetaR.FromString,
+                    response_serializer=nosql__database__api__pb2.IdentifierMetaR.SerializeToString,
+            ),
+            'GetSQLGeneratorMeta': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSQLGeneratorMeta,
+                    request_deserializer=nosql__database__api__pb2.IdentifierR.FromString,
+                    response_serializer=nosql__database__api__pb2.IdentifierMetaR.SerializeToString,
+            ),
+            'PutSQLGeneratorFiles': grpc.unary_unary_rpc_method_handler(
+                    servicer.PutSQLGeneratorFiles,
+                    request_deserializer=nosql__database__api__pb2.ManyFilesIdentifierR.FromString,
+                    response_serializer=nosql__database__api__pb2.IdentifierR.SerializeToString,
+            ),
+            'GetSQLGeneratorFiles': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSQLGeneratorFiles,
+                    request_deserializer=nosql__database__api__pb2.IdentifierR.FromString,
+                    response_serializer=nosql__database__api__pb2.ManyFilesIdentifierR.SerializeToString,
+            ),
+            'PutSQLGeneratorSQLFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.PutSQLGeneratorSQLFile,
+                    request_deserializer=nosql__database__api__pb2.FileBaseIdentifierR.FromString,
+                    response_serializer=nosql__database__api__pb2.FileBaseIdentifierR.SerializeToString,
+            ),
+            'GetSQLGeneratorSQLFile': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetSQLGeneratorSQLFile,
+                    request_deserializer=nosql__database__api__pb2.IdentifierR.FromString,
+                    response_serializer=nosql__database__api__pb2.FileBaseIdentifierR.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -239,5 +358,124 @@ class NoSQLDatabaseAPI(object):
         return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetManyFilesMetaInfo',
             nosql__database__api__pb2.StorageSegmentR.SerializeToString,
             nosql__database__api__pb2.FileSegmentR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetFilesMetaInfoCount(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetFilesMetaInfoCount',
+            nosql__database__api__pb2.StorageR.SerializeToString,
+            nosql__database__api__pb2.CountR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def PutSQLGeneratorMeta(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/PutSQLGeneratorMeta',
+            nosql__database__api__pb2.IdentifierMetaR.SerializeToString,
+            nosql__database__api__pb2.IdentifierMetaR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetSQLGeneratorMeta(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetSQLGeneratorMeta',
+            nosql__database__api__pb2.IdentifierR.SerializeToString,
+            nosql__database__api__pb2.IdentifierMetaR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def PutSQLGeneratorFiles(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/PutSQLGeneratorFiles',
+            nosql__database__api__pb2.ManyFilesIdentifierR.SerializeToString,
+            nosql__database__api__pb2.IdentifierR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetSQLGeneratorFiles(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetSQLGeneratorFiles',
+            nosql__database__api__pb2.IdentifierR.SerializeToString,
+            nosql__database__api__pb2.ManyFilesIdentifierR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def PutSQLGeneratorSQLFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/PutSQLGeneratorSQLFile',
+            nosql__database__api__pb2.FileBaseIdentifierR.SerializeToString,
+            nosql__database__api__pb2.FileBaseIdentifierR.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetSQLGeneratorSQLFile(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/nosql_database_api.NoSQLDatabaseAPI/GetSQLGeneratorSQLFile',
+            nosql__database__api__pb2.IdentifierR.SerializeToString,
+            nosql__database__api__pb2.FileBaseIdentifierR.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -1,8 +1,10 @@
 from typing import NewType
 
-Identifier = NewType("identifier", str)
-Status = NewType("status", str)
+
+Storage = NewType("Storage", str)
 
 
 from .File import *
 from .Range import *
+from .Meta import *
+from .Count import *

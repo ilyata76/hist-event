@@ -22,10 +22,12 @@ service NoSQLDatabaseAPI {
   rpc GetFileMetaInfo (FileBaseR) returns (FileR) {}
   // получить список мета-информацю всех (или отрезком) файлов
   rpc GetManyFilesMetaInfo (StorageSegmentR) returns (FileSegmentR) {}
-  // 
-  rpc PutSQLGeneratorStatus (IdentifierStatusR) returns (IdentifierStatusR) {}
   //
-  rpc GetSQLGeneratorStatus (IdentifierR) returns (IdentifierStatusR) {}
+  rpc GetFilesMetaInfoCount (StorageR) returns (CountR) {}
+  // 
+  rpc PutSQLGeneratorMeta (IdentifierMetaR) returns (IdentifierMetaR) {}
+  //
+  rpc GetSQLGeneratorMeta (IdentifierR) returns (IdentifierMetaR) {}
   //
   rpc PutSQLGeneratorFiles (ManyFilesIdentifierR) returns (IdentifierR) {}
   //
@@ -34,6 +36,8 @@ service NoSQLDatabaseAPI {
   rpc PutSQLGeneratorSQLFile (FileBaseIdentifierR) returns (FileBaseIdentifierR) {}
   // 
   rpc GetSQLGeneratorSQLFile (IdentifierR) returns (FileBaseIdentifierR) {}
+  //
+  rpc GetSQLGeneratorSQLIDs (NothingR) returns (ManyIdentifierMetaR) {}
 }
 
 message PingR {
@@ -67,9 +71,10 @@ message IdentifierR {
   string identifier = 1;
 }
 
-message IdentifierStatusR {
+message IdentifierMetaR {
   string identifier = 1;
   string status = 2;
+  string name = 3;
 }
 
 message ManyFilesIdentifierR {
@@ -80,6 +85,20 @@ message ManyFilesIdentifierR {
 message FileBaseIdentifierR {
   FileBase file = 1;
   string identifier = 2;
+}
+
+message CountR {
+  uint32 count = 1;
+}
+
+message StorageR {
+  string storage = 1;
+}
+
+message NothingR {}
+
+message ManyIdentifierMetaR {
+  repeated IdentifierMetaR metas = 1;
 }
 
 // классы

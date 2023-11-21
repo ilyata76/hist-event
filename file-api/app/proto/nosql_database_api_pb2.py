@@ -13,29 +13,43 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18nosql-database-api.proto\x12\x12nosql_database_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"/\n\x05\x46ileR\x12&\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x18.nosql_database_api.File\"7\n\tFileBaseR\x12*\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x1c.nosql_database_api.FileBase\">\n\x0fStorageSegmentR\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\r\n\x05start\x18\x02 \x01(\r\x12\x0b\n\x03\x65nd\x18\x03 \x01(\r\"7\n\x0c\x46ileSegmentR\x12\'\n\x05\x66iles\x18\x01 \x03(\x0b\x32\x18.nosql_database_api.File\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"7\n\x04\x46ile\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t2\xea\x03\n\x10NoSQLDatabaseAPI\x12>\n\x04Ping\x12\x19.nosql_database_api.PingR\x1a\x19.nosql_database_api.PongR\"\x00\x12I\n\x0f\x41\x64\x64\x46ileMetaInfo\x12\x19.nosql_database_api.FileR\x1a\x19.nosql_database_api.FileR\"\x00\x12I\n\x0fPutFileMetaInfo\x12\x19.nosql_database_api.FileR\x1a\x19.nosql_database_api.FileR\"\x00\x12P\n\x12\x44\x65leteFileMetaInfo\x12\x1d.nosql_database_api.FileBaseR\x1a\x19.nosql_database_api.FileR\"\x00\x12M\n\x0fGetFileMetaInfo\x12\x1d.nosql_database_api.FileBaseR\x1a\x19.nosql_database_api.FileR\"\x00\x12_\n\x14GetManyFilesMetaInfo\x12#.nosql_database_api.StorageSegmentR\x1a .nosql_database_api.FileSegmentR\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18nosql-database-api.proto\x12\x12nosql_database_api\"\x1b\n\x08StorageR\x12\x0f\n\x07storage\x18\x01 \x01(\t\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"/\n\x05\x46ileR\x12&\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x18.nosql_database_api.File\"7\n\tFileBaseR\x12*\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x1c.nosql_database_api.FileBase\">\n\x0fStorageSegmentR\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\r\n\x05start\x18\x02 \x01(\r\x12\x0b\n\x03\x65nd\x18\x03 \x01(\r\"7\n\x0c\x46ileSegmentR\x12\'\n\x05\x66iles\x18\x01 \x03(\x0b\x32\x18.nosql_database_api.File\"!\n\x0bIdentifierR\x12\x12\n\nidentifier\x18\x01 \x01(\t\"C\n\x0fIdentifierMetaR\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\"^\n\x14ManyFilesIdentifierR\x12\x32\n\x05\x66iles\x18\x01 \x03(\x0b\x32#.nosql_database_api.FileBaseKeyword\x12\x12\n\nidentifier\x18\x02 \x01(\t\"U\n\x13\x46ileBaseIdentifierR\x12*\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x1c.nosql_database_api.FileBase\x12\x12\n\nidentifier\x18\x02 \x01(\t\"\x17\n\x06\x43ountR\x12\r\n\x05\x63ount\x18\x01 \x01(\r\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"7\n\x04\x46ile\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x10\n\x08\x66ilename\x18\x03 \x01(\t\"A\n\x0f\x46ileBaseKeyword\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0f\n\x07keyword\x18\x04 \x01(\t2\x9f\t\n\x10NoSQLDatabaseAPI\x12>\n\x04Ping\x12\x19.nosql_database_api.PingR\x1a\x19.nosql_database_api.PongR\"\x00\x12I\n\x0f\x41\x64\x64\x46ileMetaInfo\x12\x19.nosql_database_api.FileR\x1a\x19.nosql_database_api.FileR\"\x00\x12I\n\x0fPutFileMetaInfo\x12\x19.nosql_database_api.FileR\x1a\x19.nosql_database_api.FileR\"\x00\x12P\n\x12\x44\x65leteFileMetaInfo\x12\x1d.nosql_database_api.FileBaseR\x1a\x19.nosql_database_api.FileR\"\x00\x12M\n\x0fGetFileMetaInfo\x12\x1d.nosql_database_api.FileBaseR\x1a\x19.nosql_database_api.FileR\"\x00\x12_\n\x14GetManyFilesMetaInfo\x12#.nosql_database_api.StorageSegmentR\x1a .nosql_database_api.FileSegmentR\"\x00\x12S\n\x15GetFilesMetaInfoCount\x12\x1c.nosql_database_api.StorageR\x1a\x1a.nosql_database_api.CountR\"\x00\x12\x61\n\x13PutSQLGeneratorMeta\x12#.nosql_database_api.IdentifierMetaR\x1a#.nosql_database_api.IdentifierMetaR\"\x00\x12]\n\x13GetSQLGeneratorMeta\x12\x1f.nosql_database_api.IdentifierR\x1a#.nosql_database_api.IdentifierMetaR\"\x00\x12\x63\n\x14PutSQLGeneratorFiles\x12(.nosql_database_api.ManyFilesIdentifierR\x1a\x1f.nosql_database_api.IdentifierR\"\x00\x12\x63\n\x14GetSQLGeneratorFiles\x12\x1f.nosql_database_api.IdentifierR\x1a(.nosql_database_api.ManyFilesIdentifierR\"\x00\x12l\n\x16PutSQLGeneratorSQLFile\x12\'.nosql_database_api.FileBaseIdentifierR\x1a\'.nosql_database_api.FileBaseIdentifierR\"\x00\x12\x64\n\x16GetSQLGeneratorSQLFile\x12\x1f.nosql_database_api.IdentifierR\x1a\'.nosql_database_api.FileBaseIdentifierR\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'nosql_database_api_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_PINGR']._serialized_start=48
-  _globals['_PINGR']._serialized_end=55
-  _globals['_PONGR']._serialized_start=57
-  _globals['_PONGR']._serialized_end=78
-  _globals['_FILER']._serialized_start=80
-  _globals['_FILER']._serialized_end=127
-  _globals['_FILEBASER']._serialized_start=129
-  _globals['_FILEBASER']._serialized_end=184
-  _globals['_STORAGESEGMENTR']._serialized_start=186
-  _globals['_STORAGESEGMENTR']._serialized_end=248
-  _globals['_FILESEGMENTR']._serialized_start=250
-  _globals['_FILESEGMENTR']._serialized_end=305
-  _globals['_FILEBASE']._serialized_start=307
-  _globals['_FILEBASE']._serialized_end=348
-  _globals['_FILE']._serialized_start=350
-  _globals['_FILE']._serialized_end=405
-  _globals['_NOSQLDATABASEAPI']._serialized_start=408
-  _globals['_NOSQLDATABASEAPI']._serialized_end=898
+  _globals['_STORAGER']._serialized_start=48
+  _globals['_STORAGER']._serialized_end=75
+  _globals['_PINGR']._serialized_start=77
+  _globals['_PINGR']._serialized_end=84
+  _globals['_PONGR']._serialized_start=86
+  _globals['_PONGR']._serialized_end=107
+  _globals['_FILER']._serialized_start=109
+  _globals['_FILER']._serialized_end=156
+  _globals['_FILEBASER']._serialized_start=158
+  _globals['_FILEBASER']._serialized_end=213
+  _globals['_STORAGESEGMENTR']._serialized_start=215
+  _globals['_STORAGESEGMENTR']._serialized_end=277
+  _globals['_FILESEGMENTR']._serialized_start=279
+  _globals['_FILESEGMENTR']._serialized_end=334
+  _globals['_IDENTIFIERR']._serialized_start=336
+  _globals['_IDENTIFIERR']._serialized_end=369
+  _globals['_IDENTIFIERMETAR']._serialized_start=371
+  _globals['_IDENTIFIERMETAR']._serialized_end=438
+  _globals['_MANYFILESIDENTIFIERR']._serialized_start=440
+  _globals['_MANYFILESIDENTIFIERR']._serialized_end=534
+  _globals['_FILEBASEIDENTIFIERR']._serialized_start=536
+  _globals['_FILEBASEIDENTIFIERR']._serialized_end=621
+  _globals['_COUNTR']._serialized_start=623
+  _globals['_COUNTR']._serialized_end=646
+  _globals['_FILEBASE']._serialized_start=648
+  _globals['_FILEBASE']._serialized_end=689
+  _globals['_FILE']._serialized_start=691
+  _globals['_FILE']._serialized_end=746
+  _globals['_FILEBASEKEYWORD']._serialized_start=748
+  _globals['_FILEBASEKEYWORD']._serialized_end=813
+  _globals['_NOSQLDATABASEAPI']._serialized_start=816
+  _globals['_NOSQLDATABASEAPI']._serialized_end=1999
 # @@protoc_insertion_point(module_scope)

@@ -49,13 +49,15 @@ class IdentifierR(_message.Message):
     identifier: str
     def __init__(self, identifier: _Optional[str] = ...) -> None: ...
 
-class IdentifierStatusR(_message.Message):
-    __slots__ = ["identifier", "status"]
+class IdentifierMetaR(_message.Message):
+    __slots__ = ["identifier", "status", "name"]
     IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
     identifier: str
     status: str
-    def __init__(self, identifier: _Optional[str] = ..., status: _Optional[str] = ...) -> None: ...
+    name: str
+    def __init__(self, identifier: _Optional[str] = ..., status: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class ManyFilesIdentifierR(_message.Message):
     __slots__ = ["files", "identifier"]
@@ -64,6 +66,36 @@ class ManyFilesIdentifierR(_message.Message):
     files: _containers.RepeatedCompositeFieldContainer[FileBaseKeyword]
     identifier: str
     def __init__(self, files: _Optional[_Iterable[_Union[FileBaseKeyword, _Mapping]]] = ..., identifier: _Optional[str] = ...) -> None: ...
+
+class FileBaseIdentifierR(_message.Message):
+    __slots__ = ["file", "identifier"]
+    FILE_FIELD_NUMBER: _ClassVar[int]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
+    file: FileBase
+    identifier: str
+    def __init__(self, file: _Optional[_Union[FileBase, _Mapping]] = ..., identifier: _Optional[str] = ...) -> None: ...
+
+class CountR(_message.Message):
+    __slots__ = ["count"]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
+    count: int
+    def __init__(self, count: _Optional[int] = ...) -> None: ...
+
+class StorageR(_message.Message):
+    __slots__ = ["storage"]
+    STORAGE_FIELD_NUMBER: _ClassVar[int]
+    storage: str
+    def __init__(self, storage: _Optional[str] = ...) -> None: ...
+
+class NothingR(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ManyIdentifierMetaR(_message.Message):
+    __slots__ = ["metas"]
+    METAS_FIELD_NUMBER: _ClassVar[int]
+    metas: _containers.RepeatedCompositeFieldContainer[IdentifierMetaR]
+    def __init__(self, metas: _Optional[_Iterable[_Union[IdentifierMetaR, _Mapping]]] = ...) -> None: ...
 
 class FileBase(_message.Message):
     __slots__ = ["storage", "path"]

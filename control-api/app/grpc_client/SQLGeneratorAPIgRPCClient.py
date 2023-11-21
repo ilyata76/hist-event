@@ -28,29 +28,29 @@ class SQLGeneratorAPIgRPCClient :
 
     @staticmethod
     @AbstractgRPCClient.methodAsyncDecorator("sql-generator-api:Validate", SQL_GEN_IP)
-    async def Validate(files : FileBaseKeywordList, channel = None) -> StatusIdentifier :
+    async def Validate(files : FileBaseKeywordListName, channel = None) -> StatusMeta :
         stub = pb2_grpc.SQLGeneratorAPIStub(channel)
-        request = pb2.ManyFilesR(**files.model_dump())
-        response : pb2.IdentifierStatusR = stub.Validate(request)
-        return StatusIdentifier(status=response.status, identifier=response.identifier)
+        request = pb2.ManyFilesNameR(**files.model_dump())
+        response : pb2.IdentifierMetaR = stub.Validate(request)
+        return StatusMeta(**dictFromGoogleMessage(response))
 
 
     @staticmethod
     @AbstractgRPCClient.methodAsyncDecorator("sql-generator-api:ParseAndGenerate", SQL_GEN_IP)
-    async def ParseAndGenerate(identifier : Identifier, channel = None) -> StatusIdentifier :
+    async def ParseAndGenerate(identifier : Identifier, channel = None) -> StatusMeta :
         stub = pb2_grpc.SQLGeneratorAPIStub(channel)
         request = pb2.IdentifierR(identifier=identifier)
-        response : pb2.IdentifierStatusR = stub.ParseAndGenerate(request)
-        return StatusIdentifier(status=response.status, identifier=response.identifier)
+        response : pb2.IdentifierMetaR = stub.ParseAndGenerate(request)
+        return StatusMeta(**dictFromGoogleMessage(response))
 
 
     @staticmethod
-    @AbstractgRPCClient.methodAsyncDecorator("sql-generator-api:GetSQLGeneratorStatus", SQL_GEN_IP)
-    async def GetSQLGeneratorStatus(identifier : Identifier, channel = None) -> StatusIdentifier :
+    @AbstractgRPCClient.methodAsyncDecorator("sql-generator-api:GetSQLGeneratorMeta", SQL_GEN_IP)
+    async def GetSQLGeneratorMeta(identifier : Identifier, channel = None) -> StatusMeta :
         stub = pb2_grpc.SQLGeneratorAPIStub(channel)
         request = pb2.IdentifierR(identifier=identifier)
-        response : pb2.IdentifierStatusR = stub.GetSQLGeneratorStatus(request)
-        return StatusIdentifier(status=response.status, identifier=response.identifier)
+        response : pb2.IdentifierMetaR = stub.GetSQLGeneratorMeta(request)
+        return StatusMeta(**dictFromGoogleMessage(response))
 
 
     @staticmethod
@@ -69,3 +69,12 @@ class SQLGeneratorAPIgRPCClient :
         request = pb2.IdentifierR(identifier=identifier)
         response : pb2.FileBaseIdentifierR = stub.GetSQLGeneratorSQLFile(request)
         return FileBase(**dictFromGoogleMessage(response.file))
+
+
+    @staticmethod
+    @AbstractgRPCClient.methodAsyncDecorator("sql-generator-api:GetSQLGeneratorSQLIDs", SQL_GEN_IP)
+    async def GetSQLGeneratorSQLIDs(channel = None) -> MetaIdentifierList :
+        stub = pb2_grpc.SQLGeneratorAPIStub(channel)
+        request = pb2.NothingR()
+        response : pb2.ManyIdentifierMetaR = stub.GetSQLGeneratorSQLIDs(request)
+        return MetaIdentifierList(metas=[MetaIdentifier(**dictFromGoogleMessage(meta)) for meta in response.metas])

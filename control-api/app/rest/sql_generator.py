@@ -15,29 +15,29 @@ sql_generator = APIRouter(prefix="/sql-gen")
 
 @sql_generator.put("/validate",
                    tags=["process"], name="Валидация YAML",
-                   response_model=StatusIdentifier,
+                   response_model=StatusMeta,
                    description="Проверить, являюстя ли валидными переданные YAML-файлы")
 @restMethodAsyncDecorator
 async def SQLGeneratorValidate(request : Request,
-                               files : FileBaseKeywordList) -> StatusIdentifier :
+                               files : FileBaseKeywordListName) -> StatusMeta :
     return await SQLGeneratorAPIgRPCClient.Validate(files)
 
 
 @sql_generator.put("/parse-generate/{operation}",
                    tags=["process"], name="Парсинг YAML и генерация SQL",
-                   response_model=StatusIdentifier,
+                   response_model=StatusMeta,
                    description="Пропарсить YAML-файлы и получить SQL-файл")
 @restMethodAsyncDecorator
 async def SQLGeneratorParseAndGenerate(request : Request,
-                                       operation : str) -> StatusIdentifier :
+                                       operation : str) -> StatusMeta :
     return await SQLGeneratorAPIgRPCClient.ParseAndGenerate(Identifier(operation))
 
 
-@sql_generator.get("/status/{operation}")
+@sql_generator.get("/meta/{operation}")
 @restMethodAsyncDecorator
 async def GetSQLGeneratorStatus(request : Request,
-                                operation : str) -> StatusIdentifier :
-    return await SQLGeneratorAPIgRPCClient.GetSQLGeneratorStatus(Identifier(operation))
+                                operation : str) -> StatusMeta :
+    return await SQLGeneratorAPIgRPCClient.GetSQLGeneratorMeta(Identifier(operation))
 
 
 @sql_generator.get("/files/{operation}")
@@ -45,6 +45,12 @@ async def GetSQLGeneratorStatus(request : Request,
 async def GetSQLGeneratorFiles(request : Request,
                                operation : str) -> FileBaseKeywordList :
     return await SQLGeneratorAPIgRPCClient.GetSQLGeneratorFiles(Identifier(operation))
+
+
+@sql_generator.get("/sql")
+@restMethodAsyncDecorator
+async def GetSQLGeneratorFiles(request : Request) -> MetaIdentifierList :
+    return await SQLGeneratorAPIgRPCClient.GetSQLGeneratorSQLIDs()
 
 
 @sql_generator.get("/sql/{operation}")

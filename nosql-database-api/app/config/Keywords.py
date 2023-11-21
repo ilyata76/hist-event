@@ -14,8 +14,8 @@ class StorageCollection :
         match identifier :
             case StorageIdentifier.FTP :
                 return config.DATABASE_FTP_FILES_COLLECTION
-            case StorageIdentifier.FTP :
+            case StorageIdentifier.S3 :
                 return config.DATABASE_S3_FILES_COLLECTION
             case _ :
                 raise ConfigException(code=ConfigExceptionCode.INVALID_STORAGE_IDENTIFIER,
-                                      detail=f"Нет такого идентификатора коллекции, {identifier}!")
+                                      detail=f"Нет такого идентификатора хранилища, {identifier}")

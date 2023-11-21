@@ -23,19 +23,19 @@ class SQLGeneratorDB(AbstractDB) :
         logger.debug("Создание экземпляра класса SQLGeneratorDB")
         super().__init__(client)
         self.TYPE = "type"
-        self.STATUS_TYPE = "status"
+        self.META_TYPE = "meta"
         self.SQL_TYPE = "sql"
         self.FILES_TYPE = "files"
 
 
-    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:putStatus")
-    async def putStatus(self, identifier : Identifier, status : Status) -> Status | None :
-        raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод putStatus!")
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:putMeta")
+    async def putMeta(self, identifier : Identifier, meta : Meta) -> Meta | None :
+        raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод putMeta!")
 
 
-    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:getStatus")
-    async def getStatus(self, identifier : Identifier) -> Status | None :
-        raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getStatus!")
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:getMeta")
+    async def getMeta(self, identifier : Identifier) -> Meta | None :
+        raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getMeta!")
 
 
     @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:putFiles")
@@ -56,6 +56,11 @@ class SQLGeneratorDB(AbstractDB) :
     @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:getSQL")
     async def getSQL(self, identifier : Identifier) -> FileBase | None :
         raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getSQL!")
+
+
+    @AbstractDB.methodAsyncDecorator("SQLGeneratorDB:getAllSQLIDs")
+    async def getAllSQLIDs(self) -> int :
+        raise DBException(code=DBExceptionCode.METHOD_NOT_REALIZED, detail="SQLGeneratorDB не реализует метод getAllSQLIDs!")
 
 
 class SQLGeneratorMongoDB(SQLGeneratorDB) :
@@ -80,26 +85,28 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
         self.db = self.client.client[config.DATABASE_SQL_GENERATOR_DB]
 
 
-    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:putStatus")
-    async def putStatus(self, identifier : Identifier, status : Status) -> Status | None :
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:putMeta")
+    async def putMeta(self, identifier : Identifier, meta : Meta) -> Meta | None :
         """
             Заменить или внести сведения о статусе для операции по её коллекции-идентификатору
         """
         res = None
 
         async with await self.client.client.start_session() as s :
-            exist = await self.db[identifier].find_one_and_replace({ self.TYPE : self.STATUS_TYPE },
-                                                                   { self.TYPE : self.STATUS_TYPE, self.STATUS_TYPE : status },
+            exist = await self.db[identifier].find_one_and_replace({ self.TYPE : self.META_TYPE },
+                                                                   { self.TYPE : self.META_TYPE, self.META_TYPE : meta.model_dump() },
                                                                    session=s)    
             if not exist :
-                await self.db[identifier].insert_one({ self.TYPE : self.STATUS_TYPE, self.STATUS_TYPE : status })
-            res = await self.db[identifier].find_one({ self.TYPE : self.STATUS_TYPE }, session=s)
+                await self.db[identifier].insert_one({ self.TYPE : self.META_TYPE, self.META_TYPE : meta.model_dump() }, 
+                                                     session=s)
+            res = await self.db[identifier].find_one({ self.TYPE : self.META_TYPE }, 
+                                                     session=s)
 
-        return Status(res[self.STATUS_TYPE]) if res else res
+        return Meta(**res[self.META_TYPE]) if res else res
 
 
-    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:getStatus")
-    async def getStatus(self, identifier : Identifier) -> Status | None :
+    @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:getMeta")
+    async def getMeta(self, identifier : Identifier) -> Meta | None :
         """
             Получить сведения о статусе для операции по её коллекции-идентификатору.
                 Если таковых нет, поднимает исключение
@@ -107,12 +114,12 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[identifier].find_one({ self.TYPE : self.STATUS_TYPE }, session=s)
+            res = await self.db[identifier].find_one({ self.TYPE : self.META_TYPE }, session=s)
             if not res :
                 raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS,
-                                  detail=f"Статус для {identifier} не определён")
+                                  detail=f"Мета-иноформация для {identifier} не определена")
 
-        return Status(res[self.STATUS_TYPE]) if res else res
+        return Meta(**res[self.META_TYPE]) if res else res
 
 
     @AbstractMongoDB.methodAsyncDecorator("SQLGeneratorMongoDB:putFiles")
@@ -125,8 +132,10 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
                                                                    { self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() },
                                                                    session=s) 
             if not exist :
-                await self.db[identifier].insert_one({ self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() })
-            res = await self.db[identifier].find_one({ self.TYPE : self.FILES_TYPE})
+                await self.db[identifier].insert_one({ self.TYPE : self.FILES_TYPE, self.FILES_TYPE : files.model_dump() },
+                                                     session=s)
+            res = await self.db[identifier].find_one({ self.TYPE : self.FILES_TYPE},
+                                                     session=s)
 
         return FileBaseKeywordList(**res[self.FILES_TYPE]) if res else res
 
@@ -155,8 +164,10 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
                                                                    { self.TYPE : self.SQL_TYPE, self.SQL_TYPE : file.model_dump() }, 
                                                                    session=s)
             if not exist :
-                await self.db[identifier].insert_one({ self.TYPE : self.SQL_TYPE, self.SQL_TYPE : file.model_dump() })
-            res = await self.db[identifier].find_one({ self.TYPE : self.SQL_TYPE})
+                await self.db[identifier].insert_one({ self.TYPE : self.SQL_TYPE, self.SQL_TYPE : file.model_dump() },
+                                                     session=s)
+            res = await self.db[identifier].find_one({ self.TYPE : self.SQL_TYPE},
+                                                     session=s)
 
         return FileBase(**res[self.SQL_TYPE]) if res else res
 
@@ -167,9 +178,26 @@ class SQLGeneratorMongoDB(SQLGeneratorDB) :
         res = None
 
         async with await self.client.client.start_session() as s :
-            res = await self.db[identifier].find_one({ self.TYPE : self.SQL_TYPE})
+            res = await self.db[identifier].find_one({ self.TYPE : self.SQL_TYPE},
+                                                     session=s)
             if not res :
                 raise DBException(code=DBExceptionCode.ENTITY_DONT_EXISTS,
                                   detail=f"Файл SQL для {identifier} не определён (не сгенерирован)")
         
         return FileBase(**res[self.SQL_TYPE]) if res else res
+
+
+    async def getAllSQLIDs(self) -> MetaIdentifierList :
+        """"""
+        res : list[MetaIdentifier] = []
+
+        async with await self.client.client.start_session() as s :
+            for id in (await self.db.list_collection_names(session=s)) :
+                sql_exist = await self.db[id].find_one({ self.TYPE : self.SQL_TYPE},
+                                                       session=s)
+                if sql_exist :
+                    meta = await self.db[id].find_one({ self.TYPE : self.META_TYPE }, session=s)
+                    if meta: 
+                        res.append(MetaIdentifier(**meta[self.META_TYPE], identifier=id))
+
+        return MetaIdentifierList(metas=res)

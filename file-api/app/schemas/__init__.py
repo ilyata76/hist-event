@@ -6,3 +6,4 @@ Storage = NewType("storage", str)
 
 from .File import *
 from .Range import *
+from .Count import *

@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import APIRouter, Request, UploadFile, Response
 
 from app.grpc_client import FileAPIgRPCCLient
-from app.schemas import FileBinary, File, FileBase, Range, FileList
+from app.schemas import *
 
 from .restMethodAsyncDecorator import restMethodAsyncDecorator
 
@@ -27,9 +27,19 @@ def preparePath(path : str) -> Path :
 async def fileFTPGetByPath(request : Request,
                            storage : str,
                            start : int = 0,
-                           end : int = 10) -> FileList:
+                           end : int = 10) -> FileList :
     range = Range(start=start, end=end)
     return await FileAPIgRPCCLient.GetManyFilesMetaInfo(storage=storage, range=range)
+
+
+@file.get("/count/{storage}",
+          name="Количество файлов",
+          response_model=Count,
+          description="Получить количество сохранённых в базе NoSQL файлов")
+@restMethodAsyncDecorator
+async def fileCountByStorage(request : Request,
+                             storage : str) -> Count :
+    return await FileAPIgRPCCLient.GetFilesMetaInfoCount(storage=storage)
 
 
 @file.get("/meta/{storage}/{path:path}",

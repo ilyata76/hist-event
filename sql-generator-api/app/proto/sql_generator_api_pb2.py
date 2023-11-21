@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17sql-generator-api.proto\x12\x11sql_generator_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"?\n\nManyFilesR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\"]\n\x14ManyFilesIdentifierR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\x12\x12\n\nidentifier\x18\x02 \x01(\t\"!\n\x0bIdentifierR\x12\x12\n\nidentifier\x18\x01 \x01(\t\"7\n\x11IdentifierStatusR\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\"T\n\x13\x46ileBaseIdentifierR\x12)\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x1b.sql_generator_api.FileBase\x12\x12\n\nidentifier\x18\x02 \x01(\t\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"A\n\x0f\x46ileBaseKeyword\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0f\n\x07keyword\x18\x04 \x01(\t2\xa6\x04\n\x0fSQLGeneratorAPI\x12<\n\x04Ping\x12\x18.sql_generator_api.PingR\x1a\x18.sql_generator_api.PongR\"\x00\x12Q\n\x08Validate\x12\x1d.sql_generator_api.ManyFilesR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12Z\n\x10ParseAndGenerate\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12_\n\x15GetSQLGeneratorStatus\x12\x1e.sql_generator_api.IdentifierR\x1a$.sql_generator_api.IdentifierStatusR\"\x00\x12\x61\n\x14GetSQLGeneratorFiles\x12\x1e.sql_generator_api.IdentifierR\x1a\'.sql_generator_api.ManyFilesIdentifierR\"\x00\x12\x62\n\x16GetSQLGeneratorSQLFile\x12\x1e.sql_generator_api.IdentifierR\x1a&.sql_generator_api.FileBaseIdentifierR\"\x00\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17sql-generator-api.proto\x12\x11sql_generator_api\"\x07\n\x05PingR\"\x15\n\x05PongR\x12\x0c\n\x04pong\x18\x01 \x01(\t\"Q\n\x0eManyFilesNameR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\x12\x0c\n\x04name\x18\x02 \x01(\t\"]\n\x14ManyFilesIdentifierR\x12\x31\n\x05\x66iles\x18\x01 \x03(\x0b\x32\".sql_generator_api.FileBaseKeyword\x12\x12\n\nidentifier\x18\x02 \x01(\t\"!\n\x0bIdentifierR\x12\x12\n\nidentifier\x18\x01 \x01(\t\"C\n\x0fIdentifierMetaR\x12\x12\n\nidentifier\x18\x01 \x01(\t\x12\x0e\n\x06status\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\"T\n\x13\x46ileBaseIdentifierR\x12)\n\x04\x66ile\x18\x01 \x01(\x0b\x32\x1b.sql_generator_api.FileBase\x12\x12\n\nidentifier\x18\x02 \x01(\t\"\n\n\x08NothingR\"H\n\x13ManyIdentifierMetaR\x12\x31\n\x05metas\x18\x01 \x03(\x0b\x32\".sql_generator_api.IdentifierMetaR\")\n\x08\x46ileBase\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\"A\n\x0f\x46ileBaseKeyword\x12\x0f\n\x07storage\x18\x01 \x01(\t\x12\x0c\n\x04path\x18\x02 \x01(\t\x12\x0f\n\x07keyword\x18\x04 \x01(\t2\x82\x05\n\x0fSQLGeneratorAPI\x12<\n\x04Ping\x12\x18.sql_generator_api.PingR\x1a\x18.sql_generator_api.PongR\"\x00\x12S\n\x08Validate\x12!.sql_generator_api.ManyFilesNameR\x1a\".sql_generator_api.IdentifierMetaR\"\x00\x12X\n\x10ParseAndGenerate\x12\x1e.sql_generator_api.IdentifierR\x1a\".sql_generator_api.IdentifierMetaR\"\x00\x12[\n\x13GetSQLGeneratorMeta\x12\x1e.sql_generator_api.IdentifierR\x1a\".sql_generator_api.IdentifierMetaR\"\x00\x12\x61\n\x14GetSQLGeneratorFiles\x12\x1e.sql_generator_api.IdentifierR\x1a\'.sql_generator_api.ManyFilesIdentifierR\"\x00\x12\x62\n\x16GetSQLGeneratorSQLFile\x12\x1e.sql_generator_api.IdentifierR\x1a&.sql_generator_api.FileBaseIdentifierR\"\x00\x12^\n\x15GetSQLGeneratorSQLIDs\x12\x1b.sql_generator_api.NothingR\x1a&.sql_generator_api.ManyIdentifierMetaR\"\x00\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,20 +24,24 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_PINGR']._serialized_end=53
   _globals['_PONGR']._serialized_start=55
   _globals['_PONGR']._serialized_end=76
-  _globals['_MANYFILESR']._serialized_start=78
-  _globals['_MANYFILESR']._serialized_end=141
-  _globals['_MANYFILESIDENTIFIERR']._serialized_start=143
-  _globals['_MANYFILESIDENTIFIERR']._serialized_end=236
-  _globals['_IDENTIFIERR']._serialized_start=238
-  _globals['_IDENTIFIERR']._serialized_end=271
-  _globals['_IDENTIFIERSTATUSR']._serialized_start=273
-  _globals['_IDENTIFIERSTATUSR']._serialized_end=328
-  _globals['_FILEBASEIDENTIFIERR']._serialized_start=330
-  _globals['_FILEBASEIDENTIFIERR']._serialized_end=414
-  _globals['_FILEBASE']._serialized_start=416
-  _globals['_FILEBASE']._serialized_end=457
-  _globals['_FILEBASEKEYWORD']._serialized_start=459
-  _globals['_FILEBASEKEYWORD']._serialized_end=524
-  _globals['_SQLGENERATORAPI']._serialized_start=527
-  _globals['_SQLGENERATORAPI']._serialized_end=1077
+  _globals['_MANYFILESNAMER']._serialized_start=78
+  _globals['_MANYFILESNAMER']._serialized_end=159
+  _globals['_MANYFILESIDENTIFIERR']._serialized_start=161
+  _globals['_MANYFILESIDENTIFIERR']._serialized_end=254
+  _globals['_IDENTIFIERR']._serialized_start=256
+  _globals['_IDENTIFIERR']._serialized_end=289
+  _globals['_IDENTIFIERMETAR']._serialized_start=291
+  _globals['_IDENTIFIERMETAR']._serialized_end=358
+  _globals['_FILEBASEIDENTIFIERR']._serialized_start=360
+  _globals['_FILEBASEIDENTIFIERR']._serialized_end=444
+  _globals['_NOTHINGR']._serialized_start=446
+  _globals['_NOTHINGR']._serialized_end=456
+  _globals['_MANYIDENTIFIERMETAR']._serialized_start=458
+  _globals['_MANYIDENTIFIERMETAR']._serialized_end=530
+  _globals['_FILEBASE']._serialized_start=532
+  _globals['_FILEBASE']._serialized_end=573
+  _globals['_FILEBASEKEYWORD']._serialized_start=575
+  _globals['_FILEBASEKEYWORD']._serialized_end=640
+  _globals['_SQLGENERATORAPI']._serialized_start=643
+  _globals['_SQLGENERATORAPI']._serialized_end=1285
 # @@protoc_insertion_point(module_scope)
