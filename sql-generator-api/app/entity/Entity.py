@@ -630,6 +630,7 @@ class Other(Entity) :
         -   id: int
             name:
             description:
+            meta:
     """
     meta : str | None = None
 
